@@ -2,11 +2,11 @@
 A mediawiki bot written in Python 2.7 that runs on [http://meta.wikimedia.org meta.wikimedia.org]. The bot currently tracks grant proposals submitted to the [http://meta.wikimedia.org/wiki/Grants:IEG Individual Engagement Grants program]. It interacts with both the [http://mediawiki.org/wiki/API MediaWiki API] and with a back-end MySQL database.
 
 ;Scripts
-<code>manageProposals.py</code>: tracks the status of proposals (e.g. when a new proposal has been created, who created it, whether a proposal is in 'draft' or 'proposed' status).
+[[manageProposals.py]]: tracks the status of proposals (e.g. when a new proposal has been created, who created it, whether a proposal is in 'draft' or 'proposed' status).
 
-<code>messageSubmitters.py</code>: sends reminder messages to editors who have submitted a proposal, letting them know when they need to complete their proposal by.
+[[messageSubmitters.py]]: sends reminder messages to editors who have submitted a proposal, letting them know when they need to complete their proposal by.
 
-<code>pageData.py</code>: my first attempt at a useful Python class :) Gets text and metadata about a given page from the MediaWiki API. 
+[[pageData.py]]: my first attempt at a useful Python class :) Gets text and metadata about a given page from the MediaWiki API. 
 
 == Dependencies ==
 This
@@ -58,4 +58,4 @@ This table contains a list of the edits to pages you want the bot to monitor and
 </nowiki>
 
 ;Other modules
-Users [http://pypi.python.org/pypi/wikitools wikitools 1.1.1] and [http://pypi.python.org/pypi/BeautifulSoup/3.2.1 BeautifulSoup 3.2.1]. See <code>requirements.txt</code> for pip-readable version info. All other modules should be available through the default Python libraries, I believe.
+Users [http://pypi.python.org/pypi/wikitools wikitools 1.1.1] and [http://pypi.python.org/pypi/BeautifulSoup/3.2.1 BeautifulSoup 3.2.1]. See [[requirements.txt]] for pip-readable version info. All other modules should be available through the default Python libraries, I believe.
