@@ -19,7 +19,6 @@ These scripts are designed to be used with a Mediawiki MYSQL database*, such as 
 This table contains a list of the pages you want the bot to monitor and update. It contains static metadata drawn from the mediawiki database schema's ''page'', ''revision'', and ''categorylinks'' tables, as well as dynamic metadata updated by the bot about the status of the page at a given time.
 
 <nowiki>
-<code>
 +--------------------+------------------+------+-----+---------+----------------+
 | Field              | Type             | Null | Key | Default | Extra          |
 +--------------------+------------------+------+-----+---------+----------------+
@@ -36,14 +35,12 @@ This table contains a list of the pages you want the bot to monitor and update. 
 | pc_talkpage_id     | int(11)          | YES  |     | NULL    |                |
 +--------------------+------------------+------+-----+---------+----------------+
 11 rows in set (0.01 sec)
-</code>
 </nowiki>
 
 ;Edits to tracked pages
 This table contains a list of the edits to pages you want the bot to monitor and update. It contains static metadata drawn from the mediawiki database schema's ''page'' and ''revision'' tables. This table is not really necessary, but nice to have around.
 
 <nowiki>
-<code>
 +----------------+------------------+------+-----+---------+----------------+
 | Field          | Type             | Null | Key | Default | Extra          |
 +----------------+------------------+------+-----+---------+----------------+
@@ -58,7 +55,6 @@ This table contains a list of the edits to pages you want the bot to monitor and
 | page_namespace | int(11)          | YES  |     | NULL    |                |
 +----------------+------------------+------+-----+---------+----------------+
 9 rows in set (0.01 sec)
-</code>
 </nowiki>
 
 ;Other modules
