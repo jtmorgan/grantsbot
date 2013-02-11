@@ -58,4 +58,4 @@ This table contains a list of the edits to pages you want the bot to monitor and
 </nowiki>
 
 ;Other modules
-Users <code>[http://pypi.python.org/pypi/wikitools wikitools 1.1.1]</code> and <code>[http://pypi.python.org/pypi/BeautifulSoup/3.2.1 BeautifulSoup 3.2.1]</code>. See <code>requirements.txt</code> for pip-readable version info. All other modules should be available through the default Python libraries, I believe.
+Users [http://pypi.python.org/pypi/wikitools wikitools 1.1.1] and [http://pypi.python.org/pypi/BeautifulSoup/3.2.1 BeautifulSoup 3.2.1]. See <code>requirements.txt</code> for pip-readable version info. All other modules should be available through the default Python libraries, I believe.
