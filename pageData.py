@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# Copyright 2012 Jtmorgan
+# Copyright 2013 Jtmorgan
  
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ from BeautifulSoup import BeautifulStoneSoup as bss
 import urllib2
 import itertools
 
-
+#instantiates page variables. Level and section are optional parameters.
 class Page:
 	def __init__(self, title, namespace, level=False, section=False):
 		self.section = section
@@ -30,11 +30,7 @@ class Page:
 		self.secs_url = u'http://meta.wikipedia.org/w/api.php?action=parse&page=%s%s&prop=sections&format=xml'
 		self.reps = {'_':'+', '/':'%%2F', ' ':'+'}
 
-# 	def urlEncode(self, url):
-# 		for j, k in self.reps.iteritems():
-# 			url = url.replace(j, k)	
-# 		return url	
-		
+	#gets the raw text of a page or a page section	
 	def getText(self):
 		url = self.sext_url % (self.namespace, self.title, self.section)
 		url = urlEncode(url)
@@ -45,25 +41,22 @@ class Page:
 		text = unicode(text, 'utf8')
 		text = text.strip()	
 		return text
-		
+
+	#gets the titles of all sections at a given level of the XML toc hierarchy.	
 	def getSectionData(self):
 		reps = {'_':'+', '/':'%2F', ' ':'+'}
 		sec_list = []
-# 		for j, k in reps.iteritems():
-# 			self.title = self.title.replace(j, k)
 		url = self.secs_url % (self.namespace, self.title)						
-# 		print url
 		usock = urllib2.urlopen(url)
 		sections = usock.read()
 		usock.close()
 		soup = bss(sections, selfClosingTags = ['s'])
 		for x in soup.findAll('s',toclevel=self.level):
 			secs_wanted = x['line']
-# 			print secs_wanted
 			sec_list.append(secs_wanted)	
 		return sec_list	
 	
-	#this badly needs to be abstracted	
+	#removes particular button templates when it finds them in a page. This could be more abstract.	
 	def removeButtons(self, part2, part3):
 		found = []
 		edit = False
@@ -72,9 +65,7 @@ class Page:
 			rmv_list.append("{{IEG/Proposals/Button/2}}")
 		if part3 == 1:
 			rmv_list.append("{{IEG/Proposals/Button/3}}")	
-# 		print rmv_list
 		url = self.sext_url % (self.namespace, self.title, '')
-# 		print url
 		usock = urllib2.urlopen(url)
 		text = usock.readlines()
 		usock.close()
@@ -84,12 +75,6 @@ class Page:
 					found.append(text[index])	
 					del text[index]
 		text = ''.join(text)		
-# 			if rmv2 in line:
-# 				del text[index]	
-# 		text = unicode(text, 'utf8')
-# 		text = text.strip()	
-# 		return text
-# 		print text
 		if len(found) > 0:
 			edit = True			
 		return (text, edit)
