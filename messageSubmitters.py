@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /home/jtmorgan/.local/bin/python
 
 # Copyright 2013 Jtmorgan
 
@@ -42,7 +42,7 @@ message_template = u'{{subst:Template:IEG/GrantsBot/Reminder|signature=~~~~}}'
 ##FUNCTIONS##
 #gets a list of editor's to message
 def getUsernames(cursor):
-	cursor.execute('SELECT pc_username FROM ieg_proposals WHERE p_status = "draft" AND p_creator_userid != 0')
+	cursor.execute('SELECT pc_username FROM ieg_proposals WHERE p_status = "draft" AND p_creator_userid != 0 AND pc_reminded != 1')
 	rows = cursor.fetchall()
 	if rows:
 		return rows
@@ -57,21 +57,27 @@ def messageUsers():
 		page = wikitools.Page(wiki, page_title)
 		try:
 			page.edit(message_template, section="new", sectiontitle="== Individual Engagement Grant proposals due 15 February 2013 ==", summary="Automatic reminder to complete a submitted [[Grants:IEG|Individual Engagement Grant Proposal]]", bot=1)
+			try: #update the db to show that this user has been reminded
+				cursor.execute('UPDATE ieg_proposals SET pc_reminded = 1 WHERE pc_username = "%s"' % (name,))
+				conn.commit()
+			except:	
+				logging.info('UPDATE: Could not update reminded status for User:' + name + ' at ' + curtime)
+				continue	
 		except:
 			logging.info('REMIND: Reminder to User:' + name + ' failed at to send at ' + curtime)
 			continue
 
-
+			
 ##MAIN##
 rows = getUsernames(cursor)
 if rows:
 	for row in rows:
 		name = row[0]
 		recipients.append(name)		
-	messageUsers()	
+	messageUsers()
 	logging.info('REMIND: Sent reminders to ' + ' '.join(recipients) + ' ' + curtime)	
 else:
-	logging.info('REMIND: No reminders today ' + curtime)
+	logging.info('REMIND: No reminders on ' + curtime)
 cursor.close()
 conn.close()
 

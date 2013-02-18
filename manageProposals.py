@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /home/jtmorgan/.local/bin/python
 
 # Copyright 2013 Jtmorgan
  
@@ -15,14 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
+import sys; sys.path.append('/home/jtmorgan/local/lib/python2.7/site-packages/')
 import wikitools
 import settings
 import MySQLdb
 import logging
 from datetime import datetime
 import csv
-import sys
 import pageData as p
 
 wiki = wikitools.Wiki(settings.apiurl)
@@ -54,7 +53,7 @@ INSERT IGNORE INTO ieg_proposals (page_id, page_title, p_created_date, p_latest_
 		''' % ("%Y%m%d%H%i%s", "%Y%m%d%H%i%s"))
 		conn.commit()
 		
-	#finally, updates status of proposals through categorylinks
+	#then, updates status of proposals through categorylinks
 	cursor.execute('''UPDATE ieg_proposals AS p, (SELECT cl_from, cl_to FROM metawiki_p.categorylinks AS c, ieg_proposals AS pp WHERE c.cl_from = pp.page_id AND c.cl_to IN ("IEG/Proposals/Draft", "IEG/Proposals/Proposed", "IEG/Proposals/Ineligible", "IEG/Proposals/Withdrawn")) AS tmp
 	SET p.p_status = CASE tmp.cl_to 
 	WHEN "IEG/Proposals/Draft" THEN 'draft'
@@ -63,8 +62,12 @@ INSERT IGNORE INTO ieg_proposals (page_id, page_title, p_created_date, p_latest_
 	WHEN "IEG/Proposals/Withdrawn" THEN 'withdrawn'
 	ELSE "not proposal"
 	END
-	WHERE tmp.cl_from = p.page_id;''')
+	WHERE tmp.cl_from = p.page_id''')
 	conn.commit()
+	
+	#finally, removes things that have once been categorized as active proposals, but have had those categories completely removed, from consideration
+	cursor.execute('''UPDATE ieg_proposals SET p_status = 'category removed' WHERE p_status IN ("ineligible", "withdrawn", "draft", "proposed") AND page_id NOT IN (SELECT cl_from FROM metawiki_p.categorylinks WHERE cl_to IN ("IEG/Proposals/Draft", "IEG/Proposals/Proposed", "IEG/Proposals/Ineligible", "IEG/Proposals/Withdrawn"))''')
+	conn.commit()	
 
 
 #checks whether certain sections of a proposal have been completed. If so, removes a button template from the proposal page		
@@ -74,14 +77,12 @@ def checkCompleteness():
 	rows = cursor.fetchall()
 	for row in rows:
 		prop_list.append([row[0], row[1], row[2], row[3]])
-	print prop_list	
 	for item in prop_list:
 		getSecs = p.Page(item[1], page_namespace, 2)	
 		text = ''
 		edits = getSecs.removeButtons(item[2], item[3])	
 		if edits[1]: #only edit page if something was actually found & removed
 			text = edits[0]				
-			print text
 			page = wikitools.Page(wiki, page_namespace + item[1])
 			page_text = text
 			page.edit(page_text, summary = 'Removing button templates used to create new sections', bot = 1)		
@@ -123,6 +124,6 @@ def writeline(data, writer):
 newProposals()
 proposals = checkCompleteness()
 updateDB(proposals)
-writeReport()
+# writeReport() #not currently needed
 cursor.close()
 conn.close()

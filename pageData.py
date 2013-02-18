@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys; sys.path.append('/home/jtmorgan/local/lib/python2.7/site-packages/')
 from BeautifulSoup import BeautifulStoneSoup as bss
 import urllib2
 import itertools
@@ -34,7 +35,7 @@ class Page:
 	def getText(self):
 		url = self.sext_url % (self.namespace, self.title, self.section)
 		url = urlEncode(url)
-		print url
+# 		print url
 		usock = urllib2.urlopen(url)
 		text = usock.read()
 		usock.close()
