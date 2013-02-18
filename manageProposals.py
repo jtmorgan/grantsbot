@@ -91,31 +91,37 @@ def checkCompleteness():
 	return prop_list
 
 	
-#updates the completed status of proposals						
-def updateDB(list):
-		for item in list:
-			cursor.execute('''
-	UPDATE ieg_proposals SET p_has_sec2 = %d, p_has_sec3 = %d WHERE page_id = %s
-			''' % (item[2], item[3], item[0]))
-			conn.commit()
+#updates the under_review and in_idealab status of proposals						
+def updateDB():
+	cursor.execute('''UPDATE ieg_proposals AS p, (SELECT cl_from, cl_to FROM metawiki_p.categorylinks AS c, ieg_proposals AS pp WHERE c.cl_from = pp.page_id AND c.cl_to IN ("IEG/Proposals/IdeaLab", "IEG/Proposals/Review") ORDER BY cl_from ASC) AS tmp
+	SET p.p_in_idealab = CASE tmp.cl_to 
+	WHEN "IEG/Proposals/IdeaLab" THEN 1
+	ELSE 0
+	END,
+	p.p_under_review = CASE tmp.cl_to
+	WHEN "IEG/Proposals/Review" THEN 1
+	ELSE 0
+	END
+	WHERE tmp.cl_from = p.page_id''')
+	conn.commit()
 
 
 #creates an output csv file
 def writeReport():
 	f = open(sys.argv[1], 'wt')
 	writer = csv.writer(f, quoting=csv.QUOTE_NONNUMERIC)
-	writer.writerow( ('ID','Proposal page', 'Date created', 'Last edited', 'Submitter', 'Completed?') )
-	cursor.execute('SELECT id, page_title, submitted_date, latest_edit_date, s_username, all_secs FROM ieg_proposals WHERE p_is_proposal = 1 ORDER BY id ASC')
+	writer.writerow( ('ID','Proposal page', 'current status', 'under review (y/n)', 'in idealab (y/n)', 'Date created', 'Last edited', 'Submitter') )
+	cursor.execute('SELECT id, page_title, p_status, p_under_review, p_in_idealab, p_created_date, p_latest_edit_date, pc_username FROM ieg_proposals WHERE ((p_status IS NOT NULL AND p_status != "not proposal") OR (p_under_review = 1 OR p_in_idealab = 1)) ORDER BY id ASC')
 	rows = cursor.fetchall()
 	for row in rows:
-		ist = [row[0], row[1], row[2], row[3], row[4], row[5]]
+		ist = [row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]]
 		writeline(ist, writer)
 		
 		
 #writes a new line of data to output csv
 def writeline(data, writer):
 	try:
-		writer.writerow( (data[0], data[1], data[2], data[3], data[4], data[5]) )
+		writer.writerow( (data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]) )
 	except ValueError:
 		writer.writerow( ("error!") )
 
@@ -123,7 +129,7 @@ def writeline(data, writer):
 ##MAIN##
 newProposals()
 proposals = checkCompleteness()
-updateDB(proposals)
-# writeReport() #not currently needed
+updateDB()
+writeReport()
 cursor.close()
 conn.close()
