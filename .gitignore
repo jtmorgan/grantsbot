@@ -1,2 +1,8 @@
 # configuration files #
 * settings.py
+# subdirectories
+data/
+logs/
+modules/
+# crud
+* .DS_Store
