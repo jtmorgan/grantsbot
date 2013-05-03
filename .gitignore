@@ -1,8 +1,11 @@
-# configuration files #
-* settings.py
+# configuration files
+settings.*
+# compiled modules
+*.pyc
 # subdirectories
 data/
 logs/
 modules/
 # crud
-* .DS_Store
+*.DS_Store
+*.InterarchyMirrorCacheData
