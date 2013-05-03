@@ -1,71 +1,89 @@
-#! /usr/bin/env python
+#! /usr/bin/env python2.7
 
 # Copyright 2013 Jtmorgan
- 
+
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
- 
+
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
- 
+
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys; sys.path.append('/home/jtmorgan/local/lib/python2.7/site-packages/')
 from BeautifulSoup import BeautifulStoneSoup as bss
 import urllib2
 import itertools
 
-#instantiates page variables. Level and section are optional parameters.
 class Page:
-	def __init__(self, title, namespace, level=False, section=False):
-		self.section = section
+	"""A page on a wiki."""
+
+	def __init__(self, title, namespace):
+		"""
+		Instantiates page-level variables.
+		"""
+# 		self.section = section
 		self.title = title
 		self.namespace = namespace
-		self.level = level
+# 		self.level = level
 		self.sext_url = u'http://meta.wikimedia.org/w/index.php?title=%s%s&action=raw&section=%s'
 		self.secs_url = u'http://meta.wikipedia.org/w/api.php?action=parse&page=%s%s&prop=sections&format=xml'
 		self.reps = {'_':'+', '/':'%%2F', ' ':'+'}
 
-	#gets the raw text of a page or a page section	
-	def getText(self):
-		url = self.sext_url % (self.namespace, self.title, self.section)
-		url = urlEncode(url)
+
+	def getText(self, section=False):
+		"""
+		Gets the raw text of a page or page section.
+		"""
+		if not section:
+			section = ''
+		url = self.sext_url % (self.namespace, self.title, section)
+# 		url = urlEncode(url)
 # 		print url
 		usock = urllib2.urlopen(url)
 		text = usock.read()
 		usock.close()
 		text = unicode(text, 'utf8')
-		text = text.strip()	
+		text = text.strip()
+
 		return text
 
-	#gets the titles of all sections at a given level of the XML toc hierarchy.	
-	def getSectionData(self):
+
+	def getSectionData(self, level):
+		"""
+		Returns the the section numbers and titles of all sections
+		at a given level of the XML toc hierarchy.
+		"""
 		reps = {'_':'+', '/':'%2F', ' ':'+'}
-		sec_list = []
-		url = self.secs_url % (self.namespace, self.title)						
+		secs_list = []
+		url = self.secs_url % (self.namespace, self.title)
 		usock = urllib2.urlopen(url)
 		sections = usock.read()
 		usock.close()
 		soup = bss(sections, selfClosingTags = ['s'])
-		for x in soup.findAll('s',toclevel=self.level):
-			secs_wanted = x['line']
-			sec_list.append(secs_wanted)	
-		return sec_list	
-	
-	#removes particular button templates when it finds them in a page. This could be more abstract.	
+		for x in soup.findAll('s',toclevel=level):
+			secs_wanted = (x['index'], x['line'])
+			secs_list.append(secs_wanted)
+
+		return secs_list
+
+
 	def removeButtons(self, part2, part3):
+		"""
+		Removes particular button templates when it finds them in a page.
+		This should be made more abstract.
+		"""
 		found = []
 		edit = False
 		rmv_list = []
 		if part2 == 1:
 			rmv_list.append("{{IEG/Proposals/Button/2}}")
 		if part3 == 1:
-			rmv_list.append("{{IEG/Proposals/Button/3}}")	
+			rmv_list.append("{{IEG/Proposals/Button/3}}")
 		url = self.sext_url % (self.namespace, self.title, '')
 		usock = urllib2.urlopen(url)
 		text = usock.readlines()
@@ -73,10 +91,9 @@ class Page:
 		for index, line in enumerate(text):
 			for rmv in rmv_list:
 				if rmv in line:
-					found.append(text[index])	
+					found.append(text[index])
 					del text[index]
-		text = ''.join(text)		
+		text = ''.join(text)
 		if len(found) > 0:
-			edit = True			
+			edit = True
 		return (text, edit)
-		
