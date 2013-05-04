@@ -9,3 +9,4 @@ modules/
 # crud
 *.DS_Store
 *.InterarchyMirrorCacheData
+*Icon*
