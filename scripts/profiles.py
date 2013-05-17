@@ -18,22 +18,24 @@
 from BeautifulSoup import BeautifulStoneSoup as bss
 import urllib2
 import itertools
+from wikitools import category as wtcat
+import shelve #stores the pages we're interested in
+
+import grantsbot_settings
+
+wiki = wikitools.Wiki(grantsbot_settings.apiurl)
+wiki.login(settings.username, grantsbot_settings.password)
 
 class Page:
 	"""A page on a wiki."""
 
-	def __init__(self, title, namespace):
+	def __init__(self, title, namespace = grantsbot_settings.rootpage):
 		"""
 		Instantiates page-level variables.
 		"""
-# 		self.section = section
 		self.title = title
 		self.namespace = namespace
-# 		self.level = level
-		self.sext_url = u'http://meta.wikimedia.org/w/index.php?title=%s%s&action=raw&section=%s'
-		self.secs_url = u'http://meta.wikipedia.org/w/api.php?action=parse&page=%s%s&prop=sections&format=xml'
-		self.reps = {'_':'+', '/':'%%2F', ' ':'+'}
-
+		self.page_path = title + namespace
 
 	def getText(self, section=False):
 		"""
@@ -51,7 +53,6 @@ class Page:
 		text = text.strip()
 
 		return text
-
 
 	def getSectionData(self, level):
 		"""
@@ -72,28 +73,37 @@ class Page:
 		return secs_list
 
 
-	def removeButtons(self, part2, part3):
-		"""
-		Removes particular button templates when it finds them in a page.
-		This should be made more abstract.
-		"""
-		found = []
-		edit = False
-		rmv_list = []
-		if part2 == 1:
-			rmv_list.append("{{IEG/Proposals/Button/2}}")
-		if part3 == 1:
-			rmv_list.append("{{IEG/Proposals/Button/3}}")
-		url = self.sext_url % (self.namespace, self.title, '')
-		usock = urllib2.urlopen(url)
-		text = usock.readlines()
-		usock.close()
-		for index, line in enumerate(text):
-			for rmv in rmv_list:
-				if rmv in line:
-					found.append(text[index])
-					del text[index]
-		text = ''.join(text)
-		if len(found) > 0:
-			edit = True
-		return (text, edit)
+
+
+class ProfilePage(Page):
+	"""variables and functions related to working with profiles pages."""
+
+
+classPropsalPage(Page):
+
+class CategoryMembers:
+
+	def getCategoryMembers(title):
+		"""Get the members of a given category and its subcategories."""
+		cat_pages = []
+		cat_subcats = []
+		cat_page = wtcat.Category(wiki, title)
+		cat_pages = cat_page.getAllMembers(titleonly=True, namespace=[200,201]) #abstract
+		subcat_count = len(cat_page.getAllMembers(titleonly=True, namespace=[14]))
+		if len(subcat_count) > 0:
+
+		cat_subcats = cat_page.getAllMembers(titleonly=True, namespace=[200,201])
+
+	def getSubCatPages(cat_subcats):
+		for subcat in cat_subcats:
+			cat_page = wtcat.Category(wiki, title)
+
+
+
+
+
+
+
+
+
+

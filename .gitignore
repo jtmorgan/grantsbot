@@ -1,5 +1,5 @@
 # configuration files
-settings.*
+grantsbot_settings.*
 # compiled modules
 *.pyc
 # subdirectories

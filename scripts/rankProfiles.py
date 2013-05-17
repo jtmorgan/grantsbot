@@ -19,23 +19,24 @@ from datetime import datetime
 import MySQLdb
 import logging
 import pageData as p
-import settings
+import grantsbot_settings
 import wikitools
 
 wiki = wikitools.Wiki(settings.apiurl)
 wiki.login(settings.username, settings.password)
-logging.basicConfig(filename='/home/jtmorgan/grantsbot/logs/moves.log',level=logging.INFO)
-conn = MySQLdb.connect(host = 'metawiki-p.userdb.toolserver.org', db = 'u_jtmorgan_p', read_default_file = '~/.my.cnf', use_unicode=1, charset="utf8" )
+logging.basicConfig(filename= grantsbot_settings.logs + 'moves.log', level=logging.INFO)
+conn = MySQLdb.connect(host = grantsbot_settings.host, db = grantsbot_settings.db, read_default_file = '~/.my.cnf', use_unicode=1, charset="utf8" )
 curtime = str(datetime.utcnow())
 cursor = conn.cursor()
-page_namespace = (settings.rootpage)
-page_title = "IdeaLab/Introductions"
+# page_namespace = (settings.rootpage)
+# page_title = "IdeaLab/Introductions"
 
 
 ### FUNCTIONS ###
 def getContributors(cursor):
 	contribs = {}
-	cursor.execute("SELECT rev_user_text, recent_edits FROM (SELECT rev_user_text, (CASE WHEN recent_edits IS NULL THEN 0 ELSE recent_edits END) AS recent_edits FROM ieg_profiles) AS tmp ORDER BY recent_edits DESC")
+	query = "SELECT rev_user_text, recent_edits FROM (SELECT rev_user_text, (CASE WHEN recent_edits IS NULL THEN 0 ELSE recent_edits END) AS recent_edits FROM metawiki_p.) AS tmp ORDER BY recent_edits DESC"
+	cursor.execute(query)
 	rows = cursor.fetchall()
 	for row in rows:
 		contributor = row[0]
@@ -43,8 +44,8 @@ def getContributors(cursor):
 		contribs.update({contributor:edits})
 	print contribs
 	return contribs
-	
-		
+
+
 def findProfiles(profile_page, contributors):
 	prof_list = []
 	profile_secs = profile_page.getSectionData(1)
@@ -54,12 +55,12 @@ def findProfiles(profile_page, contributors):
 				if sec[1] not in j:
 					print sec
 			except UnicodeDecodeError:
-				continue		
+				continue
 # 		profile_text = profile_page.getText(sec[0])
 # # 		print profile_text
 # 		prof_list.append((sec[1],profile_text))
 
-	return prof_list	
+	return prof_list
 
 
 # def updateDb():
