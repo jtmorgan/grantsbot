@@ -58,5 +58,6 @@ def returnProfiles(profile_page, profile_list):
 
 ##main##
 profile_list = findProfiles(profile_page, contributors)
+print profile_list
 # returnProfiles(profile_page, profile_list)
 
