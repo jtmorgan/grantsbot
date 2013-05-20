@@ -45,18 +45,22 @@ def findProfiles(page_title):
 	return profile_list
 
 #returns the host profiles to the page, with the newest hosts on top
-def returnProfiles(profile_page, profile_list):
-	report_title = page_namespace + page_title
-	report = wikitools.Page(wiki, report_title)
-	template = open('/home/jtmorgan/grantsbot/scripts/profile_page_template.txt')
-	report_template = template.read()
-	profiles = report_template % '\n'.join([x[1] for x in profile_list])
+def returnProfiles(profile_list):
+# 	print profile_list
+	profile_list2 = sorted(profile_list, key=lambda item: item['edits'], reverse = True)
+# 	print profile_list2
+# 	report_title = page_namespace + page_title
+# 	report = wikitools.Page(wiki, report_title)
+# 	template = open('/home/jtmorgan/grantsbot/profile_page_template.txt')
+# 	report_template = template.read()
+	report_template = "%s"
+	profiles = report_template % '\n'.join([x['text'] for x in profile_list2])
 	print profiles
 # 	profiles = profiles.encode('utf-8')
 # 	report.edit(profiles, section=0, summary="Reordering the host profiles, with newly-joined and highly-active hosts at the top", bot=1)
 
 ##main##
 profile_list = findProfiles("IdeaLab/Introductions")
-print profile_list
-# returnProfiles(profile_page, profile_list)
+# print profile_list
+returnProfiles(profile_list)
 
