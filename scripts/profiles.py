@@ -15,18 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from BeautifulSoup import BeautifulStoneSoup as bss
-import urllib2
-import itertools
-from wikitools import category as wtcat
-import shelve #stores the pages we're interested in
-
+# from wikitools import category as wtcat
+import wikitools
 import grantsbot_settings
 
-wiki = wikitools.Wiki(grantsbot_settings.apiurl)
-wiki.login(settings.username, grantsbot_settings.password)
-
-class Page:
+class Profiles:
 	"""A page on a wiki."""
 
 	def __init__(self, title, namespace = grantsbot_settings.rootpage):
@@ -36,50 +29,57 @@ class Page:
 		self.title = title
 		self.namespace = namespace
 		self.page_path = title + namespace
+		self.wiki = wikitools.Wiki(grantsbot_settings.apiurl)
 
-	def getText(self, section=False):
+	def getPageText(self, section=False):
 		"""
 		Gets the raw text of a page or page section.
+		Sample: http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&titles=Grants:IdeaLab/Introductions&rvprop=content&rvsection=21&format=jsonfm
 		"""
-		if not section:
-			section = ''
-		url = self.sext_url % (self.namespace, self.title, section)
-# 		url = urlEncode(url)
-# 		print url
-		usock = urllib2.urlopen(url)
-		text = usock.read()
-		usock.close()
-		text = unicode(text, 'utf8')
-		text = text.strip()
-
+		params = {
+			'action': 'query',
+			'prop': 'revisions',
+			'titles': self.page_path,
+			'rvprop' : 'content'
+			'rvsection' : section
+		}
+		req = wikitools.APIRequest(wiki, params)
+		response = req.query()
+		page_id = response['query']['pages'].keys()[0]
+		text = response['query']['pages'][page_id]['revisions'][0]['*']
 		return text
 
-	def getSectionData(self, level):
+	def getPageSectionData(self):
 		"""
-		Returns the the section numbers and titles of all sections
-		at a given level of the XML toc hierarchy.
+		Returns the section titles and numbers for a given page.
+		Sample request: http://meta.wikimedia.org/w/api.php?action=parse&page=Grants:IdeaLab/Introductions&prop=sections&format=jsonfm
 		"""
-		reps = {'_':'+', '/':'%2F', ' ':'+'}
-		secs_list = []
-		url = self.secs_url % (self.namespace, self.title)
-		usock = urllib2.urlopen(url)
-		sections = usock.read()
-		usock.close()
-		soup = bss(sections, selfClosingTags = ['s'])
-		for x in soup.findAll('s',toclevel=level):
-			secs_wanted = (x['index'], x['line'])
-			secs_list.append(secs_wanted)
-
+		params = {
+			'action': 'parse',
+			'page': self.page_path,
+			'prop': 'sections',
+		}
+		req = wikitools.APIRequest(wiki, params)
+		response = req.query()
+		secs_list = [{'username' : x['line'], 'profile_index' : x['index']}) for x in response['parse']['sections']]
 		return secs_list
 
-
-
-
-class ProfilePage(Page):
-	"""variables and functions related to working with profiles pages."""
-
-
-classPropsalPage(Page):
+	def getUserRecentEdits(self, user_name, edit_namespace):
+		"""
+		Returns information about a user.
+		Currently only gets edits in a given namespace within the past month.
+		Sample: http://meta.wikimedia.org/w/api.php?action=query&list=recentchanges&rcnamespace=200&rcuser=Jmorgan_(WMF)&rclimit=500&format=jsonfm
+		"""
+		params = {
+			'action': 'query',
+			'list': 'recentchanges',
+			'rcuser': user_name,
+			'rcnamespace': edit_namespace
+		}
+		req = wikitools.APIRequest(self.wiki, params) #gets content namespace edits
+		response = req.query()
+		edits = len(response['query']['recentchanges'])
+		return edits
 
 class CategoryMembers:
 
@@ -98,7 +98,10 @@ class CategoryMembers:
 		for subcat in cat_subcats:
 			cat_page = wtcat.Category(wiki, title)
 
+class ProfilePage(Page):
+	"""variables and functions related to working with profiles pages."""
 
+class ProposalPage(Page):
 
 
 
