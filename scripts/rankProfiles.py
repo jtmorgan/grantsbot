@@ -22,24 +22,23 @@ import profiles
 import grantsbot_settings
 import wikitools
 
-wiki = wikitools.Wiki(settings.apiurl)
-wiki.login(settings.username, settings.password)
+# wiki = wikitools.Wiki(settings.apiurl)
+# wiki.login(settings.username, settings.password)
 logging.basicConfig(filename= grantsbot_settings.logs + 'moves.log', level=logging.INFO)
 # conn = MySQLdb.connect(host = grantsbot_settings.host, db = grantsbot_settings.db, read_default_file = '~/.my.cnf', use_unicode=1, charset="utf8" )
 # curtime = str(datetime.utcnow())
 # cursor = conn.cursor()
 # page_namespace = (settings.rootpage)
-page_title = "IdeaLab/Introductions"
 
 
 ### FUNCTIONS ###
 
 
-def findProfiles(profile_page, contributors):
+def findProfiles(page_title):
 	profile_page = profiles.Profiles(page_title)
 	profile_list = profile_page.getPageSectionData()
 	for profile in profile_list:
-		profile['text'] = profile_page.getPageSectionData(profile['profile_index'])
+		profile['text'] = profile_page.getPageText(profile['profile_index'])
 		main_edits = profile_page.getUserRecentEdits(profile['username'], 200)
 		talk_edits = profile_page.getUserRecentEdits(profile['username'], 201)
 		profile['edits'] = main_edits + talk_edits
@@ -57,7 +56,7 @@ def returnProfiles(profile_page, profile_list):
 # 	report.edit(profiles, section=0, summary="Reordering the host profiles, with newly-joined and highly-active hosts at the top", bot=1)
 
 ##main##
-profile_list = findProfiles(profile_page, contributors)
+profile_list = findProfiles("IdeaLab/Introductions")
 print profile_list
 # returnProfiles(profile_page, profile_list)
 

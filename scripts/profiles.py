@@ -27,27 +27,12 @@ class Profiles:
 		Instantiates page-level variables.
 		"""
 		self.title = title
+		print self.title
 		self.namespace = namespace
-		self.page_path = title + namespace
+		print self.namespace
+		self.page_path = namespace + title
+		print self.page_path
 		self.wiki = wikitools.Wiki(grantsbot_settings.apiurl)
-
-	def getPageText(self, section=False):
-		"""
-		Gets the raw text of a page or page section.
-		Sample: http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&titles=Grants:IdeaLab/Introductions&rvprop=content&rvsection=21&format=jsonfm
-		"""
-		params = {
-			'action': 'query',
-			'prop': 'revisions',
-			'titles': self.page_path,
-			'rvprop' : 'content'
-			'rvsection' : section
-		}
-		req = wikitools.APIRequest(wiki, params)
-		response = req.query()
-		page_id = response['query']['pages'].keys()[0]
-		text = response['query']['pages'][page_id]['revisions'][0]['*']
-		return text
 
 	def getPageSectionData(self):
 		"""
@@ -59,10 +44,28 @@ class Profiles:
 			'page': self.page_path,
 			'prop': 'sections',
 		}
-		req = wikitools.APIRequest(wiki, params)
+		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
-		secs_list = [{'username' : x['line'], 'profile_index' : x['index']}) for x in response['parse']['sections']]
+		secs_list = [{'username' : x['line'], 'profile_index' : x['index']} for x in response['parse']['sections']]
 		return secs_list
+
+	def getPageText(self, section=False):
+		"""
+		Gets the raw text of a page or page section.
+		Sample: http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&titles=Grants:IdeaLab/Introductions&rvprop=content&rvsection=21&format=jsonfm
+		"""
+		params = {
+			'action': 'query',
+			'prop': 'revisions',
+			'titles': self.page_path,
+			'rvprop' : 'content',
+			'rvsection' : section
+		}
+		req = wikitools.APIRequest(self.wiki, params)
+		response = req.query()
+		page_id = response['query']['pages'].keys()[0]
+		text = response['query']['pages'][page_id]['revisions'][0]['*']
+		return text
 
 	def getUserRecentEdits(self, user_name, edit_namespace):
 		"""
@@ -76,32 +79,32 @@ class Profiles:
 			'rcuser': user_name,
 			'rcnamespace': edit_namespace
 		}
-		req = wikitools.APIRequest(self.wiki, params) #gets content namespace edits
+		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
 		edits = len(response['query']['recentchanges'])
 		return edits
 
-class CategoryMembers:
-
-	def getCategoryMembers(title):
-		"""Get the members of a given category and its subcategories."""
-		cat_pages = []
-		cat_subcats = []
-		cat_page = wtcat.Category(wiki, title)
-		cat_pages = cat_page.getAllMembers(titleonly=True, namespace=[200,201]) #abstract
-		subcat_count = len(cat_page.getAllMembers(titleonly=True, namespace=[14]))
-		if len(subcat_count) > 0:
-
-		cat_subcats = cat_page.getAllMembers(titleonly=True, namespace=[200,201])
-
-	def getSubCatPages(cat_subcats):
-		for subcat in cat_subcats:
-			cat_page = wtcat.Category(wiki, title)
-
-class ProfilePage(Page):
-	"""variables and functions related to working with profiles pages."""
-
-class ProposalPage(Page):
+# class CategoryMembers:
+#
+# 	def getCategoryMembers(title):
+# 		"""Get the members of a given category and its subcategories."""
+# 		cat_pages = []
+# 		cat_subcats = []
+# 		cat_page = wtcat.Category(wiki, title)
+# 		cat_pages = cat_page.getAllMembers(titleonly=True, namespace=[200,201]) #abstract
+# 		subcat_count = len(cat_page.getAllMembers(titleonly=True, namespace=[14]))
+# 		if len(subcat_count) > 0:
+#
+# 		cat_subcats = cat_page.getAllMembers(titleonly=True, namespace=[200,201])
+#
+# 	def getSubCatPages(cat_subcats):
+# 		for subcat in cat_subcats:
+# 			cat_page = wtcat.Category(wiki, title)
+#
+# class ProfilePage(Page):
+# 	"""variables and functions related to working with profiles pages."""
+#
+# class ProposalPage(Page):
 
 
 
