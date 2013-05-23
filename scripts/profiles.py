@@ -18,6 +18,7 @@
 # from wikitools import category as wtcat
 import wikitools
 import grantsbot_settings
+import templates
 
 class Profiles:
 	"""A page on a wiki."""
@@ -83,6 +84,19 @@ class Profiles:
 		response = req.query()
 		edits = len(response['query']['recentchanges'])
 		return edits
+		
+	def publishProfiles(self, plist):
+		"""
+		Adds the profiles to the appropriate template and publishes them to wiki.
+		"""
+		page_templates = templates.Template()
+		plist_text = {'profiles' :'\n'.join([x['text'] for x in plist])}
+		plist_template = page_templates.getTemplate(self.title)
+		print plist_template.format(**plist_text)
+		report = plist_template.format(**plist_text).encode('utf-8')
+		self.wiki.login(grantsbot_settings.username, grantsbot_settings.password)				
+		wikipage = wikitools.Page(self.wiki, "User:Jmorgan_(WMF)/sandbox")
+		wikipage.edit(report, summary="Reordering the host profiles, with newly-joined and highly-active hosts at the top", bot=1)
 
 # class CategoryMembers:
 #

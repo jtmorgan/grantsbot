@@ -20,47 +20,30 @@
 import logging
 import profiles
 import grantsbot_settings
-import wikitools
+from datetime import datetime
 
-# wiki = wikitools.Wiki(settings.apiurl)
-# wiki.login(settings.username, settings.password)
 logging.basicConfig(filename= grantsbot_settings.logs + 'moves.log', level=logging.INFO)
+
+curtime = str(datetime.utcnow())
+
+page_title = "IdeaLab/Introductions"
+profile_page = profiles.Profiles(page_title)
+profile_list = profile_page.getPageSectionData()
+# profile_list = profile_list[0:2] #use sublist for quicker tests
+for profile in profile_list:
+	profile['text'] = profile_page.getPageText(profile['profile_index'])
+	main_edits = profile_page.getUserRecentEdits(profile['username'], 200)
+	talk_edits = profile_page.getUserRecentEdits(profile['username'], 201)
+	profile['edits'] = main_edits + talk_edits
+plist_sorted = sorted(profile_list, key=lambda item: item['edits'], reverse = True)
+profile_page.publishProfiles(plist_sorted)
+	
+
+
+
+
 # conn = MySQLdb.connect(host = grantsbot_settings.host, db = grantsbot_settings.db, read_default_file = '~/.my.cnf', use_unicode=1, charset="utf8" )
-# curtime = str(datetime.utcnow())
-# cursor = conn.cursor()
-# page_namespace = (settings.rootpage)
 
 
-### FUNCTIONS ###
 
-
-def findProfiles(page_title):
-	profile_page = profiles.Profiles(page_title)
-	profile_list = profile_page.getPageSectionData()
-	for profile in profile_list:
-		profile['text'] = profile_page.getPageText(profile['profile_index'])
-		main_edits = profile_page.getUserRecentEdits(profile['username'], 200)
-		talk_edits = profile_page.getUserRecentEdits(profile['username'], 201)
-		profile['edits'] = main_edits + talk_edits
-	return profile_list
-
-#returns the host profiles to the page, with the newest hosts on top
-def returnProfiles(profile_list):
-# 	print profile_list
-	profile_list2 = sorted(profile_list, key=lambda item: item['edits'], reverse = True)
-# 	print profile_list2
-# 	report_title = page_namespace + page_title
-# 	report = wikitools.Page(wiki, report_title)
-# 	template = open('/home/jtmorgan/grantsbot/profile_page_template.txt')
-# 	report_template = template.read()
-	report_template = "%s"
-	profiles = report_template % '\n'.join([x['text'] for x in profile_list2])
-	print profiles
-# 	profiles = profiles.encode('utf-8')
-# 	report.edit(profiles, section=0, summary="Reordering the host profiles, with newly-joined and highly-active hosts at the top", bot=1)
-
-##main##
-profile_list = findProfiles("IdeaLab/Introductions")
-# print profile_list
-returnProfiles(profile_list)
 
