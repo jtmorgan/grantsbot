@@ -28,11 +28,11 @@ class Profiles:
 		Instantiates page-level variables.
 		"""
 		self.title = title
-		print self.title
+# 		print self.title
 		self.namespace = namespace
-		print self.namespace
+# 		print self.namespace
 		self.page_path = namespace + title
-		print self.page_path
+# 		print self.page_path
 		self.wiki = wikitools.Wiki(grantsbot_settings.apiurl)
 
 	def getPageSectionData(self):
@@ -95,8 +95,8 @@ class Profiles:
 		print plist_template.format(**plist_text)
 		report = plist_template.format(**plist_text).encode('utf-8')
 		self.wiki.login(grantsbot_settings.username, grantsbot_settings.password)				
-		wikipage = wikitools.Page(self.wiki, "User:Jmorgan_(WMF)/sandbox")
-		wikipage.edit(report, summary="Reordering the host profiles, with newly-joined and highly-active hosts at the top", bot=1)
+		wikipage = wikitools.Page(self.wiki, self.page_path)
+		wikipage.edit(report, summary="**TEsT** Reordering the IdeaLab profiles, putting recently active collaborators at the top", bot=1)
 
 # class CategoryMembers:
 #
@@ -119,11 +119,3 @@ class Profiles:
 # 	"""variables and functions related to working with profiles pages."""
 #
 # class ProposalPage(Page):
-
-
-
-
-
-
-
-

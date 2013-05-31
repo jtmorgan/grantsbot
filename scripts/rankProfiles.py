@@ -37,6 +37,7 @@ for profile in profile_list:
 	profile['edits'] = main_edits + talk_edits
 plist_sorted = sorted(profile_list, key=lambda item: item['edits'], reverse = True)
 profile_page.publishProfiles(plist_sorted)
+logging.info('Reordered IdeaLab profiles at ' + curtime)
 	
 
 
