@@ -97,25 +97,3 @@ class Profiles:
 		self.wiki.login(grantsbot_settings.username, grantsbot_settings.password)				
 		wikipage = wikitools.Page(self.wiki, self.page_path)
 		wikipage.edit(report, summary="**TEsT** Reordering the IdeaLab profiles, putting recently active collaborators at the top", bot=1)
-
-# class CategoryMembers:
-#
-# 	def getCategoryMembers(title):
-# 		"""Get the members of a given category and its subcategories."""
-# 		cat_pages = []
-# 		cat_subcats = []
-# 		cat_page = wtcat.Category(wiki, title)
-# 		cat_pages = cat_page.getAllMembers(titleonly=True, namespace=[200,201]) #abstract
-# 		subcat_count = len(cat_page.getAllMembers(titleonly=True, namespace=[14]))
-# 		if len(subcat_count) > 0:
-#
-# 		cat_subcats = cat_page.getAllMembers(titleonly=True, namespace=[200,201])
-#
-# 	def getSubCatPages(cat_subcats):
-# 		for subcat in cat_subcats:
-# 			cat_page = wtcat.Category(wiki, title)
-#
-# class ProfilePage(Page):
-# 	"""variables and functions related to working with profiles pages."""
-#
-# class ProposalPage(Page):

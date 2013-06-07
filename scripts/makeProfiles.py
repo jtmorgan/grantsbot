@@ -25,9 +25,9 @@ curtime = str(datetime.utcnow())
 page_title = "IdeaLab/Introductions"
 	
 ###FUNCTIONS###
-def rankProfiles():
+def makeProfiles():
 	"""
-	rank IdeaLab participant profiles by number of recent edits to Grants namespace
+	create profiles for IdeaLab ideas.
 	"""
 
 	profile_page = profiles.Profiles(page_title)
@@ -43,9 +43,4 @@ def rankProfiles():
 	logging.info('Reordered IdeaLab profiles at ' + curtime)
 	
 ###MAIN###
-rankProfiles()	
-	
-
-
-
-
+makeProfiles()	
