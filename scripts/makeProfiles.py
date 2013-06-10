@@ -15,32 +15,56 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+import categories
+from datetime import datetime
+import grantsbot_settings
 import logging
 import profiles
-import grantsbot_settings
-from datetime import datetime
+import re
+import shelve
+import sys
 
 logging.basicConfig(filename= grantsbot_settings.logs + 'moves.log', level=logging.INFO)
 curtime = str(datetime.utcnow())
-page_title = "IdeaLab/Introductions"
+cat_title = sys.argv[1] #you specify the target category at the command line
+cat_type = sys.argv[2] #you specify the kind of members you want at the command line
+profile_type = sys.argv[3] #you specify the kind of profile you want at the command line
+
 	
 ###FUNCTIONS###
 def makeProfiles():
 	"""
 	create profiles for IdeaLab ideas.
 	"""
+	profile_elements = {'participants' : '|participants', 'summary' : '|summary'}
+	category = categories.Categories(cat_title, cat_type, 200)
+	member_list = category.getCatMembers()
+	member_list = member_list[0:10] #use sublist for quicker tests
+	for member in member_list:
+		path = member['page_path']
+		page = profiles.Profiles(path, profile_type) #needs to accept full paths
+		member['infobox'] = page.getPageText(0) #infoboxes are always in the top section
+		infobox = member['infobox']
+		for line in infobox.split('\n'):
+# 			print line
+			for k, v in profile_elements.iteritems():
+# 				print k
+# 				print v
+				if line.startswith(v, 0, len(v)):
+					try:
+						m = re.search('(?<=\=)(.*?)(?=<|$)',line).group(1)
+# 						print m
+						member[k] = m
+					except:
+						print "nope"	
+		print member['participants']
+		print member['summary']
+		
+			
+		
 
-	profile_page = profiles.Profiles(page_title)
-	profile_list = profile_page.getPageSectionData()
-	# profile_list = profile_list[0:2] #use sublist for quicker tests
-	for profile in profile_list:
-		profile['text'] = profile_page.getPageText(profile['profile_index'])
-		main_edits = profile_page.getUserRecentEdits(profile['username'], 200)
-		talk_edits = profile_page.getUserRecentEdits(profile['username'], 201)
-		profile['edits'] = main_edits + talk_edits
-	plist_sorted = sorted(profile_list, key=lambda item: item['edits'], reverse = True)
-	profile_page.publishProfiles(plist_sorted)
-	logging.info('Reordered IdeaLab profiles at ' + curtime)
+# 	profile_page.publishProfiles(plist_sorted)
 	
 ###MAIN###
 makeProfiles()	

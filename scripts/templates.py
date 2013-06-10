@@ -28,7 +28,13 @@ class Template:
 </div>
 </div></noinclude>
 [[Category:Individual Engagement Grants]]
-{profiles}"""}
+{profiles}""", 'ideas' : u"""{{{{User:Jmorgan (WMF)/sandbox/3
+|image= File:Siko_Bouterse-8.jpg
+|title= {title}
+|summary = {summary}
+|created = {datetime_added}
+}}}}"""
+}
 
 	def getTemplate(self, page):
 		if page in self.page_templates:

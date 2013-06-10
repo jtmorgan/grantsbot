@@ -23,12 +23,14 @@ import templates
 class Profiles:
 	"""A page on a wiki."""
 
-	def __init__(self, title, namespace = grantsbot_settings.rootpage):
+	def __init__(self, title, type, namespace = grantsbot_settings.rootpage):
 		"""
 		Instantiates page-level variables.
 		"""
 		self.title = title
 # 		print self.title
+		self.type = type
+# 		print self.type
 		self.namespace = namespace
 # 		print self.namespace
 		self.page_path = namespace + title
@@ -58,7 +60,7 @@ class Profiles:
 		params = {
 			'action': 'query',
 			'prop': 'revisions',
-			'titles': self.page_path,
+			'titles': self.title,
 			'rvprop' : 'content',
 			'rvsection' : section
 		}
@@ -85,6 +87,14 @@ class Profiles:
 		edits = len(response['query']['recentchanges'])
 		return edits
 		
+	def formatProfiles(self, vals):
+		"""
+		takes in a dictionary of parameter values and plugs them into the specified template
+		"""
+		page_templates = templates.Template()
+		tmplt = page_templates.getTemplate(self.type)
+		print tmplt.format(**vals)
+	
 	def publishProfiles(self, plist):
 		"""
 		Adds the profiles to the appropriate template and publishes them to wiki.

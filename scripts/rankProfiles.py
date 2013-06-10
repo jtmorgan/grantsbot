@@ -15,22 +15,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from datetime import datetime
 import logging
 import profiles
 import grantsbot_settings
-from datetime import datetime
+import sys
 
 logging.basicConfig(filename= grantsbot_settings.logs + 'moves.log', level=logging.INFO)
 curtime = str(datetime.utcnow())
-page_title = "IdeaLab/Introductions"
+profile_type = sys.argv[1] #you specify the profile type at the command line
+page_path = sys.argv[2] #you specify the target page name at the command line
 	
 ###FUNCTIONS###
-def rankProfiles():
+def rankProfiles(): #needs to be made agnostic, so that it will rank both idea profiles and people profiles
 	"""
-	rank IdeaLab participant profiles by number of recent edits to Grants namespace
+	rank IdeaLab profiles by number of recent edits. 
 	"""
 
-	profile_page = profiles.Profiles(page_title)
+	profile_page = profiles.Profiles(page_path, profile_type)
 	profile_list = profile_page.getPageSectionData()
 	# profile_list = profile_list[0:2] #use sublist for quicker tests
 	for profile in profile_list:
@@ -43,7 +45,10 @@ def rankProfiles():
 	logging.info('Reordered IdeaLab profiles at ' + curtime)
 	
 ###MAIN###
-rankProfiles()	
+if profile_type == "people":
+	rankProfiles()	
+else:
+	print "sorry, we're not set up to work with " + profile_type + "profiles yet!"	
 	
 
 
