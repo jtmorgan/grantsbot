@@ -19,7 +19,7 @@ class Template:
 	"""templates of wiki pages"""
 
 	def __init__(self):
-		self.page_templates = {'IdeaLab/Introductions' : u"""<noinclude><div style="font-family: Helvetica Neue, Helvetica, arial, sans-serif; line-height: 1.5em; background-color: #ffffff; color: #{{{{IEG/Color/Gray}}}}; min-width: 810px; margin-top: -60px; padding: 40px 0 20px">
+		self.profile_templates = {'IdeaLab/Introductions' : u"""<noinclude><div style="font-family: Helvetica Neue, Helvetica, arial, sans-serif; line-height: 1.5em; background-color: #ffffff; color: #{{{{IEG/Color/Gray}}}}; min-width: 810px; margin-top: -60px; padding: 40px 0 20px">
 <div style="margin:0 15%">
 <span style="font-size: 3em; color: #{{{{IEG/Color/Light blue}}}};">'''Individual Engagement Grants'''</span>
 <div style="margin:1em 0">
@@ -28,14 +28,18 @@ class Template:
 </div>
 </div></noinclude>
 [[Category:Individual Engagement Grants]]
-{profiles}""", 'ideas' : u"""{{{{User:Jmorgan (WMF)/sandbox/3
-|image= File:Siko_Bouterse-8.jpg
-|title= {title}
-|summary = {summary}
-|created = {datetime_added}
+{profiles}""", 'idea' : u"""{{{{IdeaLab/Feature
+| time = {time}
+| image =
+| action =
+| number of people =
+| idea = {idea}
+| idea link = {page_path}
+| summary = {summary}
 }}}}"""
 }
 
-	def getTemplate(self, page):
-		if page in self.page_templates:
-			return self.page_templates[page]
+	def getTemplate(self, tmplt_type):
+		if tmplt_type in self.profile_templates:
+			return self.profile_templates[tmplt_type]
+

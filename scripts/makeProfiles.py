@@ -17,6 +17,7 @@
 
 
 import categories
+import dateutil.parser
 from datetime import datetime
 import grantsbot_settings
 import logging
@@ -31,40 +32,42 @@ cat_title = sys.argv[1] #you specify the target category at the command line
 cat_type = sys.argv[2] #you specify the kind of members you want at the command line
 profile_type = sys.argv[3] #you specify the kind of profile you want at the command line
 
-	
+
 ###FUNCTIONS###
 def makeProfiles():
 	"""
 	create profiles for IdeaLab ideas.
 	"""
-	profile_elements = {'participants' : '|participants', 'summary' : '|summary'}
+	profile_elements = {'summary' : '|summary'}
 	category = categories.Categories(cat_title, cat_type, 200)
 	member_list = category.getCatMembers()
-	member_list = member_list[0:10] #use sublist for quicker tests
+	member_list = member_list[0:4] #use sublist for quicker tests
 	for member in member_list:
-		path = member['page_path']
-		page = profiles.Profiles(path, profile_type) #needs to accept full paths
-		member['infobox'] = page.getPageText(0) #infoboxes are always in the top section
-		infobox = member['infobox']
+		datetimefm = dateutil.parser.parse(member['datetime_added'])
+		datetimefm = datetimefm.strftime('%x')
+		member['datetime_added'] = datetimefm
+		page = profiles.Profiles(member['page_path'], profile_type) #needs to accept full paths
+		touched = page.getPageInfo('touched')
+# 		print touched
+		member['time'] = dateutil.parser.parse(touched).strftime('%x')
+		infobox = page.getPageText(0) #infoboxes are always in the top section
 		for line in infobox.split('\n'):
-# 			print line
 			for k, v in profile_elements.iteritems():
-# 				print k
-# 				print v
 				if line.startswith(v, 0, len(v)):
 					try:
 						m = re.search('(?<=\=)(.*?)(?=<|$)',line).group(1)
-# 						print m
 						member[k] = m
 					except:
-						print "nope"	
-		print member['participants']
-		print member['summary']
-		
-			
-		
+						print "nope"
+
+		member[profile_type] = re.search('([^/]+$)', member['page_path']).group(1)
+# 		print member ['idea']
+		page.formatProfiles(member)
+
+
+
 
 # 	profile_page.publishProfiles(plist_sorted)
-	
+
 ###MAIN###
-makeProfiles()	
+makeProfiles()

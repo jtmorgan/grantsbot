@@ -36,12 +36,12 @@ class Categories:
 # 		self.page_path = namespace + title
 # 		print self.page_path
 		self.wiki = wikitools.Wiki(grantsbot_settings.apiurl)
-		self.wiki.login(grantsbot_settings.username, grantsbot_settings.password)		
-		
+		self.wiki.login(grantsbot_settings.username, grantsbot_settings.password)
+
 	def getCatMembers(self):
 		"""
 		get the members of the specified category.
-		Example: http://meta.wikimedia.org/w/api.php?action=query&list=categorymembers&cmtype=page&cmtitle=Category:IEG/Proposals/IdeaLab&cmnamespace=200&cmprop=title|timestamp&cmsort=timestamp&cmdir=desc&format=jsonfm
+		Example: http://meta.wikimedia.org/w/api.php?action=query&list=categorymembers&cmtype=page&cmtitle=Category:IEG/Proposals/IdeaLab&cmnamespace=200&cmprop=title|timestamp|id&cmsort=timestamp&cmdir=desc&format=jsonfm
 		"""
 		params = {
 		'action': 'query',
@@ -49,14 +49,13 @@ class Categories:
 		'cmtitle' : self.title,
 		'cmtype': self.type,
 		'cmnamespace' : self.namespace, #this needs to be numeric! 200 for grants.
-		'cmprop' : 'title|timestamp',
+		'cmprop' : 'title|timestamp|ids',
 		'cmsort' : 'timestamp',
 		'cmdir' : 'desc'
 		}
 		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
-		mem_list = [{'page_path' : x['title'], 'datetime_added' : x['timestamp']} for x in response['query']['categorymembers']]
-		return mem_list		
+		mem_list = [{'page_id' : x['pageid'], 'page_path' : x['title'], 'datetime_added' : x['timestamp']} for x in response['query']['categorymembers']]
+		return mem_list
 
-		
-		
+

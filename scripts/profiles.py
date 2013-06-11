@@ -86,7 +86,21 @@ class Profiles:
 		response = req.query()
 		edits = len(response['query']['recentchanges'])
 		return edits
-		
+
+	def getPageInfo(self, val): #need to make this more abstract
+		params = {
+			'action': 'query',
+			'titles': self.title,
+			'prop': 'info',
+		}
+		req = wikitools.APIRequest(self.wiki, params)
+		response = req.query()
+# 		print response
+		page_id = response['query']['pages'].keys()[0]
+		info = response['query']['pages'][page_id][val]
+		return info
+
+
 	def formatProfiles(self, vals):
 		"""
 		takes in a dictionary of parameter values and plugs them into the specified template
@@ -94,7 +108,7 @@ class Profiles:
 		page_templates = templates.Template()
 		tmplt = page_templates.getTemplate(self.type)
 		print tmplt.format(**vals)
-	
+
 	def publishProfiles(self, plist):
 		"""
 		Adds the profiles to the appropriate template and publishes them to wiki.
@@ -104,6 +118,6 @@ class Profiles:
 		plist_template = page_templates.getTemplate(self.title)
 		print plist_template.format(**plist_text)
 		report = plist_template.format(**plist_text).encode('utf-8')
-		self.wiki.login(grantsbot_settings.username, grantsbot_settings.password)				
+		self.wiki.login(grantsbot_settings.username, grantsbot_settings.password)
 		wikipage = wikitools.Page(self.wiki, self.page_path)
 		wikipage.edit(report, summary="**TEsT** Reordering the IdeaLab profiles, putting recently active collaborators at the top", bot=1)
