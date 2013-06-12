@@ -26,7 +26,7 @@ import re
 import shelve
 import sys
 
-logging.basicConfig(filename= grantsbot_settings.logs + 'moves.log', level=logging.INFO)
+logging.basicConfig(filename= grantsbot_settings.logs + 'makes.log', level=logging.INFO)
 curtime = str(datetime.utcnow())
 cat_title = sys.argv[1] #you specify the target category at the command line
 cat_type = sys.argv[2] #you specify the kind of members you want at the command line
@@ -42,6 +42,7 @@ def makeProfiles():
 	category = categories.Categories(cat_title, cat_type, 200)
 	member_list = category.getCatMembers()
 	member_list = member_list[0:4] #use sublist for quicker tests
+	profiles_formattedx = [] #this is a crappy workaround. fix it.
 	for member in member_list:
 		datetimefm = dateutil.parser.parse(member['datetime_added'])
 		datetimefm = datetimefm.strftime('%x')
@@ -62,7 +63,13 @@ def makeProfiles():
 
 		member[profile_type] = re.search('([^/]+$)', member['page_path']).group(1)
 # 		print member ['idea']
-		page.formatProfiles(member)
+		profile_formatted = page.formatProfile(member)
+# 		print profile_formatted
+		profiles_formattedx.append(profile_formatted)
+	profiles_textx = '\n\n'.join(x for x in profiles_formattedx)
+	print profiles_textx
+	logging.info('Made some ' + profile_type + 'profiles at ' + curtime)
+
 
 
 
@@ -70,4 +77,4 @@ def makeProfiles():
 # 	profile_page.publishProfiles(plist_sorted)
 
 ###MAIN###
-makeProfiles()
+makeProfiles() #need to include some validation so that it only tries of the kind of profile you specified is listed somewhere.

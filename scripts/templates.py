@@ -28,7 +28,8 @@ class Template:
 </div>
 </div></noinclude>
 [[Category:Individual Engagement Grants]]
-{profiles}""", 'idea' : u"""{{{{IdeaLab/Feature
+{profiles}""", 'idea' : u"""==={idea}===
+{{{{IdeaLab/Feature
 | time = {time}
 | image =
 | action =

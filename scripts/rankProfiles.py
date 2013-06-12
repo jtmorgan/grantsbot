@@ -25,13 +25,12 @@ logging.basicConfig(filename= grantsbot_settings.logs + 'moves.log', level=loggi
 curtime = str(datetime.utcnow())
 profile_type = sys.argv[1] #you specify the profile type at the command line
 page_path = sys.argv[2] #you specify the target page name at the command line
-	
+
 ###FUNCTIONS###
 def rankProfiles(): #needs to be made agnostic, so that it will rank both idea profiles and people profiles
 	"""
-	rank IdeaLab profiles by number of recent edits. 
+	rank IdeaLab profiles by number of recent edits.
 	"""
-
 	profile_page = profiles.Profiles(page_path, profile_type)
 	profile_list = profile_page.getPageSectionData()
 	# profile_list = profile_list[0:2] #use sublist for quicker tests
@@ -41,15 +40,17 @@ def rankProfiles(): #needs to be made agnostic, so that it will rank both idea p
 		talk_edits = profile_page.getUserRecentEdits(profile['username'], 201)
 		profile['edits'] = main_edits + talk_edits
 	plist_sorted = sorted(profile_list, key=lambda item: item['edits'], reverse = True)
-	profile_page.publishProfiles(plist_sorted)
+	plist_text = {'profiles' :'\n'.join([x['text'] for x in plist_sorted])} #join 'em all together
+	formatted_profiles = profile_page.formatProfile(plist_text)
+	profile_page.publishProfile(formatted_profiles, "**TeSt** Reordering the IdeaLab profiles, putting more recently active collaborators at the top")
 	logging.info('Reordered IdeaLab profiles at ' + curtime)
-	
+
 ###MAIN###
 if profile_type == "people":
-	rankProfiles()	
+	rankProfiles()
 else:
-	print "sorry, we're not set up to work with " + profile_type + "profiles yet!"	
-	
+	print "sorry, we're not set up to work with " + profile_type + "profiles yet!"
+
 
 
 

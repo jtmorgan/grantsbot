@@ -36,6 +36,8 @@ class Profiles:
 		self.page_path = namespace + title
 # 		print self.page_path
 		self.wiki = wikitools.Wiki(grantsbot_settings.apiurl)
+		self.wiki.login(grantsbot_settings.username, grantsbot_settings.password)
+
 
 	def getPageSectionData(self):
 		"""
@@ -101,23 +103,24 @@ class Profiles:
 		return info
 
 
-	def formatProfiles(self, vals):
+	def formatProfile(self, val):
 		"""
 		takes in a dictionary of parameter values and plugs them into the specified template
 		"""
 		page_templates = templates.Template()
 		tmplt = page_templates.getTemplate(self.type)
-		print tmplt.format(**vals)
+		tmplt = tmplt.format(**val).encode('utf-8')
+# 		print tmplt
+		return tmplt
 
-	def publishProfiles(self, plist):
+	def publishProfile(self, val, editsumm):
 		"""
-		Adds the profiles to the appropriate template and publishes them to wiki.
+		Publishes a profile or set of concatenated profiles to a page on a wiki.
 		"""
-		page_templates = templates.Template()
-		plist_text = {'profiles' :'\n'.join([x['text'] for x in plist])}
-		plist_template = page_templates.getTemplate(self.title)
-		print plist_template.format(**plist_text)
-		report = plist_template.format(**plist_text).encode('utf-8')
-		self.wiki.login(grantsbot_settings.username, grantsbot_settings.password)
-		wikipage = wikitools.Page(self.wiki, self.page_path)
-		wikipage.edit(report, summary="**TEsT** Reordering the IdeaLab profiles, putting recently active collaborators at the top", bot=1)
+# 		page_templates = templates.Template()
+# 		plist_template = page_templates.getTemplate(self.title)
+# 		print plist_template.format(**plist_text)
+# 		report = plist_template.format(**plist_text).encode('utf-8')
+# 		wikipage = wikitools.Page(self.wiki, self.page_path)
+		wikipage = wikitools.Page(self.wiki, self.title)
+		wikipage.edit(val, summary=editsumm, bot=1) #need to specify the section!
