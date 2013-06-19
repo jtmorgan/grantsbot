@@ -19,6 +19,7 @@
 import wikitools
 import grantsbot_settings
 import templates
+import pages
 
 class Profiles:
 	"""A page on a wiki."""
@@ -30,7 +31,7 @@ class Profiles:
 		self.title = title
 # 		print self.title
 		self.type = type
-# 		print self.type
+		print self.type
 		self.namespace = namespace
 # 		print self.namespace
 		self.page_path = namespace + title
@@ -109,18 +110,27 @@ class Profiles:
 		"""
 		page_templates = templates.Template()
 		tmplt = page_templates.getTemplate(self.type)
+		print tmplt
 		tmplt = tmplt.format(**val).encode('utf-8')
 # 		print tmplt
 		return tmplt
 
-	def publishProfile(self, val, editsumm):
+	def publishProfile(self, val, prfl_type, edt_summ, sb_page = False):
 		"""
 		Publishes a profile or set of concatenated profiles to a page on a wiki.
 		"""
+		output_pages = pages.Page()
+		output_target = output_pages.getPage(prfl_type)
+		if output_target:
+			output_path = "User:" + output_target #set to 'user' for testing
+			if sb_page:
+				output_path += sb_page
+			print output_path
+			output = wikitools.Page(self.wiki, output_path)
+			output.edit(val, summary=edt_summ, bot=1) #need to specify the section!
+		else: "uh uh uh, you didn't say the magic word. uh uh uh!"
 # 		page_templates = templates.Template()
 # 		plist_template = page_templates.getTemplate(self.title)
 # 		print plist_template.format(**plist_text)
 # 		report = plist_template.format(**plist_text).encode('utf-8')
 # 		wikipage = wikitools.Page(self.wiki, self.page_path)
-		wikipage = wikitools.Page(self.wiki, self.title)
-		wikipage.edit(val, summary=editsumm, bot=1) #need to specify the section!
