@@ -50,8 +50,3 @@ if profile_type == "people":
 	rankProfiles()
 else:
 	print "sorry, we're not set up to work with " + profile_type + "profiles yet!"
-
-
-
-
-

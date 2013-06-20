@@ -26,19 +26,18 @@ class Profiles:
 
 	def __init__(self, title, type, namespace = grantsbot_settings.rootpage):
 		"""
-		Instantiates page-level variables.
+		Instantiates page-level variables for building a set of profiles.
 		"""
 		self.title = title
 # 		print self.title
 		self.type = type
-		print self.type
-		self.namespace = namespace
+# 		print self.type
+		self.namespace = namespace #used for people, not ideas
 # 		print self.namespace
-		self.page_path = namespace + title
-# 		print self.page_path
+		self.page_path = namespace + title #not using this for featured ideas
+		print self.page_path
 		self.wiki = wikitools.Wiki(grantsbot_settings.apiurl)
 		self.wiki.login(grantsbot_settings.username, grantsbot_settings.password)
-
 
 	def getPageSectionData(self):
 		"""
@@ -55,7 +54,7 @@ class Profiles:
 		secs_list = [{'username' : x['line'], 'profile_index' : x['index']} for x in response['parse']['sections']]
 		return secs_list
 
-	def getPageText(self, section=False):
+	def getPageText(self, section = False):
 		"""
 		Gets the raw text of a page or page section.
 		Sample: http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&titles=Grants:IdeaLab/Introductions&rvprop=content&rvsection=21&format=jsonfm
@@ -65,7 +64,7 @@ class Profiles:
 			'prop': 'revisions',
 			'titles': self.title,
 			'rvprop' : 'content',
-			'rvsection' : section
+			'rvsection' : section,
 		}
 		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
@@ -73,24 +72,28 @@ class Profiles:
 		text = response['query']['pages'][page_id]['revisions'][0]['*']
 		return text
 
-	def getUserRecentEdits(self, user_name, edit_namespace):
+	def getUserRecentEdits(self, user_name, edit_namespace = False): #rename
 		"""
-		Returns information about a user.
-		Currently only gets edits in a given namespace within the past month.
+		Get edits by a user in a given namespace within the past month. OR the first edit a user made to a particular page?
 		Sample: http://meta.wikimedia.org/w/api.php?action=query&list=recentchanges&rcnamespace=200&rcuser=Jmorgan_(WMF)&rclimit=500&format=jsonfm
 		"""
-		params = {
+		params = { #need to update this so that it will accept recent edits, or first edit to the page (page edits by user sorted in reverse date order)
 			'action': 'query',
 			'list': 'recentchanges',
 			'rcuser': user_name,
-			'rcnamespace': edit_namespace
+			'rcnamespace': edit_namespace,
 		}
 		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
 		edits = len(response['query']['recentchanges'])
 		return edits
 
-	def getPageInfo(self, val): #need to make this more abstract
+	def getPageInfo(self, val):
+		"""
+		Retrieve the value of any one of the default page info metadata.
+		Sample:
+		FIXME
+		"""
 		params = {
 			'action': 'query',
 			'titles': self.title,
@@ -110,25 +113,24 @@ class Profiles:
 		"""
 		page_templates = templates.Template()
 		tmplt = page_templates.getTemplate(self.type)
-		print tmplt
 		tmplt = tmplt.format(**val).encode('utf-8')
-# 		print tmplt
+		print tmplt
 		return tmplt
 
-	def publishProfile(self, val, prfl_type, edt_summ, sb_page = False):
+	def publishProfile(self, val, pth, edt_summ, sb_page = False):
 		"""
 		Publishes a profile or set of concatenated profiles to a page on a wiki.
 		"""
-		output_pages = pages.Page()
-		output_target = output_pages.getPage(prfl_type)
-		if output_target:
-			output_path = "User:" + output_target #set to 'user' for testing
-			if sb_page:
-				output_path += sb_page
-			print output_path
-			output = wikitools.Page(self.wiki, output_path)
-			output.edit(val, summary=edt_summ, bot=1) #need to specify the section!
-		else: "uh uh uh, you didn't say the magic word. uh uh uh!"
+# 		output_pages = pages.Page()
+# 		output_target = output_pages.getPage(prfl_type)
+# 		if output_target:
+# 			output_path = "User:" + output_target #set to 'user' for testing
+		if sb_page:
+			pth += str(sb_page)
+		print pth
+# 		output = wikitools.Page(self.wiki, pth)
+# 		output.edit(val, summary=edt_summ, bot=1) #need to specify the section!
+# 		else: "uh uh uh, you didn't say the magic word. uh uh uh!"
 # 		page_templates = templates.Template()
 # 		plist_template = page_templates.getTemplate(self.title)
 # 		print plist_template.format(**plist_text)

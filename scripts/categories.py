@@ -23,39 +23,38 @@ import templates
 class Categories:
 	"""A category on a wiki."""
 
-	def __init__(self, title, type, namespace = grantsbot_settings.numeric_namespace):
+	def __init__(self, title, namespace = grantsbot_settings.numeric_namespace, type = "page"):
 		"""
-		Instantiates page-level variables.
+		Instantiate basic variables for the category you're interested in.
 		"""
-		self.title = title
+		self.cat_title = "Category:" + title
 # 		print self.title
-		self.type = type
-		print self.type
-		self.namespace = namespace
-# 		print self.namespace
-# 		self.page_path = namespace + title
-# 		print self.page_path
+		self.mem_type = type
+# 		print self.type
+		self.mem_namespace = namespace
 		self.wiki = wikitools.Wiki(grantsbot_settings.apiurl)
 		self.wiki.login(grantsbot_settings.username, grantsbot_settings.password)
 
 	def getCatMembers(self):
 		"""
-		get the members of the specified category.
+		Get the members of the specified category and their metadata.
 		Example: http://meta.wikimedia.org/w/api.php?action=query&list=categorymembers&cmtype=page&cmtitle=Category:IEG/Proposals/IdeaLab&cmnamespace=200&cmprop=title|timestamp|id&cmsort=timestamp&cmdir=desc&format=jsonfm
 		"""
-		params = {
-		'action': 'query',
-		'list': 'categorymembers',
-		'cmtitle' : self.title,
-		'cmtype': self.type,
-		'cmnamespace' : self.namespace, #this needs to be numeric! 200 for grants.
-		'cmprop' : 'title|timestamp|ids',
-		'cmsort' : 'timestamp',
-		'cmdir' : 'desc'
-		}
-		req = wikitools.APIRequest(self.wiki, params)
-		response = req.query()
-		mem_list = [{'page_id' : x['pageid'], 'page_path' : x['title'], 'datetime_added' : x['timestamp']} for x in response['query']['categorymembers']]
-		return mem_list
+		if self.mem_type == 'page':
+			query_params = {
+			'action': 'query',
+			'list': 'categorymembers',
+			'cmtitle' : self.cat_title,
+			'cmtype': self.mem_type,
+			'cmnamespace' : self.mem_namespace,
+			'cmprop' : 'title|timestamp|ids',
+			'cmsort' : 'timestamp',
+			'cmdir' : 'desc'
+			}
+			req = wikitools.APIRequest(self.wiki, query_params)
+			response = req.query()
+			mem_list = [{'page_id' : x['pageid'], 'page_path' : x['title'], 'datetime_added' : x['timestamp']} for x in response['query']['categorymembers']]
+			return mem_list
+		else: print "not set up to get this type of category member yet"
 
 
