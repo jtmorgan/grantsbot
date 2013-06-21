@@ -24,38 +24,40 @@ class Params:
 		self.output_params = {
 			'featured idea' : {
 				'summary' : '|summary',
-				'path' : 'User:Jmorgan_(WMF)/sandbox/',
+				'output path' : 'Grants:IdeaLab/Ideas/Featured/',
 				'edit summary' : '**TeSt** updating %s profile',
 				'number featured' : 2,
 				'participants' : {
 					'category' : 'IEG/Proposals/Participants',
 					'action' : 3,
-					'first subpage' : 6,
+					'first subpage' : 1,
 					},
 				'draft' :	{
 					'category' : 'IEG/Proposals/Draft/IdeaLab',
 					'action' : 4,
-					'first subpage' : 8,
+					'first subpage' : 3,
 					},
 				'new' : {
 					'category' : 'IEG/Proposals/IdeaLab',
 					'action' : 1,
-					'first subpage' : 10,
+					'first subpage' : 5,
 					},
 				},
 			'featured person' : {
-				'summary' : 'FIXME',
-				'path' : 'User:Jmorgan_(WMF)/sandbox/',
+				'summary' : '| story',
+				'output path' : 'Grants:IdeaLab/Introductions/Featured/',
 				'edit summary' : '**TeSt** updating %s profile',
-				'number featured' : 3,
+				'number featured' : 6,
 				'main page' : 'IdeaLab/Introductions',
+				'page path' : '| username',
+				'image' : '| image =',
 				'recent' : {
-					'action' : 'FIXME',
-					'first subpage' : 12,
+					'action' : 5,
+					'first subpage' : 10,
 					},
 				'active' : {
-					'action' : 'FIXME',
-					'first subpage' : 15,
+					'action' : 5,
+					'first subpage' : 1,
 					},
 				},
 			}
@@ -63,11 +65,6 @@ class Params:
 	def getParams(self, prfl_type):
 		try:
 			tp = self.output_params[prfl_type]
-# 			try:
-# 				sb_tp = tp[sb_type]
-# 				return sb_tp
-# 			except:
-# 				print "unrecognized subtype for " + tp
 			return tp
 		except:
 			print "unrecognized profile type " + prfl_type

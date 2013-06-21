@@ -29,13 +29,13 @@ class Profiles:
 		Instantiates page-level variables for building a set of profiles.
 		"""
 		self.title = title
-# 		print self.title
+		print self.title
 		self.type = type
 # 		print self.type
 		self.namespace = namespace #used for people, not ideas
 # 		print self.namespace
 		self.page_path = namespace + title #not using this for featured ideas
-		print self.page_path
+# 		print self.page_path
 		self.wiki = wikitools.Wiki(grantsbot_settings.apiurl)
 		self.wiki.login(grantsbot_settings.username, grantsbot_settings.password)
 
@@ -62,7 +62,7 @@ class Profiles:
 		params = {
 			'action': 'query',
 			'prop': 'revisions',
-			'titles': self.title,
+			'titles': self.page_path,
 			'rvprop' : 'content',
 			'rvsection' : section,
 		}
@@ -72,9 +72,9 @@ class Profiles:
 		text = response['query']['pages'][page_id]['revisions'][0]['*']
 		return text
 
-	def getUserRecentEdits(self, user_name, edit_namespace = False): #rename
+	def getUserRecentEditInfo(self, user_name, edit_namespace = False): #rename
 		"""
-		Get edits by a user in a given namespace within the past month. OR the first edit a user made to a particular page?
+		Get edits by a user in a given namespace within the past month, and the time of their most recent edit.
 		Sample: http://meta.wikimedia.org/w/api.php?action=query&list=recentchanges&rcnamespace=200&rcuser=Jmorgan_(WMF)&rclimit=500&format=jsonfm
 		"""
 		params = { #need to update this so that it will accept recent edits, or first edit to the page (page edits by user sorted in reverse date order)
@@ -85,8 +85,14 @@ class Profiles:
 		}
 		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
-		edits = len(response['query']['recentchanges'])
-		return edits
+		recent_edits = len(response['query']['recentchanges'])
+		if recent_edits > 0:
+			latest_edit = response['query']['recentchanges'][0]['timestamp']
+			latest_rev = response['query']['recentchanges'][0]['revid']
+			edit_info = (recent_edits, latest_rev, latest_edit)
+		else:
+			edit_info = (0, 0, "")
+		return edit_info
 
 	def getPageInfo(self, val):
 		"""
@@ -101,7 +107,6 @@ class Profiles:
 		}
 		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
-# 		print response
 		page_id = response['query']['pages'].keys()[0]
 		info = response['query']['pages'][page_id][val]
 		return info
@@ -114,25 +119,16 @@ class Profiles:
 		page_templates = templates.Template()
 		tmplt = page_templates.getTemplate(self.type)
 		tmplt = tmplt.format(**val).encode('utf-8')
-		print tmplt
 		return tmplt
 
 	def publishProfile(self, val, pth, edt_summ, sb_page = False):
 		"""
 		Publishes a profile or set of concatenated profiles to a page on a wiki.
 		"""
-# 		output_pages = pages.Page()
-# 		output_target = output_pages.getPage(prfl_type)
-# 		if output_target:
-# 			output_path = "User:" + output_target #set to 'user' for testing
 		if sb_page:
 			pth += str(sb_page)
 		print pth
-# 		output = wikitools.Page(self.wiki, pth)
-# 		output.edit(val, summary=edt_summ, bot=1) #need to specify the section!
-# 		else: "uh uh uh, you didn't say the magic word. uh uh uh!"
-# 		page_templates = templates.Template()
-# 		plist_template = page_templates.getTemplate(self.title)
-# 		print plist_template.format(**plist_text)
-# 		report = plist_template.format(**plist_text).encode('utf-8')
-# 		wikipage = wikitools.Page(self.wiki, self.page_path)
+		print val
+		print edt_summ
+		output = wikitools.Page(self.wiki, pth)
+		output.edit(val, summary=edt_summ, bot=1) #need to specify the section!

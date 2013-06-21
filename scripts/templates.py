@@ -40,6 +40,17 @@ class Template:
 | idea link = {page_path}
 | summary = {summary}
 }}}}"""
+,
+'featured person' : u"""==={featured idea}===
+{{{{IdeaLab/Feature
+| time = {time}
+| image = {image}
+| action = {action}
+| number of people =
+| idea = {featured idea}
+| idea link = {page_path}
+| summary = {summary}
+}}}}"""
 }
 
 	def getTemplate(self, tmplt_type):

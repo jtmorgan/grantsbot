@@ -22,7 +22,7 @@ from datetime import datetime
 import grantsbot_settings
 import logging
 import profiles
-import output_parameters
+import output_params
 import re
 import shelve
 import sys
@@ -35,81 +35,102 @@ def makeIdeaProfiles(profile_type, profile_subtype):
 	"""
 	create featured idea profiles and post them to a gallery.
 	"""
-	#do I need a 'params.py' file? What would go in it?
-# 	profile_elements = {'summary' : '|summary'}
-# 	profile_action_param = {'Category:IEG/Proposals/Participants' : '3', 'Category:IEG/Proposals/Draft/IdeaLab' : '4', 'Category:IEG/Proposals/IdeaLab' : '1'} #abstract this
-	param = output_parameters.Params()
+	param = output_params.Params()
 	params = param.getParams(profile_type)
-	cat = params['category']
+	cat = params[profile_subtype]['category']
 	category = categories.Categories(cat, 200) #namespace redundancy
 	member_list = category.getCatMembers()
 	member_list = member_list[0:4] #use sublist for quicker tests
-# 	print member_list
-# 	profiles_formattedx = [] #this is a crappy workaround. fix it.
-# 	i = 6 #for featured ideas and featured people, different conditions should be assigned to different gallery pages.
 	i = 0
 	for member in member_list:
 		if i < params['number featured']:
 			member['datetime_added'] = dateutil.parser.parse(member['datetime_added']).strftime('%x') #assign cat added date
 			profile = profiles.Profiles(member['page_path'], profile_type)
-			touched = page.getPageInfo('touched')
+			touched = profile.getPageInfo('touched')
 	# 		print touched
 	# 		started = dateutil.parser.parse(touched).strftime('%x')
 			member['time'] = "Last edited: " + dateutil.parser.parse(touched).strftime('%x') #assign last edit date. do I need the middle variable-assignment step?
 			member['action'] = params[profile_subtype]['action'] #assign action variable
-			print action
-	# 		for k, v in profile_action_param.iteritems():
-	# 			if cat_title == k:
-	# 				member['action'] = v
 			infobox = profile.getPageText(0) #infoboxes are always in the top section
 			text_val = params['summary']
 			for line in infobox.split('\n'):
-	# 			for k, v in profile_elements.iteritems():
-	# 				if line.startswith(v, 0, len(v)):
-	# 					try:
-	# 						m = re.search('(?<=\=)(.*?)(?=<|$)',line).group(1)
-	# 						member[k] = m
-	# 					except:
-	# 						print "cannot find the template parameter " + k + " in " member['title']
 				if line.startswith(text_val, 0, len(text_val)):
 					try:
 						txt = re.search('(?<=\=)(.*?)(?=<|$)',line).group(1)
 						member['summary'] = txt
 					except:
-						print "cannot find the template parameter " + text_val + " in " member['title']
+						print "cannot find the template parameter " + text_val
 			member[profile_type] = re.search('([^/]+$)', member['page_path']).group(1) #am I still using page_path here?
-			print member [profile_type]
 			profile_formatted = profile.formatProfile(member)
-			edit_summ = member['edit summary'] % profile_type
-			path = params['output page']
+			edit_summ = params['edit summary'] % profile_type
+			path = params['output path']
 			sub_page = params[profile_subtype]['first subpage']
 			sub_page += i
-			profile.publishProfile(profile_formatted, profile_type, edit_summ, sub_page)
-	# 		print profile_formatted
-			profiles_formattedx.append(profile_formatted)
+			profile.publishProfile(profile_formatted, path, edit_summ, sub_page)
 			i += 1
 		else:
 			print "run complete"
-# 	return profiles_formattedx
-	profiles_textx = '\n\n'.join(x for x in profiles_formattedx)
-	print profiles_textx
 
-def	makePersonProfiles(profile_type, profile_subtype):
+def	makePersonProfiles(profile_type, profile_subtype): #only for most active ones, for now
 	"""
 	create featured people profiles and publish them to a gallery
 	"""
-	param = output_parameters.Params()
+	param = output_params.Params()
 	params = param.getParams(profile_type)
+# 	print params['main page']
 	profile_page = profiles.Profiles(params['main page'], profile_type)
 	profile_list = profile_page.getPageSectionData()
-	for profile in profile_list:
-		profile['text'] = profile_page.getPageText(profile['profile_index'])
-		main_edits = profile_page.getUserRecentEdits(profile['username'], 200)
-		talk_edits = profile_page.getUserRecentEdits(profile['username'], 201)
-		profile['edits'] = main_edits + talk_edits
+	for member in profile_list:
+			member['text'] = profile_page.getPageText(member['profile_index'])
+			main_edits = profile_page.getUserRecentEditInfo(member['username'], 200)
+			talk_edits = profile_page.getUserRecentEditInfo(member['username'], 201)
+			member['edits'] = main_edits[0] + talk_edits[0]
+			if main_edits[1] > talk_edits[1]:
+				recent_edit = main_edits[2]
+			else:
+				recent_edit = talk_edits[2]
+			member['time'] = "Last edited: " + dateutil.parser.parse(recent_edit).strftime('%x')
+			member['action'] = params[profile_subtype]['action']
+			sum = params['summary'] #crappy workaround
+			ttle = params['page path']
+			img = params['image']
+			for line in member['text'].split('\n'):
+				if line.startswith(ttle, 0, len(ttle)):
+					try:
+						txt = re.search('(?<=\=)(.*?)(?=<|$)',line).group(1)
+						member['page_path'] = txt.strip() #fix this! inconsistent
+						member['featured idea'] = txt.strip()[5:]
+					except:
+						print "cannot find the template parameter " + ttle
+				if line.startswith(img, 0, len(img)):
+					try:
+						txt = re.search('(?<=\=)(.*?)(?=<|\||$)',line).group(1)
+						member['image'] = txt.strip()
+					except:
+						print "cannot find the template parameter " + img
+				if line.startswith(sum, 0, len(sum)):
+					try:
+						txt = re.search('(?<=\=)(.*?)(?=<|$)',line).group(1)
+						member['summary'] = txt.strip()
+					except:
+						print "cannot find the template parameter " + sum
 	plist_sorted = sorted(profile_list, key=lambda item: item['edits'], reverse = True)
-	plist_sorted = plist_sorted[0:4] #use sublist for quicker tests
-	print plist_sorted
+	plist_sorted = plist_sorted[0:6] #use sublist for quicker tests
+	i = 0
+	for member in plist_sorted:
+		if i < params['number featured']:
+			profile = profiles.Profiles(member['page_path'], profile_type) #fix this! inconsistent
+			profile_formatted = profile.formatProfile(member)
+			edit_summ = params['edit summary'] % profile_type
+			path = params['output path']
+			sub_page = params[profile_subtype]['first subpage']
+			sub_page += i
+			profile.publishProfile(profile_formatted, path, edit_summ, sub_page)
+			i += 1
+
+# 	i = 0
+# 		if i < params['number featured']:
+
 
 ###MAIN###
 profile_type = sys.argv[1] #you specify the kind of profile you want at the command line. Currently 'featured idea' or 'featured person'.
