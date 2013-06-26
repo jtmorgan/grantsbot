@@ -30,28 +30,42 @@ class Template:
 [[Category:Individual Engagement Grants]]
 {profiles}"""
 ,
-'featured idea' : u"""==={featured idea}===
+'featured idea' : u"""
 {{{{IdeaLab/Feature
 | time = {time}
 | image =
 | action = {action}
 | number of people =
-| idea = {featured idea}
-| idea link = {page_path}
+| idea = {title}
+| idea link = {page path}
 | summary = {summary}
 }}}}"""
 ,
-'featured person' : u"""==={featured idea}===
+'featured person' : u"""
 {{{{IdeaLab/Feature
 | time = {time}
 | image = {image}
 | action = {action}
 | number of people =
-| idea = {featured idea}
-| idea link = {page_path}
+| name = {title}
+| username = {page path}
 | summary = {summary}
 }}}}"""
+,
+'idea profile' : u"""
+==<noinclude>{title}</noinclude>==
+{{{{IdeaLab/Idea/Summary
+| time= {time}
+| idea= {title}
+| idea link= {page path}
+| summary= {summary}
+| creator= {creator}
+| image =
+}}}}"""
+,
 }
+
+#changed 'featured idea' param value to 'title' for consistency
 
 	def getTemplate(self, tmplt_type):
 		if tmplt_type in self.profile_templates:

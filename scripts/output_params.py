@@ -23,7 +23,7 @@ class Params:
 	def __init__(self):
 		self.output_params = {
 			'featured idea' : {
-				'summary' : '|summary',
+				'summary' : '^\|\s*summary\s*=',
 				'output path' : 'Grants:IdeaLab/Ideas/Featured/',
 				'edit summary' : '**TeSt** updating %s profile',
 				'number featured' : 2,
@@ -48,7 +48,7 @@ class Params:
 				'output path' : 'Grants:IdeaLab/Introductions/Featured/',
 				'edit summary' : '**TeSt** updating %s profile',
 				'number featured' : 6,
-				'main page' : 'IdeaLab/Introductions',
+				'main page' : 'Grants:IdeaLab/Introductions',
 				'page path' : '| username',
 				'image' : '| image =',
 				'recent' : {
@@ -58,6 +58,28 @@ class Params:
 				'active' : {
 					'action' : 5,
 					'first subpage' : 1,
+					},
+				},
+			'idea profile' : {
+				'summary' : '^\|\s*summary\s*=',
+				'creator' : '^\|\s*creator\s*=',
+				'output path' : 'Grants:IdeaLab/Ideas/',
+				'edit summary' : '**TeSt** updating %ss',
+				'participants' : {
+					'category' : 'IEG/Proposals/Participants',
+					'subpage' : 'Participants',
+					},
+				'draft' :	{
+					'category' : 'IEG/Proposals/Draft/IdeaLab',
+					'subpage' : 'Drafts',
+					},
+				'new' : {
+					'category' : 'IEG/Proposals/IdeaLab',
+					'subpage' : 'New',
+					},
+				'ineligible' : {
+					'category' : 'IEG/Proposals/Ineligible',
+					'subpage' : 'Ineligible',
 					},
 				},
 			}

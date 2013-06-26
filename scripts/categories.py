@@ -18,7 +18,6 @@
 # from wikitools import category as wtcat
 import wikitools
 import grantsbot_settings
-import templates
 
 class Categories:
 	"""A category on a wiki."""
@@ -38,7 +37,8 @@ class Categories:
 	def getCatMembers(self):
 		"""
 		Get the members of the specified category and their metadata.
-		Example: http://meta.wikimedia.org/w/api.php?action=query&list=categorymembers&cmtype=page&cmtitle=Category:IEG/Proposals/IdeaLab&cmnamespace=200&cmprop=title|timestamp|id&cmsort=timestamp&cmdir=desc&format=jsonfm
+		Example: http://meta.wikimedia.org/w/api.php?action=query&list=categorymembers&cmtype=page&cmtitle=Category:IEG/Proposals/IdeaLab&cmnamespace=200&cmprop=title|timestamp|ids&cmsort=timestamp&cmdir=desc&format=jsonfm
+		will return a dict like {'page id' : 'someid', 'page path' : 'somepath', 'datetime added' : 'sometimestamp'}
 		"""
 		if self.mem_type == 'page':
 			query_params = {
@@ -53,7 +53,7 @@ class Categories:
 			}
 			req = wikitools.APIRequest(self.wiki, query_params)
 			response = req.query()
-			mem_list = [{'page_id' : x['pageid'], 'page_path' : x['title'], 'datetime_added' : x['timestamp']} for x in response['query']['categorymembers']]
+			mem_list = [{'page id' : x['pageid'], 'page path' : x['title'], 'datetime added' : x['timestamp']} for x in response['query']['categorymembers']]
 			return mem_list
 		else: print "not set up to get this type of category member yet"
 

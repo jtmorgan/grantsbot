@@ -24,18 +24,16 @@ import pages
 class Profiles:
 	"""A page on a wiki."""
 
-	def __init__(self, title, type, namespace = grantsbot_settings.rootpage):
+	def __init__(self, path, id, type, namespace = grantsbot_settings.rootpage):
 		"""
 		Instantiates page-level variables for building a set of profiles.
 		"""
-		self.title = title
-		print self.title
+		self.page_path = path
+		self.page_id = str(id)
 		self.type = type
-# 		print self.type
 		self.namespace = namespace #used for people, not ideas
-# 		print self.namespace
-		self.page_path = namespace + title #not using this for featured ideas
-# 		print self.page_path
+# 		self.page_path = namespace + title #not using this for featured ideas
+# # 		print self.page_path
 		self.wiki = wikitools.Wiki(grantsbot_settings.apiurl)
 		self.wiki.login(grantsbot_settings.username, grantsbot_settings.password)
 
@@ -68,9 +66,26 @@ class Profiles:
 		}
 		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
-		page_id = response['query']['pages'].keys()[0]
-		text = response['query']['pages'][page_id]['revisions'][0]['*']
+# 		page_id = response['query']['pages'].keys()[0]
+		text = response['query']['pages'][self.page_id]['revisions'][0]['*']
 		return text
+
+	def getPageInfo(self, val):
+		"""
+		Retrieve the value of any one of the default page info metadata.
+		Sample:
+http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS_and_Cartography_in_Wikimedia&format=jsonfm
+		"""
+		params = {
+			'action': 'query',
+			'titles': self.page_path,
+			'prop': 'info',
+		}
+		req = wikitools.APIRequest(self.wiki, params)
+		response = req.query()
+# 		page_id = response['query']['pages'].keys()[0] #shouldn't need this step. fixme!
+		info = response['query']['pages'][self.page_id][val]
+		return info
 
 	def getUserRecentEditInfo(self, user_name, edit_namespace = False): #rename
 		"""
@@ -94,22 +109,7 @@ class Profiles:
 			edit_info = (0, 0, "")
 		return edit_info
 
-	def getPageInfo(self, val):
-		"""
-		Retrieve the value of any one of the default page info metadata.
-		Sample:
-		FIXME
-		"""
-		params = {
-			'action': 'query',
-			'titles': self.title,
-			'prop': 'info',
-		}
-		req = wikitools.APIRequest(self.wiki, params)
-		response = req.query()
-		page_id = response['query']['pages'].keys()[0]
-		info = response['query']['pages'][page_id][val]
-		return info
+
 
 
 	def formatProfile(self, val):

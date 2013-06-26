@@ -26,6 +26,7 @@ import output_params
 import re
 import shelve
 import sys
+import templates
 
 logging.basicConfig(filename = grantsbot_settings.logs + 'makes.log', level = logging.INFO)
 curtime = str(datetime.utcnow())
@@ -33,43 +34,102 @@ curtime = str(datetime.utcnow())
 ###FUNCTIONS###
 def makeIdeaProfiles(profile_type, profile_subtype):
 	"""
-	create featured idea profiles and post them to a gallery.
+	make profiles for IdeaLab ideas or IEG proposals
 	"""
 	param = output_params.Params()
 	params = param.getParams(profile_type)
 	cat = params[profile_subtype]['category']
 	category = categories.Categories(cat, 200) #namespace redundancy
 	member_list = category.getCatMembers()
-	member_list = member_list[0:4] #use sublist for quicker tests
+	if profile_type == 'featured idea':
+		makeFeaturedProfiles(profile_type, profile_subtype, params, category, member_list)
+	elif profile_type == 'idea profile':
+		makeProfileList(profile_type, profile_subtype, params, category, member_list)
+	else:
+		print 	"unrecognized idea profile type" #this shouldn't be necessary
+
+def makeFeaturedProfiles(profile_type, profile_subtype, params, category, member_list):
+	"""
+	make featured profiles and post them each to a separate gallery page
+	"""
+	member_list = member_list[0:2] #use sublist for quicker tests
 	i = 0
 	for member in member_list:
 		if i < params['number featured']:
-			member['datetime_added'] = dateutil.parser.parse(member['datetime_added']).strftime('%x') #assign cat added date
-			profile = profiles.Profiles(member['page_path'], profile_type)
+			member['datetime added'] = dateutil.parser.parse(member['datetime added']).strftime('%x') #assign cat added date
+			profile = profiles.Profiles(member['page path'], member['page id'], profile_type)
 			touched = profile.getPageInfo('touched')
-	# 		print touched
-	# 		started = dateutil.parser.parse(touched).strftime('%x')
-			member['time'] = "Last edited: " + dateutil.parser.parse(touched).strftime('%x') #assign last edit date. do I need the middle variable-assignment step?
+			member['time'] = "Last edited: " + dateutil.parser.parse(touched).strftime('%x')
 			member['action'] = params[profile_subtype]['action'] #assign action variable
 			infobox = profile.getPageText(0) #infoboxes are always in the top section
-			text_val = params['summary']
+			sum_regex = params['summary']
 			for line in infobox.split('\n'):
-				if line.startswith(text_val, 0, len(text_val)):
+				if re.search(sum_regex, line):
 					try:
-						txt = re.search('(?<=\=)(.*?)(?=<|$)',line).group(1)
-						member['summary'] = txt
+						sum = re.search('(?<=\=)(.*?)(?=<|$)',line).group(1)
+						member['summary'] = sum
 					except:
-						print "cannot find the template parameter " + text_val
-			member[profile_type] = re.search('([^/]+$)', member['page_path']).group(1) #am I still using page_path here?
+						print "cannot find the template parameter " + sum_regex
+			member['summary'] = (member['summary'][:140] + '...') if len(member['summary']) > 140 else member['summary'] #trims all summaries to 140 characters
+			member['title'] = re.search('([^/]+$)', member['page path']).group(1)
 			profile_formatted = profile.formatProfile(member)
 			edit_summ = params['edit summary'] % profile_type
-			path = params['output path']
+			path = params['output path'] #also need number of people, at some point
 			sub_page = params[profile_subtype]['first subpage']
 			sub_page += i
 			profile.publishProfile(profile_formatted, path, edit_summ, sub_page)
 			i += 1
 		else:
 			print "run complete"
+
+def makeProfileList(profile_type, profile_subtype, params, category, member_list):
+	"""
+	make basic idea profiles and post them as a list to a category-specific profile page
+	"""
+	member_list = member_list[0:10] #only the most recently added ideas
+	plist = []
+	for member in member_list:
+		member['datetime added'] = dateutil.parser.parse(member['datetime added']).strftime('%x') #assign cat added date
+		profile = profiles.Profiles(member['page path'], member['page id'], profile_type)
+		touched = profile.getPageInfo('touched')
+		member['time'] = "Last edited: " + dateutil.parser.parse(touched).strftime('%x')
+		infobox = profile.getPageText(0) #infoboxes are always in the top section
+		sum_regex = params['summary']
+		creator_regex = params['creator']
+		sum = ""
+		cr = ""
+		for line in infobox.split('\n'):
+			if re.search(sum_regex, line):
+				try:
+					sum = re.search('(?<=\=)(.*?)(?=<|$)',line).group(1)
+					member['summary'] = sum
+				except:
+					print "could not get summary"
+			else:
+				pass
+			if re.search(creator_regex, line):
+				try:
+					cr = re.search('(?<=\=)(.*?)(?=<|$)',line).group(1)
+				except:
+					print "could not get creator"
+			else:
+				pass
+		if len(cr) > 0:
+			member['creator'] = cr
+		else:
+			member['creator'] = ""
+# 		print member['creator']
+		member['title'] = re.search('([^/]+$)', member['page path']).group(1)
+		member['profile'] = profile.formatProfile(member)
+		plist.append(member['profile'])
+	plist_text = '\n'.join(x for x in plist) #join 'em all together
+# 	print plist_text
+	edit_summ = params['edit summary'] % (profile_subtype + " " + profile_type)
+	path = params['output path']
+	sub_page = params[profile_subtype]['subpage']
+	profile.publishProfile(plist_text, path, edit_summ, sub_page)
+
+
 
 def	makePersonProfiles(profile_type, profile_subtype): #only for most active ones, for now
 	"""
@@ -135,7 +195,8 @@ def	makePersonProfiles(profile_type, profile_subtype): #only for most active one
 ###MAIN###
 profile_type = sys.argv[1] #you specify the kind of profile you want at the command line. Currently 'featured idea' or 'featured person'.
 profile_subtype = sys.argv[2] #specify the subtype, e.g. 'new', 'draft', 'recent'
-if profile_type == 'featured idea':
+
+if ( profile_type == 'featured idea' or profile_type == 'idea profile' ):
 	makeIdeaProfiles(profile_type, profile_subtype)
 elif profile_type == 'featured person':
 	makePersonProfiles(profile_type, profile_subtype)
