@@ -57,7 +57,7 @@ def makeFeaturedProfiles(profile_type, profile_subtype, params, category, member
 	for member in member_list:
 		if i < params['number featured']:
 			member['datetime added'] = dateutil.parser.parse(member['datetime added']).strftime('%x') #assign cat added date
-			profile = profiles.Profiles(member['page path'], member['page id'], profile_type)
+			profile = profiles.Profiles(member['page path'], profile_type, id=member['page id'])
 			touched = profile.getPageInfo('touched')
 			member['time'] = "Last edited: " + dateutil.parser.parse(touched).strftime('%x')
 			member['action'] = params[profile_subtype]['action'] #assign action variable
@@ -138,10 +138,13 @@ def	makePersonProfiles(profile_type, profile_subtype): #only for most active one
 	param = output_params.Params()
 	params = param.getParams(profile_type)
 # 	print params['main page']
-	profile_page = profiles.Profiles(params['main page'], profile_type)
+	profile_page = profiles.Profiles(params['main page'], profile_type, id=2101758) #should the page id be baked in like this?
 	profile_list = profile_page.getPageSectionData()
+	profile_list = profile_list[0:6] #only need top six. assumes profiles are already sorted by activity
+	i = 0
 	for member in profile_list:
-			member['text'] = profile_page.getPageText(member['profile_index'])
+		if i < params['number featured']:
+			member['text'] = profile_page.getPageText(member['profile index'])
 			main_edits = profile_page.getUserRecentEditInfo(member['username'], 200)
 			talk_edits = profile_page.getUserRecentEditInfo(member['username'], 201)
 			member['edits'] = main_edits[0] + talk_edits[0]
@@ -151,17 +154,10 @@ def	makePersonProfiles(profile_type, profile_subtype): #only for most active one
 				recent_edit = talk_edits[2]
 			member['time'] = "Last edited: " + dateutil.parser.parse(recent_edit).strftime('%x')
 			member['action'] = params[profile_subtype]['action']
+			member['page path'] = "User:" + member['username']
 			sum = params['summary'] #crappy workaround
-			ttle = params['page path']
 			img = params['image']
 			for line in member['text'].split('\n'):
-				if line.startswith(ttle, 0, len(ttle)):
-					try:
-						txt = re.search('(?<=\=)(.*?)(?=<|$)',line).group(1)
-						member['page_path'] = txt.strip() #fix this! inconsistent
-						member['featured idea'] = txt.strip()[5:]
-					except:
-						print "cannot find the template parameter " + ttle
 				if line.startswith(img, 0, len(img)):
 					try:
 						txt = re.search('(?<=\=)(.*?)(?=<|\||$)',line).group(1)
@@ -172,14 +168,13 @@ def	makePersonProfiles(profile_type, profile_subtype): #only for most active one
 					try:
 						txt = re.search('(?<=\=)(.*?)(?=<|$)',line).group(1)
 						member['summary'] = txt.strip()
+						member['summary'] = re.sub("(\[\[)(.*?)(\|)","",member['summary'])
+						member['summary'] = re.sub("\]","",member['summary'])
+						member['summary'] = re.sub("\[","",member['summary'])
+						member['summary'] = (member['summary'][:140] + '...') if len(member['summary']) > 140 else member['summary'] #trims all summaries to 140 characters
 					except:
 						print "cannot find the template parameter " + sum
-	plist_sorted = sorted(profile_list, key=lambda item: item['edits'], reverse = True)
-	plist_sorted = plist_sorted[0:6] #use sublist for quicker tests
-	i = 0
-	for member in plist_sorted:
-		if i < params['number featured']:
-			profile = profiles.Profiles(member['page_path'], profile_type) #fix this! inconsistent
+			profile = profiles.Profiles(member['page path'], profile_type) #fix this! inconsistent
 			profile_formatted = profile.formatProfile(member)
 			edit_summ = params['edit summary'] % profile_type
 			path = params['output path']
@@ -187,9 +182,6 @@ def	makePersonProfiles(profile_type, profile_subtype): #only for most active one
 			sub_page += i
 			profile.publishProfile(profile_formatted, path, edit_summ, sub_page)
 			i += 1
-
-# 	i = 0
-# 		if i < params['number featured']:
 
 
 ###MAIN###

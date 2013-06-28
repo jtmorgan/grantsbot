@@ -20,11 +20,12 @@ import wikitools
 import grantsbot_settings
 import templates
 import pages
+import re
 
 class Profiles:
 	"""A page on a wiki."""
 
-	def __init__(self, path, id, type, namespace = grantsbot_settings.rootpage):
+	def __init__(self, path, type, id = False, namespace = grantsbot_settings.rootpage):
 		"""
 		Instantiates page-level variables for building a set of profiles.
 		"""
@@ -49,7 +50,7 @@ class Profiles:
 		}
 		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
-		secs_list = [{'username' : x['line'], 'profile_index' : x['index']} for x in response['parse']['sections']]
+		secs_list = [{'username' : x['line'], 'profile index' : x['index']} for x in response['parse']['sections']] #username here should be made agnostic, so title
 		return secs_list
 
 	def getPageText(self, section = False):
@@ -108,9 +109,6 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS
 		else:
 			edit_info = (0, 0, "")
 		return edit_info
-
-
-
 
 	def formatProfile(self, val):
 		"""

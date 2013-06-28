@@ -49,11 +49,10 @@ class Params:
 				'edit summary' : '**TeSt** updating %s profile',
 				'number featured' : 6,
 				'main page' : 'Grants:IdeaLab/Introductions',
-				'page path' : '| username',
 				'image' : '| image =',
 				'recent' : {
 					'action' : 5,
-					'first subpage' : 10,
+					'first subpage' : 3,
 					},
 				'active' : {
 					'action' : 5,
@@ -81,6 +80,10 @@ class Params:
 					'category' : 'IEG/Proposals/Ineligible',
 					'subpage' : 'Ineligible',
 					},
+				},
+			'participant profile' : {
+				'output path' : 'Grants:IdeaLab/Introductions',
+				'edit summary' : 'Reordering %ss, putting recently active collaborators at the top',
 				},
 			}
 

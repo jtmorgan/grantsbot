@@ -17,9 +17,9 @@
 
 class Template:
 	"""templates of wiki pages"""
-
+#all that top-level markup shouldn't be necessary; should re-org the IdeaLab/Introductions page so that all profiles are under the first section
 	def __init__(self):
-		self.profile_templates = {'IdeaLab/Introductions' : u"""<noinclude><div style="font-family: Helvetica Neue, Helvetica, arial, sans-serif; line-height: 1.5em; background-color: #ffffff; color: #{{{{IEG/Color/Gray}}}}; min-width: 810px; margin-top: -60px; padding: 40px 0 20px">
+		self.profile_templates = {'participant profile' : u"""<noinclude><div style="font-family: Helvetica Neue, Helvetica, arial, sans-serif; line-height: 1.5em; background-color: #ffffff; color: #{{{{IEG/Color/Gray}}}}; min-width: 810px; margin-top: -60px; padding: 40px 0 20px">
 <div style="margin:0 15%">
 <span style="font-size: 3em; color: #{{{{IEG/Color/Light blue}}}};">'''Individual Engagement Grants'''</span>
 <div style="margin:1em 0">
@@ -46,8 +46,7 @@ class Template:
 | time = {time}
 | image = {image}
 | action = {action}
-| number of people =
-| name = {title}
+| name = {username}
 | username = {page path}
 | summary = {summary}
 }}}}"""

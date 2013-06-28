@@ -20,33 +20,36 @@ import logging
 import profiles
 import grantsbot_settings
 import sys
+import output_params
 
 logging.basicConfig(filename= grantsbot_settings.logs + 'moves.log', level=logging.INFO)
 curtime = str(datetime.utcnow())
-profile_type = sys.argv[1] #you specify the profile type at the command line
-page_path = sys.argv[2] #you specify the target page name at the command line
+profile_type = sys.argv[1] #you specify the profile type at the command line. it's 'participant profile' in quotes for people.
 
 ###FUNCTIONS###
-def rankProfiles(): #needs to be made agnostic, so that it will rank both idea profiles and people profiles
+def rankProfiles(profile_type): #needs to be made agnostic, so that it will rank both idea profiles and people profiles
 	"""
 	rank IdeaLab profiles by number of recent edits.
 	"""
-	profile_page = profiles.Profiles(page_path, profile_type)
+	param = output_params.Params()
+	params = param.getParams(profile_type)
+	profile_page = profiles.Profiles(params['output path'], profile_type, id=2101758) #should the page id be baked in like this?
 	profile_list = profile_page.getPageSectionData()
 	# profile_list = profile_list[0:2] #use sublist for quicker tests
 	for profile in profile_list:
-		profile['text'] = profile_page.getPageText(profile['profile_index'])
-		main_edits = profile_page.getUserRecentEdits(profile['username'], 200)
-		talk_edits = profile_page.getUserRecentEdits(profile['username'], 201)
+		profile['text'] = profile_page.getPageText(profile['profile index'])
+		main_edits = profile_page.getUserRecentEditInfo(profile['username'], 200)
+		talk_edits = profile_page.getUserRecentEditInfo(profile['username'], 201)
 		profile['edits'] = main_edits + talk_edits
 	plist_sorted = sorted(profile_list, key=lambda item: item['edits'], reverse = True)
-	plist_text = {'profiles' :'\n'.join([x['text'] for x in plist_sorted])} #join 'em all together
+	plist_text = {'profiles' :'\n\n'.join([x['text'] for x in plist_sorted])} #join 'em all together
 	formatted_profiles = profile_page.formatProfile(plist_text)
-	profile_page.publishProfile(formatted_profiles, "**TeSt** Reordering the IdeaLab profiles, putting more recently active collaborators at the top")
-	logging.info('Reordered IdeaLab profiles at ' + curtime)
+	edit_summ = params['edit summary'] % profile_type
+	profile_page.publishProfile(formatted_profiles, params['output path'], edit_summ)
+	logging.info('Reordered IdeaLab participant profiles at ' + curtime)
 
 ###MAIN###
-if profile_type == "people":
-	rankProfiles()
+if profile_type == "participant profile":
+	rankProfiles(profile_type)
 else:
 	print "sorry, we're not set up to work with " + profile_type + "profiles yet!"
