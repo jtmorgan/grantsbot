@@ -80,6 +80,10 @@ class Params:
 					'category' : 'IEG/Proposals/Ineligible',
 					'subpage' : 'Ineligible',
 					},
+				'all' : {
+					'category' : 'IEG/Proposals/IdeaLab',
+					'subpage' : 'All',
+					},
 				},
 			'participant profile' : {
 				'output path' : 'Grants:IdeaLab/Introductions',

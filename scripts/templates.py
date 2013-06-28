@@ -35,7 +35,6 @@ class Template:
 | time = {time}
 | image =
 | action = {action}
-| number of people =
 | idea = {title}
 | idea link = {page path}
 | summary = {summary}

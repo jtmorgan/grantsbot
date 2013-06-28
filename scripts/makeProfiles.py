@@ -18,7 +18,7 @@
 
 import categories
 import dateutil.parser
-from datetime import datetime
+from datetime import datetime, timedelta
 import grantsbot_settings
 import logging
 import profiles
@@ -52,6 +52,8 @@ def makeFeaturedProfiles(profile_type, profile_subtype, params, category, member
 	"""
 	make featured profiles and post them each to a separate gallery page
 	"""
+	date_since = datetime.utcnow()-timedelta(days=30) #the date 30 days ago
+	date_since = date_since.strftime('%Y%m%d%H%M%S')
 	member_list = member_list[0:2] #use sublist for quicker tests
 	i = 0
 	for member in member_list:
@@ -61,6 +63,7 @@ def makeFeaturedProfiles(profile_type, profile_subtype, params, category, member
 			touched = profile.getPageInfo('touched')
 			member['time'] = "Last edited: " + dateutil.parser.parse(touched).strftime('%x')
 			member['action'] = params[profile_subtype]['action'] #assign action variable
+			member['participants'] = profile.getPageRecentEditInfo(date_since)
 			infobox = profile.getPageText(0) #infoboxes are always in the top section
 			sum_regex = params['summary']
 			for line in infobox.split('\n'):
@@ -86,13 +89,19 @@ def makeProfileList(profile_type, profile_subtype, params, category, member_list
 	"""
 	make basic idea profiles and post them as a list to a category-specific profile page
 	"""
-	member_list = member_list[0:10] #only the most recently added ideas
+	date_since = datetime.utcnow()-timedelta(days=30) #the date 30 days ago
+	date_since = date_since.strftime('%Y%m%d%H%M%S')
+	if profile_subtype != 'all':
+		member_list = member_list[0:10] #only the most recently added ideas
+	else:
+		pass
 	plist = []
 	for member in member_list:
 		member['datetime added'] = dateutil.parser.parse(member['datetime added']).strftime('%x') #assign cat added date
-		profile = profiles.Profiles(member['page path'], member['page id'], profile_type)
+		profile = profiles.Profiles(member['page path'], profile_type, member['page id'])
 		touched = profile.getPageInfo('touched')
 		member['time'] = "Last edited: " + dateutil.parser.parse(touched).strftime('%x')
+		member['participants'] = profile.getPageRecentEditInfo(date_since)
 		infobox = profile.getPageText(0) #infoboxes are always in the top section
 		sum_regex = params['summary']
 		creator_regex = params['creator']
@@ -121,6 +130,7 @@ def makeProfileList(profile_type, profile_subtype, params, category, member_list
 # 		print member['creator']
 		member['title'] = re.search('([^/]+$)', member['page path']).group(1)
 		member['profile'] = profile.formatProfile(member)
+		print member['profile']
 		plist.append(member['profile'])
 	plist_text = '\n'.join(x for x in plist) #join 'em all together
 # 	print plist_text

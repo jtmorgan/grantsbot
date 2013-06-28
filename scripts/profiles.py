@@ -23,7 +23,7 @@ import pages
 import re
 
 class Profiles:
-	"""A page on a wiki."""
+	"""A grab-bag of operations you might want to perform on and with profiles."""
 
 	def __init__(self, path, type, id = False, namespace = grantsbot_settings.rootpage):
 		"""
@@ -31,6 +31,7 @@ class Profiles:
 		"""
 		self.page_path = path
 		self.page_id = str(id)
+		print self.page_id
 		self.type = type
 		self.namespace = namespace #used for people, not ideas
 # 		self.page_path = namespace + title #not using this for featured ideas
@@ -87,6 +88,29 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS
 # 		page_id = response['query']['pages'].keys()[0] #shouldn't need this step. fixme!
 		info = response['query']['pages'][self.page_id][val]
 		return info
+
+	def getPageRecentEditInfo(self, timestring):
+		"""
+		Gets timestamp and user id for recent revisions from a page, based on a timestamp you specify as a string.
+		Example: http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2275494&rvdir=newer&rvstart=20130601000000&rvprop=timestamp|userid&format=jsonfm
+		"""
+		params = {
+			'action': 'query',
+			'prop': 'revisions',
+			'pageids': self.page_id,
+			'rvdir': 'newer',
+			'rvstart' : timestring,
+			'rvprop' : 'userid',
+		}
+		req = wikitools.APIRequest(self.wiki, params)
+		response = req.query()
+		try:
+			recent_edits = response['query']['pages'][self.page_id]['revisions']
+			recent_editors = set([x['userid'] for x in recent_edits])
+			num_editors = str(len(recent_editors))
+		except KeyError: #if no revisions, no recent editors
+			num_editors = ""
+		return num_editors
 
 	def getUserRecentEditInfo(self, user_name, edit_namespace = False): #rename
 		"""
