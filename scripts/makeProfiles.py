@@ -54,7 +54,7 @@ def makeFeaturedProfiles(profile_type, profile_subtype, params, category, member
 	"""
 	date_since = datetime.utcnow()-timedelta(days=30) #the date 30 days ago
 	date_since = date_since.strftime('%Y%m%d%H%M%S')
-	member_list = member_list[0:2] #use sublist for quicker tests
+# 	member_list = member_list[0:2] #use sublist for quicker tests
 	i = 0
 	for member in member_list:
 		if i < params['number featured']:
@@ -91,7 +91,7 @@ def makeProfileList(profile_type, profile_subtype, params, category, member_list
 	"""
 	date_since = datetime.utcnow()-timedelta(days=30) #the date 30 days ago
 	date_since = date_since.strftime('%Y%m%d%H%M%S')
-	if profile_subtype != 'all':
+	if profile_subtype == 'new':
 		member_list = member_list[0:10] #only the most recently added ideas
 	else:
 		pass
@@ -130,7 +130,7 @@ def makeProfileList(profile_type, profile_subtype, params, category, member_list
 # 		print member['creator']
 		member['title'] = re.search('([^/]+$)', member['page path']).group(1)
 		member['profile'] = profile.formatProfile(member)
-		print member['profile']
+# 		print member['profile']
 		plist.append(member['profile'])
 	plist_text = '\n'.join(x for x in plist) #join 'em all together
 # 	print plist_text
@@ -167,7 +167,14 @@ def	makePersonProfiles(profile_type, profile_subtype): #only for most active one
 			member['page path'] = "User:" + member['username']
 			sum = params['summary'] #crappy workaround
 			img = params['image']
+			bdg = params['badge']
 			for line in member['text'].split('\n'):
+				if line.startswith(bdg, 0, len(bdg)):
+					try:
+						txt = re.search('(?<=\=)(.*?)(?=<|\||$)',line).group(1)
+						member['badge'] = txt.strip()
+					except:
+						print "cannot find the template parameter " + img
 				if line.startswith(img, 0, len(img)):
 					try:
 						txt = re.search('(?<=\=)(.*?)(?=<|\||$)',line).group(1)

@@ -46,6 +46,7 @@ class Template:
 | image = {image}
 | action = {action}
 | name = {username}
+| badge = {badge}
 | username = {page path}
 | summary = {summary}
 }}}}"""

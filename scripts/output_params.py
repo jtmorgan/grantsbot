@@ -25,7 +25,7 @@ class Params:
 			'featured idea' : {
 				'summary' : '^\|\s*summary\s*=',
 				'output path' : 'Grants:IdeaLab/Ideas/Featured/',
-				'edit summary' : '**TeSt** updating %s profile',
+				'edit summary' : 'Updating %s profile',
 				'number featured' : 2,
 				'participants' : {
 					'category' : 'IEG/Proposals/Participants',
@@ -39,17 +39,18 @@ class Params:
 					},
 				'new' : {
 					'category' : 'IEG/Proposals/IdeaLab',
-					'action' : 1,
+					'action' : 0,
 					'first subpage' : 5,
 					},
 				},
 			'featured person' : {
 				'summary' : '| story',
 				'output path' : 'Grants:IdeaLab/Introductions/Featured/',
-				'edit summary' : '**TeSt** updating %s profile',
+				'edit summary' : 'Updating %s profile',
 				'number featured' : 6,
 				'main page' : 'Grants:IdeaLab/Introductions',
 				'image' : '| image =',
+				'badge' : '| badge =',
 				'recent' : {
 					'action' : 5,
 					'first subpage' : 3,
@@ -63,7 +64,7 @@ class Params:
 				'summary' : '^\|\s*summary\s*=',
 				'creator' : '^\|\s*creator\s*=',
 				'output path' : 'Grants:IdeaLab/Ideas/',
-				'edit summary' : '**TeSt** updating %ss',
+				'edit summary' : 'Updating %ss',
 				'participants' : {
 					'category' : 'IEG/Proposals/Participants',
 					'subpage' : 'Participants',
