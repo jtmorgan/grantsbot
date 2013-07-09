@@ -29,7 +29,7 @@ class Params:
 				'number featured' : 2,
 				'participants' : {
 					'category' : 'IEG/Proposals/Participants',
-					'action' : 3,
+					'action' : 2,
 					'first subpage' : 1,
 					},
 				'draft' :	{
@@ -90,6 +90,28 @@ class Params:
 				'output path' : 'Grants:IdeaLab/Introductions',
 				'edit summary' : 'Reordering %ss, putting recently active collaborators at the top',
 				},
+			'activity feed' : {
+				'output path' : 'Grants:IdeaLab/Ideas/Activity',
+				'number featured' : 6,
+				'main page' : 'Grants:IdeaLab/',
+				'creator' : 'creator',
+				'edit summary' : 'Updating %s profile',
+				'new' : {
+					'action' : 1,
+					'category' : 'IEG/Proposals/IdeaLab',
+					'subpage' : 'Ideas/All',
+					},
+				'draft' : {
+					'action' : 4,
+					'category' : 'IEG/Proposals/Draft/IdeaLab',
+					'subpage' : 'Ideas/Drafts',
+					},
+				'participants' : {
+					'action' : 3,
+					'category' : 'IEG/Proposals/Participants',
+					'subpage' : 'Ideas/Participants',
+					},
+				}
 			}
 
 	def getParams(self, prfl_type):

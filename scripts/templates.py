@@ -34,6 +34,7 @@ class Template:
 {{{{IdeaLab/Feature
 | time = {time}
 | image =
+| number of people = {participants}
 | action = {action}
 | idea = {title}
 | idea link = {page path}
@@ -62,6 +63,16 @@ class Template:
 | image =
 }}}}"""
 ,
+'activity feed' :u"""
+==<noinclude>{item}</noinclude>==
+{{{{IdeaLab/Activity/Entry
+| time = {time}
+| name = {creator}
+| username = User:{creator}
+| action = {action}
+| idea = {title}
+| idea link = {page path}
+}}}}"""
 }
 
 #changed 'featured idea' param value to 'title' for consistency

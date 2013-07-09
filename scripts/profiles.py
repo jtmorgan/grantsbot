@@ -31,7 +31,7 @@ class Profiles:
 		"""
 		self.page_path = path
 		self.page_id = str(id)
-		print self.page_id
+# 		print self.page_id
 		self.type = type
 		self.namespace = namespace #used for people, not ideas
 # 		self.page_path = namespace + title #not using this for featured ideas
@@ -72,7 +72,7 @@ class Profiles:
 		text = response['query']['pages'][self.page_id]['revisions'][0]['*']
 		return text
 
-	def getPageInfo(self, val):
+	def getPageInfo(self, val, prop):
 		"""
 		Retrieve the value of any one of the default page info metadata.
 		Sample:
@@ -81,12 +81,17 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS
 		params = {
 			'action': 'query',
 			'titles': self.page_path,
-			'prop': 'info',
+			'prop': prop,
 		}
 		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
 # 		page_id = response['query']['pages'].keys()[0] #shouldn't need this step. fixme!
-		info = response['query']['pages'][self.page_id][val]
+		if prop == 'info':
+			info = response['query']['pages'][self.page_id][val]
+		elif prop =='revisions':
+			info = response['query']['pages'][self.page_id]['revisions'][0][val]
+		else:
+			print "invalid prop parameter specified"
 		return info
 
 	def getPageRecentEditInfo(self, timestring):
@@ -152,5 +157,5 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS
 		print pth
 		print val
 		print edt_summ
-		output = wikitools.Page(self.wiki, pth)
-		output.edit(val, summary=edt_summ, bot=1) #need to specify the section!
+# 		output = wikitools.Page(self.wiki, pth)
+# 		output.edit(val, summary=edt_summ, bot=1) #need to specify the section!

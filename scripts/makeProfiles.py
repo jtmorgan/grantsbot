@@ -27,6 +27,7 @@ import re
 import shelve
 import sys
 import templates
+import operator
 
 logging.basicConfig(filename = grantsbot_settings.logs + 'makes.log', level = logging.INFO)
 curtime = str(datetime.utcnow())
@@ -52,7 +53,7 @@ def makeFeaturedProfiles(profile_type, profile_subtype, params, category, member
 	"""
 	make featured profiles and post them each to a separate gallery page
 	"""
-	date_since = datetime.utcnow()-timedelta(days=30) #the date 30 days ago
+	date_since = datetime.utcnow()-timedelta(days=120) #the date 30 days ago
 	date_since = date_since.strftime('%Y%m%d%H%M%S')
 # 	member_list = member_list[0:2] #use sublist for quicker tests
 	i = 0
@@ -60,20 +61,28 @@ def makeFeaturedProfiles(profile_type, profile_subtype, params, category, member
 		if i < params['number featured']:
 			member['datetime added'] = dateutil.parser.parse(member['datetime added']).strftime('%x') #assign cat added date
 			profile = profiles.Profiles(member['page path'], profile_type, id=member['page id'])
-			touched = profile.getPageInfo('touched')
-			member['time'] = "Last edited: " + dateutil.parser.parse(touched).strftime('%x')
+# 			touched = profile.getPageInfo('touched', 'info') #not sure I need this. date is not accurate
+			latest = profile.getPageInfo('timestamp', 'revisions')
+			print latest
+			member['time'] = "Last edited: " + dateutil.parser.parse(latest).strftime('%x')
 			member['action'] = params[profile_subtype]['action'] #assign action variable
-			member['participants'] = profile.getPageRecentEditInfo(date_since)
+			if profile_subtype == "participants":
+				member['participants'] = profile.getPageRecentEditInfo(date_since)
+			else:
+				member['participants'] = ""
 			infobox = profile.getPageText(0) #infoboxes are always in the top section
 			sum_regex = params['summary']
 			for line in infobox.split('\n'):
 				if re.search(sum_regex, line):
 					try:
 						sum = re.search('(?<=\=)(.*?)(?=<|$)',line).group(1)
-						member['summary'] = sum
+						member['summary'] = sum.strip()
+						member['summary'] = re.sub("(\[\[)(.*?)(\|)","",member['summary'])
+						member['summary'] = re.sub("\]","",member['summary'])
+						member['summary'] = re.sub("\[","",member['summary'])
+						member['summary'] = (member['summary'][:140] + '...') if len(member['summary']) > 140 else member['summary'] #trims all summaries to 140 characters
 					except:
 						print "cannot find the template parameter " + sum_regex
-			member['summary'] = (member['summary'][:140] + '...') if len(member['summary']) > 140 else member['summary'] #trims all summaries to 140 characters
 			member['title'] = re.search('([^/]+$)', member['page path']).group(1)
 			profile_formatted = profile.formatProfile(member)
 			edit_summ = params['edit summary'] % profile_type
@@ -84,6 +93,7 @@ def makeFeaturedProfiles(profile_type, profile_subtype, params, category, member
 			i += 1
 		else:
 			print "run complete"
+			break
 
 def makeProfileList(profile_type, profile_subtype, params, category, member_list):
 	"""
@@ -99,8 +109,9 @@ def makeProfileList(profile_type, profile_subtype, params, category, member_list
 	for member in member_list:
 		member['datetime added'] = dateutil.parser.parse(member['datetime added']).strftime('%x') #assign cat added date
 		profile = profiles.Profiles(member['page path'], profile_type, member['page id'])
-		touched = profile.getPageInfo('touched')
-		member['time'] = "Last edited: " + dateutil.parser.parse(touched).strftime('%x')
+# 		touched = profile.getPageInfo('touched', 'info')
+		latest = profile.getPageInfo('timestamp', 'revisions')
+		member['time'] = "Last edited: " + dateutil.parser.parse(latest).strftime('%x')
 		member['participants'] = profile.getPageRecentEditInfo(date_since)
 		infobox = profile.getPageText(0) #infoboxes are always in the top section
 		sum_regex = params['summary']
@@ -130,14 +141,12 @@ def makeProfileList(profile_type, profile_subtype, params, category, member_list
 # 		print member['creator']
 		member['title'] = re.search('([^/]+$)', member['page path']).group(1)
 		member['profile'] = profile.formatProfile(member)
-# 		print member['profile']
-		plist.append(member['profile'])
-	plist_text = '\n'.join(x for x in plist) #join 'em all together
-# 	print plist_text
+	member_list.sort(key=operator.itemgetter('time'), reverse=True) #abstract this?
+	ptext = '\n'.join(member['profile'] for member in member_list) #join 'em all together
 	edit_summ = params['edit summary'] % (profile_subtype + " " + profile_type)
 	path = params['output path']
 	sub_page = params[profile_subtype]['subpage']
-	profile.publishProfile(plist_text, path, edit_summ, sub_page)
+	profile.publishProfile(ptext, path, edit_summ, sub_page)
 
 
 
@@ -200,6 +209,64 @@ def	makePersonProfiles(profile_type, profile_subtype): #only for most active one
 			profile.publishProfile(profile_formatted, path, edit_summ, sub_page)
 			i += 1
 
+def makeActivityFeed(profile_type, subtype_list):
+	"""
+	make an activity feed with the most recent ideas in it
+	"""
+	param = output_params.Params()
+	params = param.getParams(profile_type)
+	all_member_list = []
+	for profile_subtype in subtype_list:
+		print profile_subtype
+		cat = params[profile_subtype]['category']
+		category = categories.Categories(cat, 200) #namespace redundancy
+		member_list = category.getCatMembers()
+		member_list = member_list[0:6] #only the most recently added ideas
+		for member in member_list:
+			profile = profiles.Profiles(member['page path'], profile_type, member['page id'])
+			member['title'] = re.search('([^/]+$)', member['page path']).group(1)
+			member['time'] = dateutil.parser.parse(member['datetime added']).strftime('%x') #assign cat added date
+			member['action'] = params[profile_subtype]['action'] #assign action variable
+			infobox = profile.getPageText(0) #infoboxes are always in the top section
+			creator_regex = params['creator']
+			for line in infobox.split('\n'):
+				if re.search(creator_regex, line):
+					try:
+						cr = re.search('(?<=\=)(.*?)(?=<|$)',line).group(1)
+						member['creator'] = cr.strip()
+						break
+					except:
+						print "could not get creator"
+				else:
+					member['creator'] = ""
+# 		print member_list
+		all_member_list.extend(member_list)
+# 	print all_member_list
+	all_member_list = [x for x in all_member_list if len(x.get('creator')) > 0]
+	all_member_list.sort(key=operator.itemgetter('time'), reverse=True) #abstract this?
+	seen = [] #we're removing stuff we've seen
+	unique_member_list = []
+	for member in all_member_list:
+		t = member['page path']
+		if t not in seen:
+			seen.append(t)
+			unique_member_list.append(member)
+	print seen
+	unqiue_member_list = unique_member_list[0:6] #only the most recently added ideas
+# 	print all_member_list
+	i = 1
+	for member in unique_member_list:
+		member['item'] = i
+		i += 1
+		member['profile'] = profile.formatProfile(member)
+	ptext = '\n'.join(member['profile'] for member in unique_member_list) #join 'em all together
+	edit_summ = params['edit summary'] % (profile_type)
+	path = params['output path']
+	profile.publishProfile(ptext, path, edit_summ)
+
+
+
+
 
 ###MAIN###
 profile_type = sys.argv[1] #you specify the kind of profile you want at the command line. Currently 'featured idea' or 'featured person'.
@@ -209,6 +276,9 @@ if ( profile_type == 'featured idea' or profile_type == 'idea profile' ):
 	makeIdeaProfiles(profile_type, profile_subtype)
 elif profile_type == 'featured person':
 	makePersonProfiles(profile_type, profile_subtype)
+elif profile_type == 'activity feed':
+	subtype_list = ['new','draft','participants'] #we want to get all of these
+	makeActivityFeed(profile_type, subtype_list)
 else:
 	print "unrecognized profile type " + profile_type
 logging.info('Made some ' + profile_type + 'profiles today, ' + curtime)
