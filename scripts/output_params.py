@@ -95,7 +95,12 @@ class Params:
 				'number featured' : 6,
 				'main page' : 'Grants:IdeaLab/',
 				'creator' : 'creator',
-				'edit summary' : 'Updating %s profile',
+				'edit summary' : 'Updating %s',
+				'header template' : '<noinclude>{{IdeaLab/Categories/Template}}</noinclude>\n',
+				'people' : {
+					'action' : 5,
+					'subpage' : 'Introductions',
+					},
 				'new' : {
 					'action' : 1,
 					'category' : 'IEG/Proposals/IdeaLab',

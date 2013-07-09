@@ -67,8 +67,8 @@ class Template:
 ==<noinclude>{item}</noinclude>==
 {{{{IdeaLab/Activity/Entry
 | time = {time}
-| name = {creator}
-| username = User:{creator}
+| username = {creator}
+| number of people =
 | action = {action}
 | idea = {title}
 | idea link = {page path}

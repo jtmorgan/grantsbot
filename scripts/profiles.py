@@ -31,7 +31,7 @@ class Profiles:
 		"""
 		self.page_path = path
 		self.page_id = str(id)
-# 		print self.page_id
+		print self.page_id
 		self.type = type
 		self.namespace = namespace #used for people, not ideas
 # 		self.page_path = namespace + title #not using this for featured ideas
@@ -94,7 +94,7 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS
 			print "invalid prop parameter specified"
 		return info
 
-	def getPageRecentEditInfo(self, timestring):
+	def getPageRecentEditInfo(self, timestring, people=False):
 		"""
 		Gets timestamp and user id for recent revisions from a page, based on a timestamp you specify as a string.
 		Example: http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2275494&rvdir=newer&rvstart=20130601000000&rvprop=timestamp|userid&format=jsonfm
@@ -105,16 +105,33 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS
 			'pageids': self.page_id,
 			'rvdir': 'newer',
 			'rvstart' : timestring,
-			'rvprop' : 'userid',
+			'rvprop' : 'timestamp|user|userid|comment',
 		}
 		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
-		try:
-			recent_edits = response['query']['pages'][self.page_id]['revisions']
-			recent_editors = set([x['userid'] for x in recent_edits])
-			num_editors = str(len(recent_editors))
-		except KeyError: #if no revisions, no recent editors
-			num_editors = ""
+		if people:
+			num_editors = []
+			suffix = "new section"
+			try:
+				recent_edits = response['query']['pages'][self.page_id]['revisions']
+# 				print recent_edits
+				for edit in recent_edits:
+					if edit['comment'].endswith(suffix):
+# 						print edit['comment']
+						intro = {'creator' : edit['user'], 'datetime added' : edit['timestamp'], 'action' : 5}
+						num_editors.append(intro)
+			except KeyError: #if no revisions, no recent editors
+				print "something went wrong"
+		else:
+			try:
+				recent_edits = response['query']['pages'][self.page_id]['revisions']
+				recent_editors = set([x['userid'] for x in recent_edits])
+				num_editors = str(len(recent_editors))
+				print num_editors
+			except KeyError: #if no revisions, no recent editors
+				num_editors = ""
+				print "something really went wrong"
+
 		return num_editors
 
 	def getUserRecentEditInfo(self, user_name, edit_namespace = False): #rename

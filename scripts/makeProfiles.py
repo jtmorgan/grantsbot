@@ -42,6 +42,7 @@ def makeIdeaProfiles(profile_type, profile_subtype):
 	cat = params[profile_subtype]['category']
 	category = categories.Categories(cat, 200) #namespace redundancy
 	member_list = category.getCatMembers()
+	print member_list
 	if profile_type == 'featured idea':
 		makeFeaturedProfiles(profile_type, profile_subtype, params, category, member_list)
 	elif profile_type == 'idea profile':
@@ -217,11 +218,16 @@ def makeActivityFeed(profile_type, subtype_list):
 	params = param.getParams(profile_type)
 	all_member_list = []
 	for profile_subtype in subtype_list:
-		print profile_subtype
+# 		print profile_subtype
 		cat = params[profile_subtype]['category']
 		category = categories.Categories(cat, 200) #namespace redundancy
 		member_list = category.getCatMembers()
-		member_list = member_list[0:6] #only the most recently added ideas
+		print member_list
+		member_list.sort(key=operator.itemgetter('datetime added'), reverse=True) #abstract this?
+
+		member_list = member_list[0:6] #only the 6 most recently added ideas
+# 		print member_list
+
 		for member in member_list:
 			profile = profiles.Profiles(member['page path'], profile_type, member['page id'])
 			member['title'] = re.search('([^/]+$)', member['page path']).group(1)
@@ -240,7 +246,6 @@ def makeActivityFeed(profile_type, subtype_list):
 				else:
 					member['creator'] = ""
 # 		print member_list
-		all_member_list.extend(member_list)
 # 	print all_member_list
 	all_member_list = [x for x in all_member_list if len(x.get('creator')) > 0]
 	all_member_list.sort(key=operator.itemgetter('time'), reverse=True) #abstract this?
@@ -251,15 +256,35 @@ def makeActivityFeed(profile_type, subtype_list):
 		if t not in seen:
 			seen.append(t)
 			unique_member_list.append(member)
-	print seen
-	unqiue_member_list = unique_member_list[0:6] #only the most recently added ideas
+		else:
+			print member['page path']
+			pass
+	print unique_member_list
+	###including people###
+	people_list = []
+	date_since = datetime.utcnow()-timedelta(days=90) #the date 30 days ago
+	date_since = date_since.strftime('%Y%m%d%H%M%S')
+	profile = profiles.Profiles("Grants:IdeaLab/Introductions", profile_type, 2101758)
+	people = "people"
+	intro_list = profile.getPageRecentEditInfo(date_since, people)
+	for intro in intro_list:
+		intro['time'] = dateutil.parser.parse(intro['datetime added']).strftime('%x')
+		intro['title'] = ""
+		intro['page path'] = ""
+		unique_member_list.append(intro)
+	unique_member_list.sort(key=operator.itemgetter('time'), reverse=True) #abstract this?
+
+# 	print seen
+	print unique_member_list
+	unique_member_list = unique_member_list[0:10] #only the most recently added ideas
 # 	print all_member_list
 	i = 1
 	for member in unique_member_list:
 		member['item'] = i
 		i += 1
 		member['profile'] = profile.formatProfile(member)
-	ptext = '\n'.join(member['profile'] for member in unique_member_list) #join 'em all together
+# 	print unique_member_list
+	ptext = params['header template'] + '\n'.join(member['profile'] for member in unique_member_list) #join 'em all together
 	edit_summ = params['edit summary'] % (profile_type)
 	path = params['output path']
 	profile.publishProfile(ptext, path, edit_summ)
