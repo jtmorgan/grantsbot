@@ -16,6 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # from wikitools import category as wtcat
+from datetime import datetime, timedelta
+import dateutil.parser
 import wikitools
 import grantsbot_settings
 import templates
@@ -31,11 +33,9 @@ class Profiles:
 		"""
 		self.page_path = path
 		self.page_id = str(id)
-		print self.page_id
+# 		print self.page_id
 		self.type = type
 		self.namespace = namespace #used for people, not ideas
-# 		self.page_path = namespace + title #not using this for featured ideas
-# # 		print self.page_path
 		self.wiki = wikitools.Wiki(grantsbot_settings.apiurl)
 		self.wiki.login(grantsbot_settings.username, grantsbot_settings.password)
 
@@ -68,13 +68,12 @@ class Profiles:
 		}
 		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
-# 		page_id = response['query']['pages'].keys()[0]
 		text = response['query']['pages'][self.page_id]['revisions'][0]['*']
 		return text
 
 	def getPageInfo(self, val, prop):
 		"""
-		Retrieve the value of any one of the default page info metadata.
+		Retrieve the default page info metadata OR latest revision metadata.
 		Sample:
 http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS_and_Cartography_in_Wikimedia&format=jsonfm
 		"""
@@ -85,7 +84,6 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS
 		}
 		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
-# 		page_id = response['query']['pages'].keys()[0] #shouldn't need this step. fixme!
 		if prop == 'info':
 			info = response['query']['pages'][self.page_id][val]
 		elif prop =='revisions':
@@ -167,12 +165,64 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS
 
 	def publishProfile(self, val, pth, edt_summ, sb_page = False):
 		"""
-		Publishes a profile or set of concatenated profiles to a page on a wiki.
+		Publishes a profile or set of concatenated profiles to a page on a wiki. Currently does not support editing single sections of a page.
 		"""
 		if sb_page:
 			pth += str(sb_page)
 		print pth
 		print val
 		print edt_summ
-# 		output = wikitools.Page(self.wiki, pth)
-# 		output.edit(val, summary=edt_summ, bot=1) #need to specify the section!
+		output = wikitools.Page(self.wiki, pth)
+		try:
+			output.edit(val, summary=edt_summ, bot=1)
+			print "I tried to make an edit!"
+		except:
+			print "Couldn't make the edit :("
+
+
+class Toolkit:
+	"""
+	Handy ready-to-use methods that you don't need to create a complex object for.
+	"""
+
+	def getSubDate(self, day_interval):
+		"""
+		Returns the date a specified number of days before the current date as an API and database-friendly 14-digit timestamp string.
+		"""
+		date_since = datetime.utcnow()-timedelta(days=day_interval)
+		date_since = date_since.strftime('%Y%m%d%H%M%S')
+		return date_since
+
+	def parseISOtime(self, iso):
+		"""
+		Parses the ISO datetime values returned by the API into strings.
+		"""
+		date_str = dateutil.parser.parse(iso).strftime('%x')
+		return date_str
+
+	def formatSummaries(self, text):
+		"""
+		Cleans markup from strings of profile summary text and trims them to 140 chars.
+		"""
+		text = text.strip()
+		text = re.sub("(\[\[)(.*?)(\|)","",text)
+		text = re.sub("\]","",text)
+		text = re.sub("\[","",text)
+		text = (text[:140] + '...') if len(text) > 140 else text
+		return text
+
+	def dedupeMemberList(self, mem_list, sort_val, dict_val):
+		"""
+		Sort and remove duplicates from a list of dicts based on a specified key/value pair.
+		"""
+		mem_list.sort(key=operator.itemgetter(sort_val), reverse=True)
+		seen_list = []
+		unique_list = []
+		for mem in mem_list:
+			t = mem[dict_val]
+			if t not in seen_list:
+				seen_list.append(t)
+				unique_list.append(mem)
+			else:
+				print "couldn't dedupe. fix me dummy."
+		return unique_list

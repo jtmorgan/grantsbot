@@ -44,7 +44,7 @@ class Params:
 					},
 				},
 			'featured person' : {
-				'summary' : '| story',
+				'summary' : '^\|\s*story\s*=',
 				'output path' : 'Grants:IdeaLab/Introductions/Featured/',
 				'edit summary' : 'Updating %s profile',
 				'number featured' : 6,
