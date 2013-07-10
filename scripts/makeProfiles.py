@@ -61,7 +61,7 @@ def makeFeaturedProfiles(profile_type, profile_subtype, params, category, member
 			member['datetime added'] = tools.parseISOtime(member['datetime added'])
 			profile = profiles.Profiles(member['page path'], profile_type, id=member['page id'])
 			latest = profile.getPageInfo('timestamp', 'revisions')
-			member['time'] = "Last edited: " + tools.parseISOtime(latest)
+			member['time'] = tools.parseISOtime(latest)
 			member['action'] = params[profile_subtype]['action']
 			if profile_subtype == "participants":
 				member['participants'] = profile.getPageRecentEditInfo(date_since)
@@ -100,7 +100,7 @@ def makeProfileList(profile_type, profile_subtype, params, category, member_list
 		member['datetime added'] = tools.parseISOtime(member['datetime added'])
 		profile = profiles.Profiles(member['page path'], profile_type, member['page id'])
 		latest = profile.getPageInfo('timestamp', 'revisions')
-		member['time'] = "Last edited: " + tools.parseISOtime(latest)
+		member['time'] = tools.parseISOtime(latest)
 		member['participants'] = profile.getPageRecentEditInfo(date_since)
 		infobox = profile.getPageText(0)
 		sum_re = params['summary']
