@@ -54,17 +54,13 @@ def makeFeaturedProfiles(profile_type, profile_subtype, params, category, member
 	Make featured profiles and post them each to a separate gallery page.
 	"""
 	tools = profiles.Toolkit()
-	date_since = tools.getSubDate(120)
+	date_since = tools.getSubDate(14)
 # 	member_list = member_list[0:2] #use sublist for quicker tests
 	i = 0
 	for member in member_list:
 		if i < params['number featured']: #this is problematic	
 			profile = profiles.Profiles(member['page path'], profile_type, id=member['page id'])	
-			member['participants'] = profile.getPageRecentEditInfo(date_since)
-			if member['participants'] < 1:
-				member['participants'] = ""
-			else:
-				pass
+			member['participants'] = ""	#don't need those for this.					
 			member['datetime added'] = tools.parseISOtime(member['datetime added'])
 			latest = profile.getPageInfo('timestamp', 'revisions')
 			member['time'] = tools.parseISOtime(latest)
@@ -78,11 +74,11 @@ def makeFeaturedProfiles(profile_type, profile_subtype, params, category, member
 						if len(sum) > 1:
 							member['summary'] = tools.formatSummaries(sum)
 						else:
-							member['summary'] = ""	
+							continue	
 					except:
 						print "cannot find the template parameter " + sum_re
 				else:
-					member['summary'] = ""							
+					continue #ignore this profile because it has no summary.							
 			member['title'] = re.search('([^/]+$)', member['page path']).group(1)
 			member['profile'] = profile.formatProfile(member)
 			sub_page = params[profile_subtype]['first subpage']
@@ -204,7 +200,7 @@ def makeActivityFeed(profile_type, subtype_list):
 	param = output_params.Params()
 	params = param.getParams(profile_type)
 	tools = profiles.Toolkit()
-	date_since = tools.getSubDate(90)
+	date_since = tools.getSubDate(14)
 	all_member_list = []
 	for subtype in subtype_list:
 		cat = params[subtype]['category']
@@ -256,7 +252,7 @@ def addPeople(mem_list, tools):
 	"""
 	Add profiles of IdeaLab participants to the activity feed member list.
 	"""
-	date_since = tools.getSubDate(120)
+	date_since = tools.getSubDate(14)
 	profile = profiles.Profiles("Grants:IdeaLab/Introductions", profile_type, 2101758) #needs abstraction
 	people = "people" #boo!
 	people_list = profile.getPageRecentEditInfo(date_since, people)

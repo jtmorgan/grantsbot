@@ -33,13 +33,13 @@ class Params:
 					'first subpage' : 1,
 					},
 				'draft' :	{
-					'category' : 'IEG/Proposals/Draft/IdeaLab',
+					'category' : 'IEG/Proposals/Draft',
 					'action' : 4,
 					'first subpage' : 3,
 					},
 				'new' : {
-					'category' : 'IEG/Proposals/IdeaLab',
-					'action' : 0,
+					'category' : 'IdeaLab/Ideas/Active',
+					'action' : "",
 					'first subpage' : 5,
 					},
 				},
@@ -82,7 +82,7 @@ class Params:
 					'subpage' : 'Ineligible',
 					},
 				'all' : {
-					'category' : 'IdeaLab/Ideas/Active',
+					'category' : 'IdeaLab/Ideas/IdeaLab',
 					'subpage' : 'All',
 					},
 				},
@@ -103,7 +103,7 @@ class Params:
 					},
 				'new' : {
 					'action' : 1,
-					'category' : 'IdeaLab/Ideas/IdeaLab',
+					'category' : 'IdeaLab/Ideas/Active',
 					'subpage' : 'Ideas/All',
 					},
 				'draft' : {
