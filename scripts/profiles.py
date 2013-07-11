@@ -170,8 +170,8 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS
 		print pth
 		print val
 		print edt_summ
-		output = wikitools.Page(self.wiki, pth)
-		output.edit(val, summary=edt_summ, bot=1)
+# 		output = wikitools.Page(self.wiki, pth)
+# 		output.edit(val, summary=edt_summ, bot=1)
 
 
 
@@ -223,5 +223,4 @@ class Toolkit:
 				unique_list.append(mem)
 			else:
 				pass
-		print seen_list		
 		return unique_list

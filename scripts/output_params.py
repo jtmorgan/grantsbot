@@ -70,7 +70,7 @@ class Params:
 					'subpage' : 'Participants',
 					},
 				'draft' :	{
-					'category' : 'IEG/Proposals/Draft/IdeaLab',
+					'category' : 'IEG/Proposals/Draft',
 					'subpage' : 'Drafts',
 					},
 				'new' : {
@@ -103,12 +103,12 @@ class Params:
 					},
 				'new' : {
 					'action' : 1,
-					'category' : 'IdeaLab/Ideas/Active',
+					'category' : 'IdeaLab/Ideas/IdeaLab',
 					'subpage' : 'Ideas/All',
 					},
 				'draft' : {
 					'action' : 4,
-					'category' : 'IEG/Proposals/Draft/IdeaLab',
+					'category' : 'IEG/Proposals/Draft',
 					'subpage' : 'Ideas/Drafts',
 					},
 				'participants' : {

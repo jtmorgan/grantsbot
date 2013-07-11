@@ -138,7 +138,7 @@ def makeProfileList(profile_type, profile_subtype, params, category, member_list
 
 def	makePersonProfiles(profile_type, profile_subtype): #only for most active ones, for now
 	"""
-	create featured people profiles and publish them to a gallery
+	Create featured people profiles and publish them to a gallery.
 	"""
 	param = output_params.Params()
 	params = param.getParams(profile_type)
@@ -160,9 +160,6 @@ def	makePersonProfiles(profile_type, profile_subtype): #only for most active one
 			member['time'] = dateutil.parser.parse(recent_edit).strftime('%x')
 			member['action'] = params[profile_subtype]['action']
 			member['page path'] = "User:" + member['username']
-# 			sum_re = params['summary']
-# 			img = params['image']
-# 			bdg = params['bdg']
 			for line in member['text'].split('\n'):
 				if re.search(params['image'], line):
 					try:
