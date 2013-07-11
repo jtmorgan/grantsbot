@@ -21,6 +21,7 @@ import dateutil.parser
 import wikitools
 import grantsbot_settings
 import templates
+import operator
 import pages
 import re
 
@@ -124,12 +125,9 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS
 			try:
 				recent_edits = response['query']['pages'][self.page_id]['revisions']
 				recent_editors = set([x['userid'] for x in recent_edits])
-				num_editors = str(len(recent_editors))
-				print num_editors
+				num_editors = len(recent_editors)
 			except KeyError: #if no revisions, no recent editors
-				num_editors = ""
-				print "something really went wrong"
-
+				num_editors = 0
 		return num_editors
 
 	def getUserRecentEditInfo(self, user_name, edit_namespace = False): #rename
@@ -173,11 +171,8 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS
 		print val
 		print edt_summ
 		output = wikitools.Page(self.wiki, pth)
-		try:
-			output.edit(val, summary=edt_summ, bot=1)
-			print "I tried to make an edit!"
-		except:
-			print "Couldn't make the edit :("
+		output.edit(val, summary=edt_summ, bot=1)
+
 
 
 class Toolkit:
@@ -185,12 +180,15 @@ class Toolkit:
 	Handy ready-to-use methods that you don't need to create a complex object for.
 	"""
 
-	def getSubDate(self, day_interval):
+	def getSubDate(self, day_interval, pretty=False):
 		"""
-		Returns the date a specified number of days before the current date as an API and database-friendly 14-digit timestamp string.
+		Returns the date a specified number of days before the current date as an API and database-friendly 14-digit timestamp string. Also handy for getting a date formatted for pretty output. 
 		"""
 		date_since = datetime.utcnow()-timedelta(days=day_interval)
-		date_since = date_since.strftime('%Y%m%d%H%M%S')
+		if pretty:
+			date_since = date_since.strftime('%m/%d/%y')		
+		else:
+			date_since = date_since.strftime('%Y%m%d%H%M%S')
 		return date_since
 
 	def parseISOtime(self, iso):
@@ -213,10 +211,10 @@ class Toolkit:
 
 	def dedupeMemberList(self, mem_list, sort_val, dict_val):
 		"""
-		Sort and remove duplicates from a list of dicts based on a specified key/value pair.
+		Sort and remove duplicates from a list of dicts based on a specified key/value pair. Also removes things that should be ignored.
 		"""
 		mem_list.sort(key=operator.itemgetter(sort_val), reverse=True)
-		seen_list = []
+		seen_list = ['Grants:IdeaLab/Preload']
 		unique_list = []
 		for mem in mem_list:
 			t = mem[dict_val]
@@ -224,5 +222,6 @@ class Toolkit:
 				seen_list.append(t)
 				unique_list.append(mem)
 			else:
-				print "couldn't dedupe. fix me dummy."
+				pass
+		print seen_list		
 		return unique_list

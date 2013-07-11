@@ -18,6 +18,7 @@
 
 import categories
 from datetime import datetime
+import dateutil.parser
 import grantsbot_settings
 import logging
 import profiles
@@ -57,28 +58,33 @@ def makeFeaturedProfiles(profile_type, profile_subtype, params, category, member
 # 	member_list = member_list[0:2] #use sublist for quicker tests
 	i = 0
 	for member in member_list:
-		if i < params['number featured']:
+		if i < params['number featured']: #this is problematic	
+			profile = profiles.Profiles(member['page path'], profile_type, id=member['page id'])	
+			member['participants'] = profile.getPageRecentEditInfo(date_since)
+			if member['participants'] < 1:
+				member['participants'] = ""
+			else:
+				pass
 			member['datetime added'] = tools.parseISOtime(member['datetime added'])
-			profile = profiles.Profiles(member['page path'], profile_type, id=member['page id'])
 			latest = profile.getPageInfo('timestamp', 'revisions')
 			member['time'] = tools.parseISOtime(latest)
 			member['action'] = params[profile_subtype]['action']
-			if profile_subtype == "participants":
-				member['participants'] = profile.getPageRecentEditInfo(date_since)
-			else:
-				member['participants'] = ""
 			infobox = profile.getPageText(0)
 			sum_re = params['summary']
 			for line in infobox.split('\n'):
 				if re.search(sum_re, line):
 					try:
 						sum = re.search('(?<=\=)(.*?)(?=<|$)',line).group(1)
-						member['summary'] = tools.formatSummaries(sum)
+						if len(sum) > 1:
+							member['summary'] = tools.formatSummaries(sum)
+						else:
+							member['summary'] = ""	
 					except:
 						print "cannot find the template parameter " + sum_re
+				else:
+					member['summary'] = ""							
 			member['title'] = re.search('([^/]+$)', member['page path']).group(1)
 			member['profile'] = profile.formatProfile(member)
-# 			path = params['output path'] #also need number of people, at some point
 			sub_page = params[profile_subtype]['first subpage']
 			sub_page += i
 			profile.publishProfile(member['profile'], params['output path'], params['edit summary'] % profile_type, sub_page)
@@ -136,7 +142,7 @@ def	makePersonProfiles(profile_type, profile_subtype): #only for most active one
 	"""
 	param = output_params.Params()
 	params = param.getParams(profile_type)
-# 	print params['main page']
+	tools = profiles.Toolkit()	
 	profile_page = profiles.Profiles(params['main page'], profile_type, id=2101758) #should the page id be baked in like this?
 	profile_list = profile_page.getPageSectionData()
 	profile_list = profile_list[0:6] #only need top six. assumes profiles are already sorted by activity
@@ -151,35 +157,40 @@ def	makePersonProfiles(profile_type, profile_subtype): #only for most active one
 				recent_edit = main_edits[2]
 			else:
 				recent_edit = talk_edits[2]
-			member['time'] = "Last edited: " + dateutil.parser.parse(recent_edit).strftime('%x')
+			member['time'] = dateutil.parser.parse(recent_edit).strftime('%x')
 			member['action'] = params[profile_subtype]['action']
 			member['page path'] = "User:" + member['username']
-			sum = params['summary'] #crappy workaround
-			img = params['image']
-			bdg = params['badge']
+# 			sum_re = params['summary']
+# 			img = params['image']
+# 			bdg = params['bdg']
 			for line in member['text'].split('\n'):
-				if line.startswith(bdg, 0, len(bdg)):
+				if re.search(params['image'], line):
 					try:
-						txt = re.search('(?<=\=)(.*?)(?=<|\||$)',line).group(1)
-						member['badge'] = txt.strip()
+						img = re.search('(?<=\=)(.*?)(?=<|\||$)',line).group(1)
+						if len(img) > 1:
+							member['image'] = tools.formatSummaries(img)
+						else:
+							member['image'] = ""							
 					except:
-						print "cannot find the template parameter " + img
-				if line.startswith(img, 0, len(img)):
+						print "cannot find the template parameter " + params['image']
+				if re.search(params['badge'], line):
 					try:
-						txt = re.search('(?<=\=)(.*?)(?=<|\||$)',line).group(1)
-						member['image'] = txt.strip()
+						bdg = re.search('(?<=\=)(.*?)(?=<|\||$)',line).group(1)
+						if len(bdg) > 1:
+							member['badge'] = tools.formatSummaries(bdg)
+						else:
+							member['badge'] = ""
 					except:
-						print "cannot find the template parameter " + img
-				if line.startswith(sum, 0, len(sum)):
+						print "cannot find the template parameter " + params['badge']
+				if re.search(params['summary'], line):
 					try:
-						txt = re.search('(?<=\=)(.*?)(?=<|$)',line).group(1)
-						member['summary'] = txt.strip()
-						member['summary'] = re.sub("(\[\[)(.*?)(\|)","",member['summary'])
-						member['summary'] = re.sub("\]","",member['summary'])
-						member['summary'] = re.sub("\[","",member['summary'])
-						member['summary'] = (member['summary'][:140] + '...') if len(member['summary']) > 140 else member['summary'] #trims all summaries to 140 characters
+						sum = re.search('(?<=\=)(.*?)(?=<|$)',line).group(1)
+						if len(sum) > 1:
+							member['summary'] = tools.formatSummaries(sum)
+						else:
+							member['summary'] = ""							
 					except:
-						print "cannot find the template parameter " + sum
+						print "cannot find the template parameter " + params['summary']
 			profile = profiles.Profiles(member['page path'], profile_type) #fix this! inconsistent
 			profile_formatted = profile.formatProfile(member)
 			edit_summ = params['edit summary'] % profile_type
@@ -196,7 +207,7 @@ def makeActivityFeed(profile_type, subtype_list):
 	param = output_params.Params()
 	params = param.getParams(profile_type)
 	tools = profiles.Toolkit()
-	date_since = tools.getSubDate(120)
+	date_since = tools.getSubDate(90)
 	all_member_list = []
 	for subtype in subtype_list:
 		cat = params[subtype]['category']
@@ -204,12 +215,20 @@ def makeActivityFeed(profile_type, subtype_list):
 		member_list = category.getCatMembers()
 		member_list = member_list[0:6] #only the 6 most recently added ideas, for simplicity
 		for member in member_list:
-			member['action'] = params[subtype]['action'] #put this in cat class
+			member['subtype'] = subtype	
+			member['action'] = params[member['subtype']]['action'] #put this in cat class	
 		all_member_list.extend(member_list)
-	for member in all_member_list
-			profile = profiles.Profiles(member['page path'], profile_type, member['page id'])
-			member['title'] = re.search('([^/]+$)', member['page path']).group(1)
-			member['time'] = tools.parseISOtime(member['datetime added']) #should put this in cat class
+	for member in all_member_list:
+		profile = profiles.Profiles(member['page path'], profile_type, member['page id'])
+		member['title'] = re.search('([^/]+$)', member['page path']).group(1)
+		member['time'] = tools.parseISOtime(member['datetime added']) #should put this in cat class
+		member['participants'] = profile.getPageRecentEditInfo(date_since)
+		if member['participants'] > 2:
+			member['action'] = 2
+			member['creator'] = ""
+			member['time'] = tools.getSubDate(0, "pretty") #we use today's date for this kind of item
+		else:
+			member['participants'] = ""							
 			infobox = profile.getPageText(0) #infoboxes are always in the top section
 			creator_re = params['creator']
 			member['creator'] = ""
@@ -222,7 +241,7 @@ def makeActivityFeed(profile_type, subtype_list):
 						print "could not get creator"
 				else:
 					pass
-	all_member_list = [x for x in all_member_list if len(x.get('creator')) > 0] #only showing ones with a creator
+	all_member_list = [x for x in all_member_list if len(x.get('creator')) > 0 or x.get('action') == 2] #only keep ones with a creator or more than two participants
 	all_member_list = tools.dedupeMemberList(all_member_list, 'time', 'page path') #remove dupes
 	all_member_list = addPeople(all_member_list, tools) #add recent people profiles
 	all_member_list.sort(key=operator.itemgetter('time'), reverse=True) #abstract this?
@@ -232,25 +251,25 @@ def makeActivityFeed(profile_type, subtype_list):
 		member['item'] = i
 		i += 1
 		member['profile'] = profile.formatProfile(member)
-	all_profiles = params['header template'] + '\n'.join(member['profile'] for member in all_member_list)
+	all_profiles = params['header template'] + "".join(member['profile'] for member in all_member_list)
 	edit_summ = params['edit summary'] % (profile_type)
-	path = params['output path']
-	profile.publishProfile(ptext, params['output path'], edit_summ)
+	profile.publishProfile(all_profiles, params['output path'], edit_summ)
 
-def addPeople(mem_list, date_since):
+def addPeople(mem_list, tools):
 	"""
 	Add profiles of IdeaLab participants to the activity feed member list.
 	"""
 	date_since = tools.getSubDate(120)
 	profile = profiles.Profiles("Grants:IdeaLab/Introductions", profile_type, 2101758) #needs abstraction
 	people = "people" #boo!
-	intro_list = profile.getPageRecentEditInfo(date_since, people)
-	for intro in intro_list:
-		intro['creator'] = "[[User:" + intro['creator'] + "|" + intro['creator'] + "]]"
-		intro['time'] = tools.parseISOtime(member['datetime added'])
-		intro['title'] = ""
-		intro['page path'] = ""
-		mem_list.append(intro)
+	people_list = profile.getPageRecentEditInfo(date_since, people)
+	for person in people_list:
+		person['creator'] = "[[User:" + person['creator'] + "|" + person['creator'] + "]]"
+		person['time'] = tools.parseISOtime(person['datetime added'])
+		person['title'] = ""
+		person['page path'] = ""
+		person['participants'] = ""
+	mem_list.extend(people_list)
 	return mem_list
 
 

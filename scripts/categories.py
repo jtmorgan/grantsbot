@@ -27,7 +27,7 @@ class Categories:
 		Instantiate basic variables for the category you're interested in.
 		"""
 		self.cat_title = "Category:" + title
-# 		print self.title
+		self.supercat = "Category:IdeaLab/Ideas/Active"
 		self.mem_type = type
 # 		print self.type
 		self.mem_namespace = namespace
@@ -54,6 +54,15 @@ class Categories:
 			req = wikitools.APIRequest(self.wiki, query_params)
 			response = req.query()
 			mem_list = [{'page id' : x['pageid'], 'page path' : x['title'], 'datetime added' : x['timestamp']} for x in response['query']['categorymembers']]
+			if self.cat_title != "Category:IEG/Proposals/Draft/IdeaLab":
+				query_params['title'] = self.supercat
+				req = wikitools.APIRequest(self.wiki, query_params)
+				response = req.query()
+				super_list = [{'page id' : x['pageid'], 'page path' : x['title'], 'datetime added' : x['timestamp']} for x in response['query']['categorymembers']]	
+				active_pages = [x['pageid'] for x in super_list]
+				mem_list = [x for x in mem_list if x['pageid'] in active_pages]					
+			else:
+				pass
 			return mem_list
 		else: print "not set up to get this type of category member yet"
 

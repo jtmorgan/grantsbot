@@ -67,7 +67,7 @@ class Template:
 {{{{IdeaLab/Activity/Entry
 | time = {time}
 | username = {creator}
-| number of people =
+| number of people = {participants}
 | action = {action}
 | idea = {title}
 | idea link = {page path}

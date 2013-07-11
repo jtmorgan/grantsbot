@@ -28,8 +28,8 @@ class Params:
 				'edit summary' : 'Updating %s profile',
 				'number featured' : 2,
 				'participants' : {
-					'category' : 'IEG/Proposals/Participants',
-					'action' : 2,
+					'category' : 'IdeaLab/Ideas/Participants',
+					'action' : 3,
 					'first subpage' : 1,
 					},
 				'draft' :	{
@@ -49,8 +49,8 @@ class Params:
 				'edit summary' : 'Updating %s profile',
 				'number featured' : 6,
 				'main page' : 'Grants:IdeaLab/Introductions',
-				'image' : '| image =',
-				'badge' : '| badge =',
+				'image' : '^\|\s*image\s*=',
+				'badge' : '^\|\s*badge\s*=',
 				'recent' : {
 					'action' : 5,
 					'first subpage' : 3,
@@ -66,7 +66,7 @@ class Params:
 				'output path' : 'Grants:IdeaLab/Ideas/',
 				'edit summary' : 'Updating %ss',
 				'participants' : {
-					'category' : 'IEG/Proposals/Participants',
+					'category' : 'IdeaLab/Ideas/Participants',
 					'subpage' : 'Participants',
 					},
 				'draft' :	{
@@ -74,15 +74,15 @@ class Params:
 					'subpage' : 'Drafts',
 					},
 				'new' : {
-					'category' : 'IEG/Proposals/IdeaLab',
+					'category' : 'IdeaLab/Ideas/Active',
 					'subpage' : 'New',
 					},
 				'ineligible' : {
-					'category' : 'IEG/Proposals/Ineligible',
+					'category' : 'IEG/Proposals/Ineligible', #ineligible ideas?
 					'subpage' : 'Ineligible',
 					},
 				'all' : {
-					'category' : 'IEG/Proposals/IdeaLab',
+					'category' : 'IdeaLab/Ideas/Active',
 					'subpage' : 'All',
 					},
 				},
@@ -103,7 +103,7 @@ class Params:
 					},
 				'new' : {
 					'action' : 1,
-					'category' : 'IEG/Proposals/IdeaLab',
+					'category' : 'IdeaLab/Ideas/Active',
 					'subpage' : 'Ideas/All',
 					},
 				'draft' : {
@@ -113,7 +113,7 @@ class Params:
 					},
 				'participants' : {
 					'action' : 3,
-					'category' : 'IEG/Proposals/Participants',
+					'category' : 'IdeaLab/Ideas/Participants',
 					'subpage' : 'Ideas/Participants',
 					},
 				}
