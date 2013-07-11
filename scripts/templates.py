@@ -38,6 +38,7 @@ class Template:
 | idea = {title}
 | idea link = {page path}
 | summary = {summary}
+| image = {image}
 }}}}"""
 ,
 'featured person' : u"""
@@ -59,7 +60,7 @@ class Template:
 | idea link= {page path}
 | summary= {summary}
 | creator= {creator}
-| image =
+| image = {image}
 }}}}"""
 ,
 'activity feed' :u"""

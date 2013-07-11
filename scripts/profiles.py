@@ -113,7 +113,6 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS
 			suffix = "new section"
 			try:
 				recent_edits = response['query']['pages'][self.page_id]['revisions']
-# 				print recent_edits
 				for edit in recent_edits:
 					if edit['comment'].endswith(suffix):
 # 						print edit['comment']
@@ -182,11 +181,11 @@ class Toolkit:
 
 	def getSubDate(self, day_interval, pretty=False):
 		"""
-		Returns the date a specified number of days before the current date as an API and database-friendly 14-digit timestamp string. Also handy for getting a date formatted for pretty output. 
+		Returns the date a specified number of days before the current date as an API and database-friendly 14-digit timestamp string. Also handy for getting a date formatted for pretty output.
 		"""
 		date_since = datetime.utcnow()-timedelta(days=day_interval)
 		if pretty:
-			date_since = date_since.strftime('%m/%d/%y')		
+			date_since = date_since.strftime('%m/%d/%y')
 		else:
 			date_since = date_since.strftime('%Y%m%d%H%M%S')
 		return date_since

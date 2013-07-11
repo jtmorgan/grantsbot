@@ -58,27 +58,39 @@ def makeFeaturedProfiles(profile_type, profile_subtype, params, category, member
 # 	member_list = member_list[0:2] #use sublist for quicker tests
 	i = 0
 	for member in member_list:
-		if i < params['number featured']: #this is problematic	
-			profile = profiles.Profiles(member['page path'], profile_type, id=member['page id'])	
-			member['participants'] = ""	#don't need those for this.					
+		if i < params['number featured']: #this is problematic
+			profile = profiles.Profiles(member['page path'], profile_type, id=member['page id'])
+			member['participants'] = ""	#don't need those for this.
 			member['datetime added'] = tools.parseISOtime(member['datetime added'])
 			latest = profile.getPageInfo('timestamp', 'revisions')
 			member['time'] = tools.parseISOtime(latest)
 			member['action'] = params[profile_subtype]['action']
 			infobox = profile.getPageText(0)
 			sum_re = params['summary']
+			member['image'] = ""
 			for line in infobox.split('\n'):
+				if re.search(params['image'], line):
+					try:
+						img = re.search('(?<=\=)(.*?)(?=<|\||$)',line).group(1)
+						print "image is " + img
+						member['image'] = img
+ 						if len(img) > 1:
+ 							member['image'] = img
+ 						else:
+ 							member['image'] = ""
+					except:
+						print "cannot find the template parameter " + params['image']
 				if re.search(sum_re, line):
 					try:
 						sum = re.search('(?<=\=)(.*?)(?=<|$)',line).group(1)
 						if len(sum) > 1:
 							member['summary'] = tools.formatSummaries(sum)
 						else:
-							continue	
+							continue
 					except:
 						print "cannot find the template parameter " + sum_re
 				else:
-					continue #ignore this profile because it has no summary.							
+					continue #ignore this profile because it has no summary.
 			member['title'] = re.search('([^/]+$)', member['page path']).group(1)
 			member['profile'] = profile.formatProfile(member)
 			sub_page = params[profile_subtype]['first subpage']
@@ -109,6 +121,7 @@ def makeProfileList(profile_type, profile_subtype, params, category, member_list
 		creator_re = params['creator']
 		member['summary'] = ""
 		member['creator'] = ""
+		member['image'] = ""
 		for line in infobox.split('\n'):
 			if re.search(sum_re, line):
 				try:
@@ -124,6 +137,15 @@ def makeProfileList(profile_type, profile_subtype, params, category, member_list
 					print "could not get creator"
 			else:
 				pass
+			if re.search(params['image'], line):
+				try:
+					img = re.search('(?<=\=)(.*?)(?=<|\||$)',line).group(1)
+					if len(img) > 1:
+						member['image'] = img
+					else:
+						member['image'] = ""
+				except:
+					print "cannot find the template parameter " + params['image']
 		member['title'] = re.search('([^/]+$)', member['page path']).group(1)
 		member['profile'] = profile.formatProfile(member)
 	member_list.sort(key=operator.itemgetter('time'), reverse=True) #abstract this?
@@ -138,7 +160,7 @@ def	makePersonProfiles(profile_type, profile_subtype): #only for most active one
 	"""
 	param = output_params.Params()
 	params = param.getParams(profile_type)
-	tools = profiles.Toolkit()	
+	tools = profiles.Toolkit()
 	profile_page = profiles.Profiles(params['main page'], profile_type, id=2101758) #should the page id be baked in like this?
 	profile_list = profile_page.getPageSectionData()
 	profile_list = profile_list[0:6] #only need top six. assumes profiles are already sorted by activity
@@ -163,7 +185,7 @@ def	makePersonProfiles(profile_type, profile_subtype): #only for most active one
 						if len(img) > 1:
 							member['image'] = tools.formatSummaries(img)
 						else:
-							member['image'] = ""							
+							member['image'] = ""
 					except:
 						print "cannot find the template parameter " + params['image']
 				if re.search(params['badge'], line):
@@ -181,7 +203,7 @@ def	makePersonProfiles(profile_type, profile_subtype): #only for most active one
 						if len(sum) > 1:
 							member['summary'] = tools.formatSummaries(sum)
 						else:
-							member['summary'] = ""							
+							member['summary'] = ""
 					except:
 						print "cannot find the template parameter " + params['summary']
 			profile = profiles.Profiles(member['page path'], profile_type) #fix this! inconsistent
@@ -208,8 +230,8 @@ def makeActivityFeed(profile_type, subtype_list):
 		member_list = category.getCatMembers()
 		member_list = member_list[0:6] #only the 6 most recently added ideas, for simplicity
 		for member in member_list:
-			member['subtype'] = subtype	
-			member['action'] = params[member['subtype']]['action'] #put this in cat class	
+			member['subtype'] = subtype
+			member['action'] = params[member['subtype']]['action'] #put this in cat class
 		all_member_list.extend(member_list)
 	for member in all_member_list:
 		profile = profiles.Profiles(member['page path'], profile_type, member['page id'])
@@ -221,7 +243,7 @@ def makeActivityFeed(profile_type, subtype_list):
 			member['creator'] = ""
 			member['time'] = tools.getSubDate(0, "pretty") #we use today's date for this kind of item
 		else:
-			member['participants'] = ""							
+			member['participants'] = ""
 			infobox = profile.getPageText(0) #infoboxes are always in the top section
 			creator_re = params['creator']
 			member['creator'] = ""

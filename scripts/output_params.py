@@ -26,6 +26,7 @@ class Params:
 				'summary' : '^\|\s*summary\s*=',
 				'output path' : 'Grants:IdeaLab/Ideas/Featured/',
 				'edit summary' : 'Updating %s profile',
+				'image' : '^\|\s*image\s*=',
 				'number featured' : 2,
 				'participants' : {
 					'category' : 'IdeaLab/Ideas/Participants',
@@ -63,6 +64,7 @@ class Params:
 			'idea profile' : {
 				'summary' : '^\|\s*summary\s*=',
 				'creator' : '^\|\s*creator\s*=',
+				'image' : '^\|\s*image\s*=',
 				'output path' : 'Grants:IdeaLab/Ideas/',
 				'edit summary' : 'Updating %ss',
 				'participants' : {
