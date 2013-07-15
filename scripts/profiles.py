@@ -93,7 +93,7 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS
 			print "invalid prop parameter specified"
 		return info
 
-	def getPageRecentEditInfo(self, timestring, people=False):
+	def getPageRecentEditInfo(self, timestring, pages=False, people=False):
 		"""
 		Gets timestamp and user id for recent revisions from a page, based on a timestamp you specify as a string.
 		Example: http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2275494&rvdir=newer&rvstart=20130601000000&rvprop=timestamp|userid&format=jsonfm
@@ -101,33 +101,41 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS
 		params = {
 			'action': 'query',
 			'prop': 'revisions',
-			'pageids': self.page_id,
+			'pageids': '',
 			'rvdir': 'newer',
 			'rvstart' : timestring,
-			'rvprop' : 'timestamp|user|userid|comment',
+			'rvprop' : 'timestamp|user|userid|comment|talkid',
 		}
-		req = wikitools.APIRequest(self.wiki, params)
-		response = req.query()
-		if people:
-			num_editors = []
+		recent_editors = []
+		if pages:
+			for page in pages:
+				params['pageids'] = page
+				req = wikitools.APIRequest(self.wiki, params)
+				response = req.query()
+				try:
+					edits = response['query']['pages'][params['pageids']]['revisions']
+# 					print edits
+					editors = [x['userid'] for x in edits]
+					recent_editors.extend(editors)
+				except: #if no revisions, no recent editors, no talkpageid
+					pass
+			recent_editors = list(set([x for x in recent_editors])) #remove duplicates
+		elif people:
 			suffix = "new section"
+			params['pageids'] = self.page_id
+			req = wikitools.APIRequest(self.wiki, params)
+			response = req.query()
 			try:
-				recent_edits = response['query']['pages'][self.page_id]['revisions']
-				for edit in recent_edits:
+				edits = response['query']['pages'][params['pageids']]['revisions']
+				for edit in edits:
 					if edit['comment'].endswith(suffix):
-# 						print edit['comment']
 						intro = {'creator' : edit['user'], 'datetime added' : edit['timestamp'], 'action' : 5}
-						num_editors.append(intro)
+						recent_editors.append(intro)
 			except KeyError: #if no revisions, no recent editors
-				print "something went wrong"
+				pass
 		else:
-			try:
-				recent_edits = response['query']['pages'][self.page_id]['revisions']
-				recent_editors = set([x['userid'] for x in recent_edits])
-				num_editors = len(recent_editors)
-			except KeyError: #if no revisions, no recent editors
-				num_editors = 0
-		return num_editors
+			print "Need list of pageids or specify that you want person profiles."
+		return recent_editors
 
 	def getUserRecentEditInfo(self, user_name, edit_namespace = False): #rename
 		"""
@@ -166,9 +174,9 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS
 		"""
 		if sb_page:
 			pth += str(sb_page)
-		print pth
-		print val
-		print edt_summ
+# 		print pth
+# 		print val
+# 		print edt_summ
 		output = wikitools.Page(self.wiki, pth)
 		output.edit(val, summary=edt_summ, bot=1)
 

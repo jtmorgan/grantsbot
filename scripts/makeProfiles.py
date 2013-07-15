@@ -115,7 +115,8 @@ def makeProfileList(profile_type, profile_subtype, params, category, member_list
 		profile = profiles.Profiles(member['page path'], profile_type, member['page id'])
 		latest = profile.getPageInfo('timestamp', 'revisions')
 		member['time'] = tools.parseISOtime(latest)
-		member['participants'] = profile.getPageRecentEditInfo(date_since)
+		recent_editors = profile.getPageRecentEditInfo(date_since, pages=(member['page id'], member['talkpage id'],))
+		member['participants'] = len(recent_editors)
 		infobox = profile.getPageText(0)
 		sum_re = params['summary']
 		creator_re = params['creator']
@@ -228,7 +229,6 @@ def makeActivityFeed(profile_type, subtype_list):
 		cat = params[subtype]['category']
 		category = categories.Categories(cat, 200) #namespace redundancy
 		member_list = category.getCatMembers()
-		member_list = member_list[0:6] #only the 6 most recently added ideas, for simplicity
 		for member in member_list:
 			member['subtype'] = subtype
 			member['action'] = params[member['subtype']]['action'] #put this in cat class
@@ -237,8 +237,9 @@ def makeActivityFeed(profile_type, subtype_list):
 		profile = profiles.Profiles(member['page path'], profile_type, member['page id'])
 		member['title'] = re.search('([^/]+$)', member['page path']).group(1)
 		member['time'] = tools.parseISOtime(member['datetime added']) #should put this in cat class
-		member['participants'] = profile.getPageRecentEditInfo(date_since)
-		if member['participants'] > 2:
+		recent_editors = profile.getPageRecentEditInfo(date_since, pages=(member['page id'], member['talkpage id'],))
+		if len(recent_editors) > 2:
+			member['participants'] = len(recent_editors)
 			member['action'] = 2
 			member['creator'] = ""
 			member['time'] = tools.getSubDate(0, "pretty") #we use today's date for this kind of item
@@ -260,7 +261,7 @@ def makeActivityFeed(profile_type, subtype_list):
 	all_member_list = tools.dedupeMemberList(all_member_list, 'time', 'page path') #remove dupes
 	all_member_list = addPeople(all_member_list, tools) #add recent people profiles
 	all_member_list.sort(key=operator.itemgetter('time'), reverse=True) #abstract this?
-	all_member_list = all_member_list[0:10] #only the most recently events
+	all_member_list = all_member_list[0:6] #only the most recently events
 	i = 1
 	for member in all_member_list:
 		member['item'] = i
@@ -277,7 +278,7 @@ def addPeople(mem_list, tools):
 	date_since = tools.getSubDate(14)
 	profile = profiles.Profiles("Grants:IdeaLab/Introductions", profile_type, 2101758) #needs abstraction
 	people = "people" #boo!
-	people_list = profile.getPageRecentEditInfo(date_since, people)
+	people_list = profile.getPageRecentEditInfo(date_since, people=True)
 	for person in people_list:
 		person['creator'] = "[[User:" + person['creator'] + "|" + person['creator'] + "]]"
 		person['time'] = tools.parseISOtime(person['datetime added'])

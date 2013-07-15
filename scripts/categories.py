@@ -53,17 +53,46 @@ class Categories:
 			}
 			req = wikitools.APIRequest(self.wiki, query_params)
 			response = req.query()
-			mem_list = [{'page id' : x['pageid'], 'page path' : x['title'], 'datetime added' : x['timestamp']} for x in response['query']['categorymembers']]
+			mem_list = [{'page id' : str(x['pageid']), 'page path' : x['title'], 'datetime added' : x['timestamp']} for x in response['query']['categorymembers']]
+			for mem in mem_list:
+				mem = self.getPageMetaData(mem)
+# 				print mem['talkpage id']
 			if self.cat_title == "Category:IdeaLab/Ideas/Participants":
 				query_params['cmtitle'] = self.supercat
 				req = wikitools.APIRequest(self.wiki, query_params)
 				response = req.query()
-				super_list = [{'page id' : x['pageid'], 'page path' : x['title'], 'datetime added' : x['timestamp']} for x in response['query']['categorymembers']]	
+				super_list = [{'page id' : x['pageid'], 'page path' : x['title'], 'datetime added' : x['timestamp']} for x in response['query']['categorymembers']]
 				active_pages = [x['page id'] for x in super_list]
-				mem_list = [x for x in mem_list if x['page id'] in active_pages]					
+				mem_list = [x for x in mem_list if x['page id'] in active_pages]
 			else:
 				pass
 			return mem_list
 		else: print "not set up to get this type of category member yet"
+
+	def getPageMetaData(self, mempage):
+		"""
+		Gets some additional metadata about each page. Currently just the local talkpage id or subjectid and the full url. Need to make this a call to profiles.py.
+		"""
+		params = {
+			'action': 'query',
+			'titles': mempage['page path'],
+			'prop': 'info',
+			'inprop' : 'talkid|subjectid|url'
+		}
+		req = wikitools.APIRequest(self.wiki, params)
+		response = req.query()
+# 		print mempage
+		pageid = str(mempage['page id'])
+		try:
+			mempage['talkpage id'] = str(response['query']['pages'][pageid]['talkid'])
+# 			print mempage['talkpage id']
+		except KeyError:
+			mempage['talkpage id'] = ""
+# 		mempage['subject id'] = response['query']['pages'][pageid]['subjectid']
+# 		mempage['url'] = response['query']['pages'][pageid]['fullurl']
+		return mempage
+
+
+
 
 
