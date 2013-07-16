@@ -111,6 +111,7 @@ def makeProfileList(profile_type, profile_subtype, params, category, member_list
 	else:
 		pass
 	for member in member_list:
+# 		print member
 		member['datetime added'] = tools.parseISOtime(member['datetime added'])
 		profile = profiles.Profiles(member['page path'], profile_type, member['page id'])
 		latest = profile.getPageInfo('timestamp', 'revisions')
@@ -150,9 +151,11 @@ def makeProfileList(profile_type, profile_subtype, params, category, member_list
 		member['title'] = re.search('([^/]+$)', member['page path']).group(1)
 		member['profile'] = profile.formatProfile(member)
 	member_list.sort(key=operator.itemgetter('time'), reverse=True) #abstract this?
+	member_list = tools.dedupeMemberList(member_list, 'time', 'page path') #not the ideal place for this	
 	all_profiles = '\n'.join(member['profile'] for member in member_list)
 	edit_summ = params['edit summary'] % (profile_subtype + " " + profile_type)
 	sub_page = params[profile_subtype]['subpage']
+	profile = profiles.Profiles(params['output path'], profile_type) #stupid tocreate a new profile object here.
 	profile.publishProfile(all_profiles, params['output path'], edit_summ, sub_page)
 
 def	makePersonProfiles(profile_type, profile_subtype): #only for most active ones, for now

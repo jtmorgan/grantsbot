@@ -54,18 +54,20 @@ class Categories:
 			req = wikitools.APIRequest(self.wiki, query_params)
 			response = req.query()
 			mem_list = [{'page id' : str(x['pageid']), 'page path' : x['title'], 'datetime added' : x['timestamp']} for x in response['query']['categorymembers']]
+# 			print mem_list
 			for mem in mem_list:
 				mem = self.getPageMetaData(mem)
 # 				print mem['talkpage id']
-			if self.cat_title == "Category:IdeaLab/Ideas/Participants":
-				query_params['cmtitle'] = self.supercat
-				req = wikitools.APIRequest(self.wiki, query_params)
-				response = req.query()
-				super_list = [{'page id' : x['pageid'], 'page path' : x['title'], 'datetime added' : x['timestamp']} for x in response['query']['categorymembers']]
-				active_pages = [x['page id'] for x in super_list]
-				mem_list = [x for x in mem_list if x['page id'] in active_pages]
-			else:
-				pass
+# 			if self.cat_title == "Category:IdeaLab/Ideas/Participants":
+# 				print "participants FTW"
+# 				query_params['cmtitle'] = self.supercat
+# 				req = wikitools.APIRequest(self.wiki, query_params)
+# 				response = req.query()
+# 				super_list = [{'page id' : x['pageid'], 'page path' : x['title'], 'datetime added' : x['timestamp']} for x in response['query']['categorymembers']]
+# 				active_pages = [x['page id'] for x in super_list]
+# 				mem_list = [x for x in mem_list if x['page id'] in active_pages]
+# 			else:
+# 				pass
 			return mem_list
 		else: print "not set up to get this type of category member yet"
 
