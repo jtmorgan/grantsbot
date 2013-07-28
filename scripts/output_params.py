@@ -118,7 +118,24 @@ class Params:
 					'category' : 'IdeaLab/Ideas/Participants',
 					'subpage' : 'Ideas/Participants',
 					},
-				}
+				},
+			'ieg proposal' : {
+				'button header' : 'Part 2:',
+				'button template' : '{{IEG/Proposals/Button/2}}',
+				'edit summary' : 'Removing button templates from %ss',
+				'draft' :	{
+					'category' : 'IEG/Proposals/Draft',
+					},
+				'proposed' :	{
+					'category' : 'IEG/Proposals/Proposed',
+					},
+				'withdrawn' :	{
+					'category' : 'IEG/Proposals/Withdrawn',
+					},
+				'ineligible' : {
+					'category' : 'IEG/Proposals/Ineligible',
+					},
+				},
 			}
 
 	def getParams(self, prfl_type):

@@ -72,7 +72,7 @@ class Profiles:
 		text = response['query']['pages'][self.page_id]['revisions'][0]['*']
 		return text
 
-	def getPageInfo(self, val, prop):
+	def getPageInfo(self, val, prop, talkpage = False):
 		"""
 		Retrieve the default page info metadata OR latest revision metadata.
 		Sample:
@@ -80,15 +80,20 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS
 		"""
 		params = {
 			'action': 'query',
-			'titles': self.page_path,
 			'prop': prop,
 		}
+		if talkpage:
+			page_id = str(talkpage)
+			params['pageids'] = page_id			
+		else:
+			params['titles'] = self.page_path
+			page_id = self.page_id	
 		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
 		if prop == 'info':
-			info = response['query']['pages'][self.page_id][val]
+			info = response['query']['pages'][page_id][val]
 		elif prop =='revisions':
-			info = response['query']['pages'][self.page_id]['revisions'][0][val]
+			info = response['query']['pages'][page_id]['revisions'][0][val]
 		else:
 			print "invalid prop parameter specified"
 		return info
@@ -168,19 +173,22 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS
 		tmplt = tmplt.format(**val).encode('utf-8')
 		return tmplt
 
-	def publishProfile(self, val, pth, edt_summ, sb_page = False):
+	def publishProfile(self, val, path, edit_summ, sb_page = False, edit_sec = False):
 		"""
-		Publishes a profile or set of concatenated profiles to a page on a wiki. Currently does not support editing single sections of a page.
+		Publishes a profile or set of concatenated profiles to a page on a wiki.
 		"""
 		if sb_page:
-			pth += str(sb_page)
-# 		print pth
+			path += str(sb_page)			
+# 		print path
 # 		print val
-# 		print edt_summ
-		output = wikitools.Page(self.wiki, pth)
-		output.edit(val, summary=edt_summ, bot=1)
-
-
+# 		print edit_summ
+		output = wikitools.Page(self.wiki, path)
+		if edit_sec:
+			output.edit(val, section=edit_sec, summary=edit_summ, bot=1)
+		else:
+			output.edit(val, summary=edit_summ, bot=1) #not ideal
+		
+			
 
 class Toolkit:
 	"""
@@ -231,3 +239,14 @@ class Toolkit:
 			else:
 				pass
 		return unique_list
+	
+	def compareDates(self, date_one, date_two):
+		"""
+		Compares to date strings and returns the most recent one.
+		"""
+		one = datetime.strptime(date_one, "%m/%d/%y")
+		two = datetime.strptime(date_two, "%m/%d/%y")
+		if one >= two:
+			return date_one
+		else:
+			return date_two			

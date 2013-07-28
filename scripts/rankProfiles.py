@@ -24,16 +24,16 @@ import output_params
 
 logging.basicConfig(filename= grantsbot_settings.logs + 'moves.log', level=logging.INFO)
 curtime = str(datetime.utcnow())
-profile_type = sys.argv[1] #you specify the profile type at the command line. it's 'participant profile' in quotes for people.
+profile_type = sys.argv[1] #you specify the profile type at the command line. it's "participant profile" for people.
 
 ###FUNCTIONS###
-def rankProfiles(profile_type): #needs to be made agnostic, so that it will rank both idea profiles and people profiles
+def rankProfiles(profile_type):
 	"""
 	rank IdeaLab profiles by number of recent edits.
 	"""
 	param = output_params.Params()
 	params = param.getParams(profile_type)
-	profile_page = profiles.Profiles(params['output path'], profile_type, id=2101758) #should the page id be baked in like this?
+	profile_page = profiles.Profiles(params['output path'], profile_type, id=2101758) #not really ideal
 	profile_list = profile_page.getPageSectionData()
 	# profile_list = profile_list[0:2] #use sublist for quicker tests
 	for profile in profile_list:
