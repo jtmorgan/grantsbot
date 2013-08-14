@@ -41,7 +41,7 @@ def checkCompleteness(p_type, subtype_list):
 		category = categories.Categories(cat, 200) #namespace redundancy
 		member_list = category.getCatMembers()
 		all_member_list.extend(member_list)
-	all_member_list = all_member_list[0:6] #only the most recent proposals	
+	all_member_list = all_member_list[0:6] #only the most recent proposals
 	all_member_list = tools.dedupeMemberList(all_member_list, 'page path', 'page path')
 # 	print all_member_list
 	for member in all_member_list:
@@ -55,16 +55,16 @@ def checkCompleteness(p_type, subtype_list):
 				if params['button template'] in p_text:
 					p_text = p_text.replace(params['button template'], "")
 					edit_summ = params['edit summary'] % (p_type)
-					p_page.publishProfile(p_text, member['page path'], edit_summ, edit_sec = edit_sec)				
+					p_page.publishProfile(p_text, member['page path'], edit_summ, edit_sec = edit_sec)
 					logging.info('Removed button from section ' + str(edit_sec) + " on proposal " + member['page path'] + " at " + curtime)
 				else:
-					pass	
+					pass
 			else:
 				pass
 
 ##MAIN##
 p_type = sys.argv[1] #try "ieg proposal"
-if p_type == 'ieg proposal':
+if p_type == 'ieg_proposal':
 	subtype_list = ['draft','proposed','ineligible', 'withdrawn']
 	checkCompleteness(p_type, subtype_list)
 else:

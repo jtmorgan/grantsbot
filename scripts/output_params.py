@@ -22,7 +22,7 @@ class Params:
 
 	def __init__(self):
 		self.output_params = {
-			'featured idea' : {
+			'featured_idea' : {
 				'summary' : '^\|\s*summary\s*=',
 				'output path' : 'Grants:IdeaLab/Ideas/Featured/',
 				'edit summary' : 'Updating %s profile',
@@ -44,7 +44,7 @@ class Params:
 					'first subpage' : 5,
 					},
 				},
-			'featured person' : {
+			'featured_person' : {
 				'summary' : '^\|\s*story\s*=',
 				'output path' : 'Grants:IdeaLab/Introductions/Featured/',
 				'edit summary' : 'Updating %s profile',
@@ -61,7 +61,7 @@ class Params:
 					'first subpage' : 1,
 					},
 				},
-			'idea profile' : {
+			'idea_profile' : {
 				'summary' : '^\|\s*summary\s*=',
 				'creator' : '^\|\s*creator\s*=',
 				'image' : '^\|\s*image\s*=',
@@ -88,11 +88,11 @@ class Params:
 					'subpage' : 'All',
 					},
 				},
-			'participant profile' : {
+			'participant_profile' : {
 				'output path' : 'Grants:IdeaLab/Introductions',
 				'edit summary' : 'Reordering %ss, putting recently active collaborators at the top',
 				},
-			'activity feed' : {
+			'activity_feed' : {
 				'output path' : 'Grants:IdeaLab/Ideas/Activity',
 				'number featured' : 6,
 				'main page' : 'Grants:IdeaLab/',
@@ -119,7 +119,7 @@ class Params:
 					'subpage' : 'Ideas/Participants',
 					},
 				},
-			'ieg proposal' : {
+			'ieg_proposal' : {
 				'button header' : 'Part 2:',
 				'button template' : '{{IEG/Proposals/Button/2}}',
 				'edit summary' : 'Removing button templates from %ss',

@@ -42,13 +42,13 @@ def makeIdeaProfiles(profile_type, profile_subtype):
 	cat = params[profile_subtype]['category']
 	category = categories.Categories(cat, 200) #namespace redundancy
 	member_list = category.getCatMembers()
-	if profile_type == 'featured idea':
+	if profile_type == 'featured_idea':
 		makeFeaturedProfiles(profile_type, profile_subtype, params, category, member_list)
-	elif profile_type == 'idea profile':
+	elif profile_type == 'idea_profile':
 		makeProfileList(profile_type, profile_subtype, params, category, member_list)
 	else:
 		logging.info("Unrecognized profile type " + profile_type)
-		
+
 def makeFeaturedProfiles(profile_type, profile_subtype, params, category, member_list):
 	"""
 	Make featured profiles and post them each to a separate gallery page.
@@ -67,7 +67,7 @@ def makeFeaturedProfiles(profile_type, profile_subtype, params, category, member
 				latest_talk = tools.parseISOtime(profile.getPageInfo("timestamp", "revisions", talkpage=member['talkpage id']))
 				latest = tools.compareDates(latest, latest_talk) #returns the most recent date
 			else:
-				pass	
+				pass
 			member['time'] = latest
 			member['action'] = params[profile_subtype]['action']
 			infobox = profile.getPageText(0)
@@ -122,7 +122,7 @@ def makeProfileList(profile_type, profile_subtype, params, category, member_list
 			latest_talk = tools.parseISOtime(profile.getPageInfo("timestamp", "revisions", talkpage=member['talkpage id']))
 			latest = tools.compareDates(latest, latest_talk) #returns the most recent date
 		else:
-			pass		
+			pass
 		member['time'] = latest
 		recent_editors = profile.getPageRecentEditInfo(date_since, pages=(member['page id'], member['talkpage id'],))
 		member['participants'] = len(recent_editors)
@@ -220,7 +220,7 @@ def	makePersonProfiles(profile_type, profile_subtype): #only for most active one
 						logging.info("Cannot find the template parameter " + params['summary'] + " for the profile " + member['page path'] + " of type " + profile_type)
 			if "staff" in member['badge']: #we're not featuring staff members
 				continue
-			else:	
+			else:
 				profile = profiles.Profiles(member['page path'], profile_type) #fix this! inconsistent
 				profile_formatted = profile.formatProfile(member)
 				edit_summ = params['edit summary'] % profile_type
@@ -230,7 +230,7 @@ def	makePersonProfiles(profile_type, profile_subtype): #only for most active one
 				profile.publishProfile(profile_formatted, path, edit_summ, sub_page)
 				i += 1
 		else:
-			break		
+			break
 
 def makeActivityFeed(profile_type, subtype_list):
 	"""
@@ -309,11 +309,11 @@ def addPeople(mem_list, tools):
 profile_type = sys.argv[1] #you specify the kind of profile you want at the command line. Currently 'featured idea' or 'featured person'.
 profile_subtype = sys.argv[2] #specify the subtype, e.g. 'new', 'draft', 'recent'
 
-if ( profile_type == 'featured idea' or profile_type == 'idea profile' ):
+if ( profile_type == 'featured_idea' or profile_type == 'idea_profile' ):
 	makeIdeaProfiles(profile_type, profile_subtype)
-elif profile_type == 'featured person':
+elif profile_type == 'featured_person':
 	makePersonProfiles(profile_type, profile_subtype)
-elif profile_type == 'activity feed':
+elif profile_type == 'activity_feed':
 	subtype_list = ['new','draft','participants'] #we want to get all of these
 	makeActivityFeed(profile_type, subtype_list)
 else:

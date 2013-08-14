@@ -33,6 +33,7 @@ def rankProfiles(profile_type):
 	"""
 	param = output_params.Params()
 	params = param.getParams(profile_type)
+	print params['output path']
 	profile_page = profiles.Profiles(params['output path'], profile_type, id=2101758) #not really ideal
 	profile_list = profile_page.getPageSectionData()
 	# profile_list = profile_list[0:2] #use sublist for quicker tests
@@ -49,7 +50,7 @@ def rankProfiles(profile_type):
 	logging.info('Reordered IdeaLab participant profiles at ' + curtime)
 
 ###MAIN###
-if profile_type == "participant profile":
+if profile_type == "participant_profile":
 	rankProfiles(profile_type)
 else:
 	print "sorry, we're not set up to work with " + profile_type + "profiles yet!"
