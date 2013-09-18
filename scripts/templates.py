@@ -73,6 +73,14 @@ class Template:
 | idea = {title}
 | idea link = {page path}
 }}}}"""
+,
+'gac_reminder' :u"""== A reminder to review ==
+Dear '''{{ {{{|safesubst:}}}ROOTPAGENAME}}''',
+
+As you know, the Grant Advisory Committee (GAC) has a [[Grant Advisory Committee#Inactivity|standard of participation]] commitment.  It appears you have not made any contributions to grant proposal discussions in the past three months.  If you're no longer able to devote time to helping with grant prpoposal evaluation, we understand -- just let us know, please;  if you ''are'' still interested, please do engage with some of the [[Grants:Index/Requests|open grant proposals]] in the coming two weeks.  If you don't, your GAC membership will automatically expire.
+
+If you have any questions, or think this automated message is mistaken, please contact the grants team at <tt>grants AT wikimedia DOT org</tt>.  Thanks! ~~~~"""
+,
 }
 
 #changed 'featured idea' param value to 'title' for consistency
