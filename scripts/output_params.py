@@ -136,6 +136,103 @@ class Params:
 					'category' : 'IEG/Proposals/Ineligible',
 					},
 				},
+			'evaluation_activity_feed' : { #fixme
+				'output path' : 'Grants:IdeaLab/Ideas/Activity',
+				'number featured' : 6,
+				'main page' : 'Grants:IdeaLab/',
+				'creator' : 'creator',
+				'edit summary' : 'Updating %s',
+				'header template' : '<noinclude>{{IdeaLab/Categories/Template}}</noinclude>\n',
+				'people' : {
+					'action' : 5,
+					'subpage' : 'Introductions',
+					},
+				'new' : {
+					'action' : 1,
+					'category' : 'IdeaLab/Ideas/Active',
+					'subpage' : 'Ideas/All',
+					},
+				'draft' : {
+					'action' : 4,
+					'category' : 'IEG/Proposals/Draft',
+					'subpage' : 'Ideas/Drafts',
+					},
+				'participants' : {
+					'action' : 3,
+					'category' : 'IdeaLab/Ideas/Participants',
+					'subpage' : 'Ideas/Participants',
+					},
+				},
+			'evaluation_resource_profile' : { #fixme
+				'summary' : '^\|\s*summary\s*=',
+				'creator' : '^\|\s*creator\s*=',
+				'image' : '^\|\s*image\s*=',
+				'output path' : 'Grants:IdeaLab/Ideas/',
+				'edit summary' : 'Updating %ss',
+				'participants' : {
+					'category' : 'IdeaLab/Ideas/Participants',
+					'subpage' : 'Participants',
+					},
+				'draft' :	{
+					'category' : 'IEG/Proposals/Draft',
+					'subpage' : 'Drafts',
+					},
+				'new' : {
+					'category' : 'IdeaLab/Ideas/Active',
+					'subpage' : 'New',
+					},
+				'ineligible' : {
+					'category' : 'IEG/Proposals/Ineligible', #ineligible ideas?
+					'subpage' : 'Ineligible',
+					},
+				'all' : {
+					'category' : 'IdeaLab/Ideas/IdeaLab',
+					'subpage' : 'All',
+					},
+				},
+			'evaluation_featured_resource' : { #fixme
+				'summary' : '^\|\s*summary\s*=',
+				'output path' : 'Grants:IdeaLab/Ideas/Featured/',
+				'edit summary' : 'Updating %s profile',
+				'image' : '^\|\s*image\s*=',
+				'number featured' : 2,
+				'participants' : {
+					'category' : 'IdeaLab/Ideas/Participants',
+					'action' : 3,
+					'first subpage' : 1,
+					},
+				'draft' :	{
+					'category' : 'IEG/Proposals/Draft',
+					'action' : 4,
+					'first subpage' : 3,
+					},
+				'new' : {
+					'category' : 'IdeaLab/Ideas/Active',
+					'action' : "",
+					'first subpage' : 5,
+					},
+				},
+			'evaluation_featured_person' : { #fixme
+				'summary' : '^\|\s*story\s*=',
+				'output path' : 'Grants:IdeaLab/Introductions/Featured/',
+				'edit summary' : 'Updating %s profile',
+				'number featured' : 6,
+				'main page' : 'Grants:IdeaLab/Introductions',
+				'image' : '^\|\s*image\s*=',
+				'badge' : '^\|\s*badge\s*=',
+				'recent' : {
+					'action' : 5,
+					'first subpage' : 3,
+					},
+				'active' : {
+					'action' : 5,
+					'first subpage' : 1,
+					},
+				},
+			'evaluation_participant_profile' : { #fixme
+				'output path' : 'Grants:IdeaLab/Introductions',
+				'edit summary' : 'Reordering %ss, putting recently active collaborators at the top',
+				},
 			}
 
 	def getParams(self, prfl_type):

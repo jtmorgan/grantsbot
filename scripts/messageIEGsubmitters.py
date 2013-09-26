@@ -19,7 +19,9 @@ import MySQLdb
 import wikitools
 import grantsbot_settings
 from datetime import datetime
-import templates
+import logging
+import categories
+import profiles.py
 
 wiki = wikitools.Wiki(grantsbot_settings.apiurl)
 wiki.login(grantsbot_settings.username, grantsbot_settings.password)
@@ -34,46 +36,62 @@ page_namespace = "User_talk:"
 # lists to track who needs a reminder
 recipients = []
 
+
+##GLOBAL VARIABLES##
+curtime = str(datetime.utcnow())
+page_namespace = 'User_talk:'
+
+# lists to track who needs a reminder
+recipients = []
+
 # the reminder template
-message_templates = templates.Template()
-tmplt = message_templates.getTemplate('gac_reminder')
+message_template = u'{{subst:Template:IEG/GrantsBot/Reminder|signature=~~~~}}'
+
 
 ##FUNCTIONS##
+#gets a list of editor's to message
+def getPages():
+	category = categories.Categories("IEG_2013_round_2", 200) #namespace redundancy
+	member_list = category.getCatMembers()
+	print member_list
 
-def updateGACtivity(cursor):
-	cursor.execute('update gac_members set active = 0;')#reset active status
-	conn.commit()
-	cursor.execute('UPDATE gac_members as h, (SELECT rev_user, COUNT(rev_id) AS recent_edits FROM metawiki_p.revision AS r, metawiki_p.page as p WHERE r.rev_user IN (SELECT user_id FROM gac_members) AND r.rev_page = p.page_id AND p.page_namespace = 201 and r.rev_timestamp > DATE_FORMAT(DATE_SUB(NOW(),INTERVAL 3 MONTH),"%s") GROUP BY r.rev_user) AS tmp SET h.recent_edits = IF(tmp.recent_edits, tmp.recent_edits, 0), h.active = IF(tmp.recent_edits, 1, 0) WHERE h.user_id = tmp.rev_user;' % ("%Y%m%d%H%i%s")) #sets everyone's status
-	conn.commit()
-	
+##FUNCTIONS##
 #gets a list of editor's to message
 def getUsernames(cursor):
-	cursor.execute('SELECT user_name FROM gac_members WHERE active = 0 AND doNotMessage IS NULL;')
+	cursor.execute('SELECT pc_username FROM ieg_proposals WHERE p_status = "draft" AND p_creator_userid != 0 AND ieg_round_2 = 1')
 	rows = cursor.fetchall()
 	if rows:
 		return rows
 	else:
 		pass
-		
-
-#send the reminder message		
+#send the reminder message
 def messageUsers():
 	for name in recipients:
 		page_title = page_namespace + name
 		page = wikitools.Page(wiki, page_title)
-		page.edit(tmplt, section="new", summary="Automatic reminder to participate in [[Grants_Advisory_Committee|GAC]] activities", bot=1)
+		try:
+			page.edit(message_template, section="new", sectiontitle="== Individual Engagement Grant proposals due 15 February 2013 ==", summary="Automatic reminder to complete a submitted [[Grants:IEG|Individual Engagement Grant Proposal]]", bot=1)
+			try: #update the db to show that this user has been reminded
+				cursor.execute('UPDATE ieg_proposals SET pc_reminded = 1 WHERE pc_username = "%s"' % (name,))
+				conn.commit()
+			except:
+				logging.info('UPDATE: Could not update reminded status for User:' + name + ' at ' + curtime)
+				continue
+		except:
+			logging.info('REMIND: Reminder to User:' + name + ' failed at to send at ' + curtime)
+			continue
 
 
-			
 ##MAIN##
-#updateGACtivity(cursor)
 rows = getUsernames(cursor)
 if rows:
 	for row in rows:
 		name = row[0]
 		recipients.append(name)
-# 	print recipients			
 	messageUsers()
+	logging.info('REMIND: Sent reminders to ' + ' '.join(recipients) + ' ' + curtime)
+else:
+	logging.info('REMIND: No reminders on ' + curtime)
 cursor.close()
 conn.close()
 

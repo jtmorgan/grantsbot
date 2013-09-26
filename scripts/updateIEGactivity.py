@@ -18,11 +18,13 @@
 import MySQLdb
 import logging
 from datetime import datetime
+import grantsbot_settings
 
-logging.basicConfig(filename='/home/jtmorgan/grantsbot/logs/profiles.log',level=logging.INFO)
-conn = MySQLdb.connect(host = 'metawiki-p.userdb.toolserver.org', db = 'u_jtmorgan_p', read_default_file = '~/.my.cnf', use_unicode=1, charset="utf8" )
-curtime = str(datetime.utcnow())
+wiki = wikitools.Wiki(grantsbot_settings.apiurl)
+wiki.login(grantsbot_settings.username, grantsbot_settings.password)
+conn = MySQLdb.connect(host = grantsbot_settings.host, db = grantsbot_settings.dbname, read_default_file = grantsbot_settings.defaultcnf, use_unicode=1, charset="utf8")
 cursor = conn.cursor()
+curtime = str(datetime.utcnow())
 
 ##FUNCTIONS##
 def updateProfiles(cursor):
@@ -46,8 +48,8 @@ def updateProfiles(cursor):
 			new_profiles.append(new)
 			logging.info('Added new profiles for ' + ' '.join(new_profiles) + ' at ' + curtime)
 	else:
-		logging.info('No new profiles added at ' + curtime)			
-			
+		logging.info('No new profiles added at ' + curtime)
+
 
 def updatePagelist(cursor):
 	"""
