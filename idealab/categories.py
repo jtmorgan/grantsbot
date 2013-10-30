@@ -22,13 +22,15 @@ import grantsbot_settings
 class Categories:
 	"""A category on a wiki."""
 
-	def __init__(self, title, namespace = grantsbot_settings.numeric_namespace, type = "page"):
+	def __init__(self, title, namespace = grantsbot_settings.numeric_namespace, type = "page", action = False): #should be more agnostic about namespace param
 		"""
 		Instantiate basic variables for the category you're interested in.
 		"""
 		self.cat_title = "Category:" + title
 		self.supercat = "Category:IdeaLab/Ideas/Active"
 		self.mem_type = type
+		if action:
+			self.action = action
 # 		print self.type
 		self.mem_namespace = namespace
 		self.wiki = wikitools.Wiki(grantsbot_settings.apiurl)
@@ -53,23 +55,12 @@ class Categories:
 			}
 			req = wikitools.APIRequest(self.wiki, query_params)
 			response = req.query()
-			mem_list = [{'page id' : str(x['pageid']), 'page path' : x['title'], 'datetime added' : x['timestamp']} for x in response['query']['categorymembers']]
-# 			print mem_list
+			mem_list = [{'page id' : str(x['pageid']), 'page path' : x['title'], 'timestamp' : x['timestamp']} for x in response['query']['categorymembers']]
 			for mem in mem_list:
 				mem = self.getPageMetaData(mem)
-# 				print mem['talkpage id']
-# 			if self.cat_title == "Category:IdeaLab/Ideas/Participants":
-# 				print "participants FTW"
-# 				query_params['cmtitle'] = self.supercat
-# 				req = wikitools.APIRequest(self.wiki, query_params)
-# 				response = req.query()
-# 				super_list = [{'page id' : x['pageid'], 'page path' : x['title'], 'datetime added' : x['timestamp']} for x in response['query']['categorymembers']]
-# 				active_pages = [x['page id'] for x in super_list]
-# 				mem_list = [x for x in mem_list if x['page id'] in active_pages]
-# 			else:
-# 				pass
 			return mem_list
-		else: print "not set up to get this type of category member yet"
+		else: 
+			print "not set up to get " + self.mem_type + " category members yet"
 
 	def getPageMetaData(self, mempage):
 		"""
@@ -83,18 +74,30 @@ class Categories:
 		}
 		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
-# 		print mempage
 		pageid = str(mempage['page id'])
 		try:
 			mempage['talkpage id'] = str(response['query']['pages'][pageid]['talkid'])
-# 			print mempage['talkpage id']
 		except KeyError:
-			mempage['talkpage id'] = ""
-# 		mempage['subject id'] = response['query']['pages'][pageid]['subjectid']
-# 		mempage['url'] = response['query']['pages'][pageid]['fullurl']
+			mempage['talkpage id'] = "" #probably not necessary anymore, if I add these default params in to every one anyway.
 		return mempage
 
 
+#this was some 'supercat' that was below for mem in mem_list:
+# 				print mem['talkpage id']
+# 			if self.cat_title == "Category:IdeaLab/Ideas/Participants":
+# 				print "participants FTW"
+# 				query_params['cmtitle'] = self.supercat
+# 				req = wikitools.APIRequest(self.wiki, query_params)
+# 				response = req.query()
+# 				super_list = [{'page id' : x['pageid'], 'page path' : x['title'], 'datetime added' : x['timestamp']} for x in response['query']['categorymembers']]
+# 				active_pages = [x['page id'] for x in super_list]
+# 				mem_list = [x for x in mem_list if x['page id'] in active_pages]
+# 			else:
+# 				pass
 
+
+#other stuff I could be getting
+# 		mempage['subject id'] = response['query']['pages'][pageid]['subjectid']
+# 		mempage['url'] = response['query']['pages'][pageid]['fullurl']
 
 
