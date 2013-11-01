@@ -44,7 +44,22 @@ class Profiles:
 		self.wiki = wikitools.Wiki(grantsbot_settings.apiurl)
 		self.wiki.login(grantsbot_settings.username, grantsbot_settings.password)
 
-	def getPageSectionData(self):
+# 	def getPageSectionData(self):
+# 		"""
+# 		Returns the section titles and numbers for a given page.
+# 		Sample request: http://meta.wikimedia.org/w/api.php?action=parse&page=Grants:IdeaLab/Introductions&prop=sections&format=jsonfm
+# 		"""
+# 		params = {
+# 			'action': 'parse',
+# 			'page': self.page_path,
+# 			'prop': 'sections',
+# 		}
+# 		req = wikitools.APIRequest(self.wiki, params)
+# 		response = req.query()
+# 		secs_list = [{'title' : unicode(x['line']), 'index' : x['index']} for x in response['parse']['sections']]
+# 		return secs_list
+
+	def getPageSectionData(self, level = False):
 		"""
 		Returns the section titles and numbers for a given page.
 		Sample request: http://meta.wikimedia.org/w/api.php?action=parse&page=Grants:IdeaLab/Introductions&prop=sections&format=jsonfm
@@ -56,8 +71,11 @@ class Profiles:
 		}
 		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
-		secs_list = [{'title' : unicode(x['line']), 'index' : x['index']} for x in response['parse']['sections']]
-		return secs_list
+		if level:
+			secs_list = [{'title' : unicode(x['line']), 'index' : x['index']} for x in response['parse']['sections'] if x['level'] == level]
+		else:
+			secs_list = [{'title' : unicode(x['line']), 'index' : x['index']} for x in response['parse']['sections']]				
+		return secs_list		
 
 	def getPageText(self, section = False):
 		"""
@@ -75,6 +93,29 @@ class Profiles:
 		response = req.query()
 		text = response['query']['pages'][self.page_id]['revisions'][0]['*']
 		return text
+
+	def getUserRecentEditInfo(self, user_name, edit_namespace = False): #rename
+		"""
+		Get edits by a user in a given namespace within the past month, and the time of their most recent edit.
+		Sample: http://meta.wikimedia.org/w/api.php?action=query&list=recentchanges&rcnamespace=200&rcuser=Jmorgan_(WMF)&rclimit=500&format=jsonfm
+		"""
+		params = {
+				'action': 'query',
+				'list': 'recentchanges',
+				'rcuser': user_name,
+				'rcnamespace': edit_namespace,
+		}
+		req = wikitools.APIRequest(self.wiki, params)
+		response = req.query()
+		recent_edits = len(response['query']['recentchanges'])
+# 			if recent_edits > 0:
+# 					latest_edit = response['query']['recentchanges'][0]['timestamp']
+# 					latest_rev = response['query']['recentchanges'][0]['revid']
+# 					edit_info = (recent_edits, latest_rev, latest_edit)
+# 			else:
+# 					edit_info = (0, 0, "")
+# 			return edit_info		
+		return recent_edits
 
 	def scrapeInfobox(self, member, infobox, redict = False): #gets the relevant param values from text of an infobox
 		if redict:
@@ -107,10 +148,10 @@ class Profiles:
 		"""
 		if sb_page:
 			path += str(sb_page)			
-		print path
-		print val
-		print edit_summ
-		print edit_sec
+# 		print path
+# 		print val
+# 		print edit_summ
+# 		print edit_sec
 		output = wikitools.Page(self.wiki, path)
 		if edit_sec:
 			output.edit(val, section=edit_sec, summary=edit_summ, bot=1)

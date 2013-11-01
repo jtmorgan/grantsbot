@@ -105,18 +105,25 @@ class Params:
 							},					
 						},
 					},		
-			'intro' : { #fixme
+			'evalportal_intro' : {
 				'output path' : 'Programs:Evaluation portal/Parlor/Introductions',
 				'output page id' : 2344396,
 				'edit summary' : 'Reordering %ss, putting recently active participants at the top',
 				},
+			'idealab_intro' : {
+				'output path' : 'Grants:IdeaLab/Introductions',
+				'output page id' : 2101758,
+				'main namespace' : 200,
+				'talk namespace' : 201,
+				'edit summary' : 'Reordering %ss, putting recently active participants at the top',
+				},				
 			'profile defaults' : ['action','badge','datetime','image','page id','page path','participants','summary','talkpage id','time','timestamp','title','title link','username','item',]
 			,
 			'learning reports' : {
 				'output path' : 'Programs:Evaluation portal/Boiler room/Grants lessons 2012',
 				'header template' : '<noinclude>[[Category:Evaluation portal]]</noinclude>\n',				
 				'edit summary' : 'adding lessons learned sections of grant reports',
-				},										
+				},														
 			}
 
 	def getParams(self, profile_type):
