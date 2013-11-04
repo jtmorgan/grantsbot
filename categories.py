@@ -22,7 +22,7 @@ import grantsbot_settings
 class Categories:
 	"""A category on a wiki."""
 
-	def __init__(self, title, namespace = grantsbot_settings.numeric_namespace, type = "page", action = False): #should be more agnostic about namespace param
+	def __init__(self, title, namespace = False, type = "page", action = False): #should be more agnostic about namespace param
 		"""
 		Instantiate basic variables for the category you're interested in.
 		"""
@@ -32,7 +32,10 @@ class Categories:
 		if action:
 			self.action = action
 # 		print self.type
-		self.mem_namespace = namespace
+		if namespace:
+			self.mem_namespace = namespace
+		else:
+			self.mem_namespace = ""	
 		self.wiki = wikitools.Wiki(grantsbot_settings.apiurl)
 		self.wiki.login(grantsbot_settings.username, grantsbot_settings.password)
 

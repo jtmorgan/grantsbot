@@ -46,6 +46,26 @@ class Template:
 | title = {title}
 | title link = {page path}
 }}}}"""	,
+'idealab_guide' : u"""
+==<noinclude>{title}</noinclude>==
+{{{{IdeaLab/Idea/Summary
+| time= {time}
+| idea= {title}
+| idea link= {page path}
+| summary= {summary}
+| creator= {username}
+| image = {image}
+}}}}""",
+'idealab_feed' :u"""
+==<noinclude>{item}</noinclude>==
+{{{{IdeaLab/Activity/Entry
+| time = {time}
+| username = {username}
+| number of people = {participants}
+| action = {action}
+| idea = {title}
+| idea link = {page path}
+}}}}""",
 	'evalportal_intro' : u"""<noinclude>{{{{Evaluation/Header
 |page summary=Thanks for making your profile! {{{{Evaluation/Link/Dark_background|top text=|top color=F7F6F1|top wikilink=Programs:Evaluation_portal/Parlor|line color=F7F6F1}}}}
 |links=

@@ -44,21 +44,6 @@ class Profiles:
 		self.wiki = wikitools.Wiki(grantsbot_settings.apiurl)
 		self.wiki.login(grantsbot_settings.username, grantsbot_settings.password)
 
-# 	def getPageSectionData(self):
-# 		"""
-# 		Returns the section titles and numbers for a given page.
-# 		Sample request: http://meta.wikimedia.org/w/api.php?action=parse&page=Grants:IdeaLab/Introductions&prop=sections&format=jsonfm
-# 		"""
-# 		params = {
-# 			'action': 'parse',
-# 			'page': self.page_path,
-# 			'prop': 'sections',
-# 		}
-# 		req = wikitools.APIRequest(self.wiki, params)
-# 		response = req.query()
-# 		secs_list = [{'title' : unicode(x['line']), 'index' : x['index']} for x in response['parse']['sections']]
-# 		return secs_list
-
 	def getPageSectionData(self, level = False):
 		"""
 		Returns the section titles and numbers for a given page.
@@ -75,7 +60,7 @@ class Profiles:
 			secs_list = [{'title' : unicode(x['line']), 'index' : x['index']} for x in response['parse']['sections'] if x['level'] == level]
 		else:
 			secs_list = [{'title' : unicode(x['line']), 'index' : x['index']} for x in response['parse']['sections']]				
-		return secs_list		
+		return secs_list				
 
 	def getPageText(self, section = False):
 		"""
@@ -94,6 +79,54 @@ class Profiles:
 		text = response['query']['pages'][self.page_id]['revisions'][0]['*']
 		return text
 
+#    def getPageInfo(self): #used to be fancier. just gets latest rev for now. Fix!
+# 		"""
+# 		Retrieve the default page info metadata OR latest revision metadata.
+# 		Sample:
+# http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS_and_Cartography_in_Wikimedia&format=jsonfm
+# 		"""
+# 		params = {
+# 				'action': 'query',
+# 				'titles': self.page_path,
+# 		}
+# 
+# 		req = wikitools.APIRequest(self.wiki, params)
+# 		response = req.query()
+# 		latest_rev = response['query']['pages'][self.page_id]['lastrevid']
+# 		return latest_rev
+                
+	def getPageEditInfo(self, sort_val="newer", page = False, rvstart = False, val = "user"): 
+		"""
+		Returns a list of values from revision properties you specify. Can use the page id associated with the current profiles object, or another one (useful for talkpage)
+		Example: http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&rvdir=newer&rvstart=20130601000000&rvprop=comment|ids|timestamp|user|userid&rvlimit=50&format=jsonfm
+		"""
+		vals = []
+		if page:
+			page_id = page
+		else:
+			page_id = self.page_id	
+	
+		params = {
+				'action': 'query',
+				'prop': 'revisions',
+				'pageids': page_id,
+				'rvprop' : 'comment|ids|timestamp|user|userid',
+				'rvdir' : sort_val,
+				'rvlimit' : 100,
+				'rvstart' : '',
+					}
+		if rvstart:
+			params['rvstart'] = rvstart							
+		req = wikitools.APIRequest(self.wiki, params)
+		response = req.query()
+		if 'revisions' in response['query']['pages'][page_id]:
+			revs = response['query']['pages'][page_id]['revisions']
+			for r in revs:
+				vals.append(r[val])
+		else:
+			print "no recent revs for " + page_id + " " + rvstart		
+		return vals		
+
 	def getUserRecentEditInfo(self, user_name, edit_namespace = False): #rename
 		"""
 		Get edits by a user in a given namespace within the past month, and the time of their most recent edit.
@@ -107,15 +140,55 @@ class Profiles:
 		}
 		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
-		recent_edits = len(response['query']['recentchanges'])
-# 			if recent_edits > 0:
-# 					latest_edit = response['query']['recentchanges'][0]['timestamp']
-# 					latest_rev = response['query']['recentchanges'][0]['revid']
-# 					edit_info = (recent_edits, latest_rev, latest_edit)
-# 			else:
-# 					edit_info = (0, 0, "")
-# 			return edit_info		
+		recent_edits = len(response['query']['recentchanges'])		
 		return recent_edits
+	
+	def getPageFirstOrLatest(self, sort_val="newer", val="timestamp", page = False):
+		"""
+		Returns requested property for the first or latest revision to a page.
+		Latest timestamp is default.
+		"""
+		if page:
+			page_id = page
+		else:
+			page_id = self.page_id			
+		params = {
+				'action': 'query',
+				'prop': 'revisions',
+				'pageids': page_id,
+				'rvdir' : sort_val,
+				'rvprop' : 'comment|ids|timestamp|user|userid',	
+				'rvlimit' : 1,
+					}
+		req = wikitools.APIRequest(self.wiki, params)
+		response = req.query()						
+		vals = response['query']['pages'][page_id]['revisions'][0][val]
+		return vals
+		
+	def getRecentIntros(self, rvstart): #should generalize this a bit, like getPageEditInfo
+		"""
+		Gets recent profiles added to a page. Example:
+http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&rvdir=newer&rvstart=20130601000000&rvprop=comment|ids|timestamp|user|userid&rvlimit=50&format=jsonfm		
+		"""
+		params = {
+				'action': 'query',
+				'prop': 'revisions',
+				'pageids': self.page_id,
+				'rvprop' : 'comment|ids|timestamp|user',
+				'rvstart' : rvstart,
+				'rvlimit' : 100, #arbitrarily high
+				'rvdir' : 'newer',
+					}		
+		intro_list = []
+		suffix = "new section"
+		req = wikitools.APIRequest(self.wiki, params)
+		response = req.query()
+		revs = response['query']['pages'][self.page_id]['revisions']
+		for r in revs:
+			if r['comment'].endswith(suffix):
+				intro = {'username' : r['user'], 'timestamp' : r['timestamp'], 'page path' : self.page_path, 'page id' : self.page_id}#?
+				intro_list.append(intro)
+		return intro_list					
 
 	def scrapeInfobox(self, member, infobox, redict = False): #gets the relevant param values from text of an infobox
 		if redict:
@@ -148,10 +221,10 @@ class Profiles:
 		"""
 		if sb_page:
 			path += str(sb_page)			
-# 		print path
-# 		print val
-# 		print edit_summ
-# 		print edit_sec
+		print path
+		print val
+		print edit_summ
+		print edit_sec
 		output = wikitools.Page(self.wiki, path)
 		if edit_sec:
 			output.edit(val, section=edit_sec, summary=edit_summ, bot=1)
@@ -198,10 +271,7 @@ class Toolkit:
 		Returns the date a specified number of days before the current date as an API and database-friendly 14-digit timestamp string. Also handy for getting a date formatted for pretty output.
 		"""
 		date_since = datetime.utcnow()-timedelta(days=day_interval)
-		if pretty:
-			date_since = date_since.strftime('%m/%d/%y')
-		else:
-			date_since = date_since.strftime('%Y%m%d%H%M%S')
+		date_since = date_since.strftime('%Y%m%d%H%M%S')
 		return date_since
 
 	def titleFromPath(self, path): #making this less abstract, unfortunately

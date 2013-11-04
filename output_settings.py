@@ -104,7 +104,62 @@ class Params:
 							'namespace' : 'Programs:',
 							},					
 						},
-					},		
+					},
+			'idealab_guide' : {
+					'infobox params' : {			
+						'summary' : '^\|\s*summary\s*=',
+						'username' : '^\|\s*creator\s*=',
+						'image' : '^\|\s*image\s*=',
+						},
+					'header template' : """<noinclude>[[Category:IdeaLab]]</noinclude>""",	
+					'main namespace' : 200,				
+					'output path' : 'Grants:IdeaLab/Ideas/',
+					'edit summary' : 'Updating %s',
+					'participants' : {
+							'category' : 'IdeaLab/Ideas/Participants',
+							'subpage' : 'Participants',
+							},
+					'draft' :        {
+							'category' : 'IEG/Proposals/Draft',
+							'subpage' : 'Drafts',
+							},
+					'new' : {
+							'category' : 'IdeaLab/Ideas/Active',
+							'subpage' : 'New',
+							},
+					'ineligible' : {
+							'category' : 'IEG/Proposals/Ineligible', #ineligible ideas?
+							'subpage' : 'Ineligible',
+							},
+					'all' : {
+							'category' : 'IdeaLab/Ideas/IdeaLab',
+							'subpage' : 'All',
+							},
+					},	
+			'idealab_feed' : { #fixme
+					'output path' : 'Grants:IdeaLab/Ideas/Activity',
+					'number featured' : 6,
+					'main page' : 'Grants:IdeaLab/Ideas/Activity',
+					'main namespace' : 200,
+					'username' : '',
+					'output section' : '',
+					'category' : 'IdeaLab/Ideas/All',					
+					'edit summary' : 'Updating %s entries',
+					'header template' : """<noinclude>[[Category:IdeaLab]]</noinclude>""",
+					'activity' : {
+						'new idea' : {
+							'action' : 1,
+							'category' : 'IdeaLab/Ideas/Active',							
+							},
+						'ieg' : {
+							'action' : 4,
+							'category' : 'IEG/Proposals/Draft',	
+							},						
+						'joined' : {
+							'action' : 5,
+							},					
+						},
+					},											
 			'evalportal_intro' : {
 				'output path' : 'Programs:Evaluation portal/Parlor/Introductions',
 				'output page id' : 2344396,
