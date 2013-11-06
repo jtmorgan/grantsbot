@@ -32,13 +32,13 @@ def makeGuide():
 	member_list = getMembers()
 	for member in member_list:
 		member = getMemberData(member)
-	member_list = tools.setTimeValues(member_list)			
+	member_list = tools.setTimeValues(member_list, val = params[params['subtype']]['time value'])		
 	member_list = tools.addDefaults(member_list)
 	member_list.sort(key=operator.itemgetter('datetime'), reverse=True)	
 	if params['subtype'] == "new":
 		member_list = member_list[:10]		
-# 	print member_list		
-	prepOutput(member_list)				
+	unique_list = tools.dedupeMemberList(member_list, "datetime", "page id") 	
+	prepOutput(unique_list)				
 	
 def getMembers():
 	cat = params[params['subtype']]['category']
@@ -52,16 +52,24 @@ def getMemberData(member):
 	profile = profiles.Profiles(member['page path'], id=member['page id'], settings = params) 
 	infobox = profile.getPageText(0) #zero is the top section
 	member = profile.scrapeInfobox(member, infobox, redict = params['infobox params'])
-	member['timestamp'] = profile.getPageFirstOrLatest()			
+	revs = []
+	main_revs = profile.getPageEditInfo()	
+	revs.extend(main_revs)			
+	if member['talkpage id']:
+		talk_revs = profile.getPageEditInfo(page = member['talkpage id'])		
+		if talk_revs:
+			revs.extend(talk_revs)
+	revs.sort(key=operator.itemgetter('revid'), reverse=True)
+	member['timestamp'] = revs[0]['timestamp']
+	revs.sort(key=operator.itemgetter('revid'), reverse=False)	#this doesn't seem to be working
+	member['username'] = "[[User:" + revs[0]['user'] + "]]"
+	member['created'] = revs[0]['timestamp']
 	return member		
-
+				
 def prepOutput(member_list):
-	output = profiles.Profiles(params['output path'], settings = params) #stupid tocreate a new profile object here.
+	output = profiles.Profiles(params['output path'], settings = params)
 	for member in member_list: #inconsistent. i do this earlier in eval_portal
-		if (member['username'] and "]]" not in member['username']):
-			member['username'] = member['username'] + "]]" #sloppy. makes a wikilink of username
-		else: pass
-		member['profile'] = output.formatProfile(member) #will this work here?		
+		member['profile'] = output.formatProfile(member)		
 	all_profiles = params['header template'] + '\n'.join(member['profile'] for member in member_list)
 	edit_summ = params['edit summary'] % (params['subtype'] + " " + params['type'])
 	output.publishProfile(all_profiles, params['output path'], edit_summ, sb_page = params[params['subtype']]['subpage'])

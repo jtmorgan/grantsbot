@@ -18,6 +18,7 @@
 # from wikitools import category as wtcat
 from datetime import datetime, timedelta
 import dateutil.parser
+from dateutil.relativedelta import relativedelta
 import wikitools
 import grantsbot_settings
 import MySQLdb
@@ -95,12 +96,11 @@ class Profiles:
 # 		latest_rev = response['query']['pages'][self.page_id]['lastrevid']
 # 		return latest_rev
                 
-	def getPageEditInfo(self, sort_val="newer", page = False, rvstart = False, val = "user"): 
+	def getPageEditInfo(self, sort_dir="older", page = False, rvstart = False, rvend = False): 
 		"""
 		Returns a list of values from revision properties you specify. Can use the page id associated with the current profiles object, or another one (useful for talkpage)
 		Example: http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&rvdir=newer&rvstart=20130601000000&rvprop=comment|ids|timestamp|user|userid&rvlimit=50&format=jsonfm
 		"""
-		vals = []
 		if page:
 			page_id = page
 		else:
@@ -111,21 +111,20 @@ class Profiles:
 				'prop': 'revisions',
 				'pageids': page_id,
 				'rvprop' : 'comment|ids|timestamp|user|userid',
-				'rvdir' : sort_val,
-				'rvlimit' : 100,
-				'rvstart' : '',
+				'rvlimit' : 'max',
+				'rvdir' : sort_dir,
 					}
 		if rvstart:
-			params['rvstart'] = rvstart							
+			params['rvstart'] = rvstart	
+		if rvend:
+			params['rvend'] = rvend	
 		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
-		if 'revisions' in response['query']['pages'][page_id]:
+		try:
 			revs = response['query']['pages'][page_id]['revisions']
-			for r in revs:
-				vals.append(r[val])
-		else:
-			print "no recent revs for " + page_id + " " + rvstart		
-		return vals		
+		except:
+			revs = []		
+		return revs		
 
 	def getUserRecentEditInfo(self, user_name, edit_namespace = False): #rename
 		"""
@@ -142,28 +141,6 @@ class Profiles:
 		response = req.query()
 		recent_edits = len(response['query']['recentchanges'])		
 		return recent_edits
-	
-	def getPageFirstOrLatest(self, sort_val="newer", val="timestamp", page = False):
-		"""
-		Returns requested property for the first or latest revision to a page.
-		Latest timestamp is default.
-		"""
-		if page:
-			page_id = page
-		else:
-			page_id = self.page_id			
-		params = {
-				'action': 'query',
-				'prop': 'revisions',
-				'pageids': page_id,
-				'rvdir' : sort_val,
-				'rvprop' : 'comment|ids|timestamp|user|userid',	
-				'rvlimit' : 1,
-					}
-		req = wikitools.APIRequest(self.wiki, params)
-		response = req.query()						
-		vals = response['query']['pages'][page_id]['revisions'][0][val]
-		return vals
 		
 	def getRecentIntros(self, rvstart): #should generalize this a bit, like getPageEditInfo
 		"""
@@ -231,8 +208,6 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&
 		else:
 			output.edit(val, summary=edit_summ, bot=1)
 		
-			
-
 class Toolkit:
 	"""
 	Handy ready-to-use methods that you don't need to create a complex object for.
@@ -250,7 +225,7 @@ class Toolkit:
 					m[k] = v
 		return member_list
 
-	def setTimeValues(self, member_list):
+	def setTimeValues(self, member_list, val="timestamp"):
 		"""
 		Adds a python date object and a pretty formatted date string 
 		to each dict in a list of dicts that contains a 'timestamp' key that contains a
@@ -259,7 +234,7 @@ class Toolkit:
 		"""
 		for m in member_list:
 			try:
-				m['datetime'] = dateutil.parser.parse(m['timestamp'])							
+				m['datetime'] = dateutil.parser.parse(m[val])						
 				m['time'] = datetime.strftime(m['datetime'], '%d %B %Y')
 			except:
 				print "no timestamp available for " + m['title']							
@@ -270,9 +245,12 @@ class Toolkit:
 		"""
 		Returns the date a specified number of days before the current date as an API and database-friendly 14-digit timestamp string. Also handy for getting a date formatted for pretty output.
 		"""
-		date_since = datetime.utcnow()-timedelta(days=day_interval)
-		date_since = date_since.strftime('%Y%m%d%H%M%S')
-		return date_since
+		today = datetime.utcnow()
+		sd_datetime = today - relativedelta(days=day_interval)
+		sd_datetime = datetime.utcnow().replace(tzinfo=dateutil.tz.tzutc())-timedelta(days=day_interval)
+		sd_string = sd_datetime.strftime('%Y%m%d%H%M%S')
+		subdate = (sd_datetime, sd_string)
+		return subdate
 
 	def titleFromPath(self, path): #making this less abstract, unfortunately
 		title = re.search('([^/]+$)', path).group(1).replace("_", " ")	
@@ -331,8 +309,6 @@ class Toolkit:
 		query = q.getQuery(query_type)
 		cursor.execute(query)
 		rows = cursor.fetchall()
-		for row in rows: 
-			print row[0]
 		return rows
 			
 	

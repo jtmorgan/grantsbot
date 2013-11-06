@@ -108,7 +108,6 @@ class Params:
 			'idealab_guide' : {
 					'infobox params' : {			
 						'summary' : '^\|\s*summary\s*=',
-						'username' : '^\|\s*creator\s*=',
 						'image' : '^\|\s*image\s*=',
 						},
 					'header template' : """<noinclude>[[Category:IdeaLab]]</noinclude>""",	
@@ -118,22 +117,27 @@ class Params:
 					'participants' : {
 							'category' : 'IdeaLab/Ideas/Participants',
 							'subpage' : 'Participants',
+							'time value' : 'timestamp',							
 							},
 					'draft' :        {
 							'category' : 'IEG/Proposals/Draft',
 							'subpage' : 'Drafts',
+							'time value' : 'timestamp',							
 							},
 					'new' : {
 							'category' : 'IdeaLab/Ideas/Active',
 							'subpage' : 'New',
+							'time value' : 'created',
 							},
 					'ineligible' : {
 							'category' : 'IEG/Proposals/Ineligible', #ineligible ideas?
 							'subpage' : 'Ineligible',
+							'time value' : 'timestamp',														
 							},
 					'all' : {
 							'category' : 'IdeaLab/Ideas/IdeaLab',
 							'subpage' : 'All',
+							'time value' : 'timestamp',														
 							},
 					},	
 			'idealab_feed' : { #fixme
@@ -172,7 +176,7 @@ class Params:
 				'talk namespace' : 201,
 				'edit summary' : 'Reordering %ss, putting recently active participants at the top',
 				},				
-			'profile defaults' : ['action','badge','datetime','image','page id','page path','participants','summary','talkpage id','time','timestamp','title','title link','username','item',]
+			'profile defaults' : ['action','badge','datetime','image','page id','page path','participants','summary', 'create date', 'talkpage id','time','timestamp','title','title link','username','item',]
 			,
 			'learning reports' : {
 				'output path' : 'Programs:Evaluation portal/Boiler room/Grants lessons 2012',
