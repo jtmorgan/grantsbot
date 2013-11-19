@@ -66,12 +66,7 @@ class Template:
 | idea = {title}
 | idea link = {page path}
 }}}}""",
-	'evalportal_intro' : u"""<noinclude>{{{{Evaluation/Header
-|page summary=Thanks for making your profile! {{{{Evaluation/Link/Dark_background|top text=|top color=F7F6F1|top wikilink=Programs:Evaluation_portal/Parlor|line color=F7F6F1}}}}
-|links=
-|more content=<div style="color: #2E2C2C; text-align:center">{{{{Evaluation/People/Button}}}}</div>
-}}}}
-</noinclude>
+	'evalportal_intro' : u"""==Profiles==\n
 {profiles}""",
 	'idealab_intro' : u"""<noinclude><div style="font-family: Helvetica Neue, Helvetica, arial, sans-serif; line-height: 1.5em; background-color: #ffffff; color: #{{{{IEG/Color/Gray}}}}; min-width: 810px; margin-top: -60px; padding: 40px 0 20px">
 <div style="margin:0 15%">

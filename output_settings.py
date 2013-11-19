@@ -167,6 +167,8 @@ class Params:
 			'evalportal_intro' : {
 				'output path' : 'Programs:Evaluation portal/Parlor/Introductions',
 				'output page id' : 2344396,
+				'profile toclevel' : 2,
+				'output section' : 1,
 				'edit summary' : 'Reordering %ss, putting recently active participants at the top',
 				},
 			'idealab_intro' : {

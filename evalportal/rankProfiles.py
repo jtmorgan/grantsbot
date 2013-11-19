@@ -27,7 +27,8 @@ def rankProfiles():
 	rank Eval portal profiles by number of recent edits.
 	"""
 	profile_page = profiles.Profiles(params['output path'], params['output page id'], params)
-	profile_list = profile_page.getPageSectionData()
+	profile_list = profile_page.getPageSectionData(level = params['profile toclevel'])
+	print profile_list
 	for profile in profile_list:
 		profile['title'].encode("utf8")#so redundant!
 	quote1 = "'"
@@ -52,7 +53,7 @@ def rankProfiles():
 	plist_text = {'profiles' :'\n\n'.join([x['text'] for x in plist_sorted])} 
 	formatted_profiles = profile_page.formatProfile(plist_text)
 	edit_summ = params['edit summary'] % (params['type'],)
-	profile_page.publishProfile(formatted_profiles, params['output path'], edit_summ)
+	profile_page.publishProfile(formatted_profiles, params['output path'], edit_summ, edit_sec = params['output section'])
 
 
 ###MAIN###

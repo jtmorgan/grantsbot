@@ -58,7 +58,7 @@ class Profiles:
 		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
 		if level:
-			secs_list = [{'title' : unicode(x['line']), 'index' : x['index']} for x in response['parse']['sections'] if x['level'] == level]
+			secs_list = [{'title' : unicode(x['line']), 'index' : x['index']} for x in response['parse']['sections'] if x['toclevel'] == level]
 		else:
 			secs_list = [{'title' : unicode(x['line']), 'index' : x['index']} for x in response['parse']['sections']]				
 		return secs_list				
