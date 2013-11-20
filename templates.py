@@ -66,6 +66,16 @@ class Template:
 | idea = {title}
 | idea link = {page path}
 }}}}""",
+'idealab_gallery' :u"""
+{{{{IdeaLab/Feature
+| time = {time}
+| image = {image}
+| number of people = {participants}
+| action = {action}
+| idea = {title}
+| idea link = {page path}
+| summary = {summary}
+}}}}""",
 	'evalportal_intro' : u"""==Profiles==\n
 {profiles}""",
 	'idealab_intro' : u"""<noinclude><div style="font-family: Helvetica Neue, Helvetica, arial, sans-serif; line-height: 1.5em; background-color: #ffffff; color: #{{{{IEG/Color/Gray}}}}; min-width: 810px; margin-top: -60px; padding: 40px 0 20px">
