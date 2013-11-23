@@ -25,73 +25,47 @@ import categories
 
 ###FUNCTIONS
 def makeGallery():
-	"""Makes featured profiles for the idealab
+	"""Makes featured profiles for idealab galleries.
 	"""
-	all_member_list = getMembers()
-	all_member_list = tools.addDefaults(all_member_list)
-	for member in all_member_list:				
-		member = getMemberData(member)
-	all_member_list = tools.setTimeValues(all_member_list)			
-	recently_active = [m for m in all_member_list if m['datetime'] > date_threshold[0]]
-	recently_active.sort(key=operator.itemgetter('datetime'), reverse=True)	
-	recently_active = recently_active[:6]						
-	prepOutput(recently_active)				
-	
-def getMembers():
-	all_member_list = []
-	event_types = params['featured']
-	for k,v in event_types.iteritems():
-		profile_type = k
-		if v['action'] == 1:
-			cat = v['category'] 
-			memcat = categories.Categories(cat, namespace = params['main namespace'])
-			members = memcat.getCatMembers()
-			for mem in members:
-				mem['profile type'] = profile_type
-				mem['action'] = params['featured'][event_type]['action']
-			all_member_list.extend(members)
-		elif v['action'] == 5:	
-			intro = profiles.Profiles("Grants:IdeaLab/Introductions", id=2101758, settings = params)
-			recent_intros = intro.getRecentIntros(date_threshold)
-			for i in recent_intros:
-				i['profile type'] = profile_type
-			all_member_list.extend(recent_intros)
-		else:
-			pass	
-	return all_member_list					
-				
-def getMemberData(member):
-	profile = profiles.Profiles(member['page path'], id=member['page id'], settings = params) 
-	member['title'] = tools.titleFromPath(member['page path'])		
-	if member['event type'] == "joined":
-		pass
-	else:	
-		recent_revs = []
-		main_revs = profile.getPageEditInfo(rvend = date_threshold[1],)
-		if main_revs:
-			recent_revs.extend(main_revs)		
-		if member['talkpage id']:
-			talk_revs = profile.getPageEditInfo(rvend = date_threshold[1], page = member['talkpage id'])		
-			if talk_revs:
-				recent_revs.extend(talk_revs)
-		if recent_revs:
-			member['participants'] = len(list(set([x['user'] for x in recent_revs])))		
-			if member['participants'] > 2:
-				member['action'] = 2
-				recent_revs.sort(key=operator.itemgetter('revid'), reverse=True)			
-				member['timestamp'] = recent_revs[0]['timestamp']				
-	return member	
+	if params['subtype'] == 'intro':
+		featured_list = getIntros()
+	prepOutput(featured_list)				
 
-def prepOutput(short_member_list):
-	output = profiles.Profiles(params['output path'], settings = params) #stupid tocreate a new profile object here.
-	for m in short_member_list: #inconsistent. i do this earlier in eval_portal
-		if (m['username'] and "]]" not in m['username']):
-			m['username'] = m['username'] + "]]" #sloppy. makes a wikilink of username
-		else: pass
-		m['profile'] = output.formatProfile(m) #will this work here?		
-	all_profiles = params['header template'] + '\n'.join(m['profile'] for m in short_member_list)
-	edit_summ = params['edit summary'] % (params['subtype'] + " " + params['type'])
-	output.publishProfile(all_profiles, params['output path'], edit_summ)
+def getIntros():
+	"""
+	Gets info about the top-billed participants on the intros page.
+	"""
+	featured_list = []
+	profile_page = profiles.Profiles(params[params['subtype']]['input page path'], params[params['subtype']]['input page id'], params)
+	profile_list = profile_page.getPageSectionData(level = params[params['subtype']]['profile toclevel'])
+	profile_list = profile_list[:6]
+	for profile in profile_list:
+		text = profile_page.getPageText(profile['index'])
+		profile = profile_page.scrapeInfobox(profile, text)
+		if (profile['summary'] and profile['name']):
+			profile['action'] = params[params['subtype']]['action']
+			profile['summary'] = tools.formatSummaries(profile['summary'])
+			profile['username'] = "User:" + profile['title'] 
+			del profile['title'] #title is used for featured ideas, in a different param
+			featured_list.append(profile)
+	
+	return featured_list		
+
+
+
+def prepOutput(featured_list):
+	i = 1
+	featured_list = tools.addDefaults(featured_list)       		
+	output = profiles.Profiles(params[params['subtype']]['output path'], settings = params) #stupid tocreate a new profile object here. and stupid to re-specify the path below
+	for f in featured_list:
+		if i <= params['number featured']:
+			f['profile'] = output.formatProfile(f)
+			f['profile'] = params['header template'] + '\n' + f['profile']
+			edit_summ = params['edit summary'] % (params['subtype'] + " " + params['type'])
+			output.publishProfile(f['profile'], params[params['subtype']]['output path'], edit_summ, sb_page = i)
+			i += 1
+		else:
+			break	
 
 ###MAIN
 param = output_settings.Params()
@@ -99,5 +73,50 @@ params = param.getParams(sys.argv[1])
 params['type'] = sys.argv[1]
 params['subtype'] = sys.argv[2]
 tools = profiles.Toolkit()
-date_threshold = tools.getSubDate(30)
 makeGallery()	
+
+###CRAPLINE
+# def getMembers():
+# 	all_member_list = []
+# 	event_types = params['featured']
+# 	for k,v in event_types.iteritems():
+# 		profile_type = k
+# 		if v['action'] == 1:
+# 			cat = v['category'] 
+# 			memcat = categories.Categories(cat, namespace = params['main namespace'])
+# 			members = memcat.getCatMembers()
+# 			for mem in members:
+# 				mem['profile type'] = profile_type
+# 				mem['action'] = params['featured'][event_type]['action']
+# 			all_member_list.extend(members)
+# 		elif v['action'] == 5:	
+# 			intro = profiles.Profiles("Grants:IdeaLab/Introductions", id=2101758, settings = params)
+# 			recent_intros = intro.getRecentIntros(date_threshold)
+# 			for i in recent_intros:
+# 				i['profile type'] = profile_type
+# 			all_member_list.extend(recent_intros)
+# 		else:
+# 			pass	
+# 	return all_member_list					
+				
+# def getMemberData(member):
+# 	profile = profiles.Profiles(member['page path'], id=member['page id'], settings = params) 
+# 	member['title'] = tools.titleFromPath(member['page path'])		
+# 	if member['event type'] == "joined":
+# 		pass
+# 	else:	
+# 		recent_revs = []
+# 		main_revs = profile.getPageEditInfo(rvend = date_threshold[1],)
+# 		if main_revs:
+# 			recent_revs.extend(main_revs)		
+# 		if member['talkpage id']:
+# 			talk_revs = profile.getPageEditInfo(rvend = date_threshold[1], page = member['talkpage id'])		
+# 			if talk_revs:
+# 				recent_revs.extend(talk_revs)
+# 		if recent_revs:
+# 			member['participants'] = len(list(set([x['user'] for x in recent_revs])))		
+# 			if member['participants'] > 2:
+# 				member['action'] = 2
+# 				recent_revs.sort(key=operator.itemgetter('revid'), reverse=True)			
+# 				member['timestamp'] = recent_revs[0]['timestamp']				
+# 	return member	

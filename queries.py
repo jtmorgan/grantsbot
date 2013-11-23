@@ -56,7 +56,7 @@ SELECT rev_user_text, rev_timestamp, p_path, rev_comment
 	'string' : u"""
 SELECT re_date, p_path, page_id 
 	FROM eval_patterns 
-		WHERE ignored IS NULL;
+		WHERE ignored IS NULL and p_namespace = 200;
 	""",
 	'variables' : False,
 	},	

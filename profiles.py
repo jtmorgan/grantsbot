@@ -66,15 +66,17 @@ class Profiles:
 	def getPageText(self, section = False):
 		"""
 		Gets the raw text of a page or page section.
-		Sample: http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&titles=Grants:IdeaLab/Introductions&rvprop=content&rvsection=21&format=jsonfm
+		Sample: http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&titles=Grants:Learning_patterns/Repeat_events&rvprop=content&rvsection=0&format=jsonfm
 		"""
 		params = {
 			'action': 'query',
 			'prop': 'revisions',
 			'titles': self.page_path,
 			'rvprop' : 'content',
-			'rvsection' : section,
+			'rvsection' : '',
 		}
+		if section:
+			params['rvsection'] = section
 		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
 		text = response['query']['pages'][self.page_id]['revisions'][0]['*']
@@ -198,10 +200,10 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&
 		"""
 		if sb_page:
 			path += str(sb_page)			
-		print path
-		print val
-		print edit_summ
-		print edit_sec
+# 		print path
+# 		print val
+# 		print edit_summ
+# 		print edit_sec
 		output = wikitools.Page(self.wiki, path)
 		if edit_sec:
 			output.edit(val, section=edit_sec, summary=edit_summ, bot=1)
@@ -310,6 +312,14 @@ class Toolkit:
 		cursor.execute(query)
 		rows = cursor.fetchall()
 		return rows
+		
+	def pprintDict(self, d, indent=0):
+	   for key, value in d.iteritems():
+		  print '\t' * indent + str(key)
+		  if isinstance(value, dict):
+			 pretty(value, indent+1)
+		  else:
+			 print '\t' * (indent+1) + str(value)		
 			
 	
 

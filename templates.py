@@ -70,6 +70,9 @@ class Template:
 {{{{IdeaLab/Feature
 | time = {time}
 | image = {image}
+| badge = {badge}
+| name = {name}
+| username = {username}
 | number of people = {participants}
 | action = {action}
 | idea = {title}

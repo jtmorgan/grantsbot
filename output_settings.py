@@ -163,7 +163,41 @@ class Params:
 							'action' : 5,
 							},					
 						},
-					},											
+					},
+			'idealab_gallery' : {
+					'edit summary' : 'Updating %s profiles',
+					'header template' : '<noinclude>[[Category:IdeaLab]]</noinclude>',					
+					'number featured' : 6,
+					'infobox params' : {
+						'summary' : '^\|\s*summary\s*=',
+						'image' : '^\|\s*image\s*=',
+						},												
+					'intro' : {
+						'output path' : 'Grants:IdeaLab/Introductions/Featured/',			
+						'action' : 5,
+						'input page path' : 'Grants:IdeaLab/Introductions',
+						'input page id' : 2101758,
+						'profile toclevel' : 1,
+						'infobox params' : {
+							'summary' : '^\|\s*story\s*=',
+							'name' : '^\|\s*name\s*=',
+							'image' : '^\|\s*image\s*=',
+							'badge' : '^\|\s*badge\s*=',
+							},							
+						},
+					'resource' : {
+						'namespace' : 'Grants:',
+						'action' : 5,
+						'subpage' : 'Introductions/Featured/',
+						'first subpage' : 1,
+						},	
+					'question' : {
+						'namespace' : 'Grants:',
+						'action' : 5,
+						'subpage' : 'Introductions/Featured/',
+						'first subpage' : 1,
+						},													
+					},																
 			'evalportal_intro' : {
 				'output path' : 'Programs:Evaluation portal/Parlor/Introductions',
 				'output page id' : 2344396,
@@ -178,7 +212,7 @@ class Params:
 				'talk namespace' : 201,
 				'edit summary' : 'Reordering %ss, putting recently active participants at the top',
 				},				
-			'profile defaults' : ['action','badge','datetime','image','page id','page path','participants','summary', 'create date', 'talkpage id','time','timestamp','title','title link','username','item',]
+			'profile defaults' : ['action','badge','datetime','image','page id','page path','participants','summary', 'create date', 'talkpage id','time','timestamp','title','title link','username','item', 'name', ]
 			,
 			'learning reports' : {
 				'output path' : 'Programs:Evaluation portal/Boiler room/Grants lessons 2012',

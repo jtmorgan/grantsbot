@@ -45,7 +45,7 @@ def getMembers():
 		
 def getMemberData(member):
 	profile = profiles.Profiles(member['page path'], id=member['page id'], settings = params) 
-	infobox = profile.getPageText(0) #zero is the top section
+	infobox = profile.getPageText(section = 0) #zero is the top section
 	member = profile.scrapeInfobox(member, infobox)
 	member['profile'] = profile.formatProfile(member)				
 	return member		
