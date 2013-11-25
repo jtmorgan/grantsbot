@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import dateutil.parser
 import grantsbot_settings
 import operator
 import output_settings
@@ -29,11 +30,14 @@ def makeFeed():
 	"""
 	all_member_list = getMembers()
 	all_member_list = tools.addDefaults(all_member_list)
-	for member in all_member_list:				
-		member = getMemberData(member)
+	for member in all_member_list:
+		if member['event type'] == "joined":
+			pass					
+		else:	
+			member = getMemberData(member)
 	all_member_list = tools.setTimeValues(all_member_list)			
 	recently_active = [m for m in all_member_list if m['datetime'] > date_threshold[0]]
-	recently_active.sort(key=operator.itemgetter('datetime'), reverse=True)	
+	recently_active = tools.dedupeMemberList(recently_active, 'datetime', 'page path')
 	recently_active = recently_active[:6]						
 	prepOutput(recently_active)				
 	
@@ -42,50 +46,56 @@ def getMembers():
 	event_types = params['activity']
 	for k,v in event_types.iteritems():
 		event_type = k
-		if v['action'] != 5:
+		if v['action'] == 5:
+			intro = profiles.Profiles("Grants:IdeaLab/Introductions", id=2101758, settings = params)
+			members = intro.getRecentIntros(date_threshold[1])
+		elif v['action'] == 1:	
+			members = []		
 			cat = v['category'] 
 			memcat = categories.Categories(cat, namespace = params['main namespace'])
-			members = memcat.getCatMembers()
-			for mem in members:
-				mem['event type'] = event_type
-				mem['action'] = params['activity'][event_type]['action']
-			all_member_list.extend(members)
+			candidates = memcat.getCatMembers()
+			for c in candidates:
+				creation_date = dateutil.parser.parse(c['timestamp'])#looks for pages created in specified date range
+				if creation_date > date_threshold[0]:
+					members.append(c)
+				else:
+					pass	
 		else:
-			intro = profiles.Profiles("Grants:IdeaLab/Introductions", id=2101758, settings = params)
-			recent_intros = intro.getRecentIntros(date_threshold)
-			for i in recent_intros:
-				i['event type'] = event_type
-			all_member_list.extend(recent_intros)
+			cat = v['category'] 
+			memcat = categories.Categories(cat, namespace = params['main namespace'])
+			members = memcat.getCatMembers()						
+		for mem in members:
+			mem['event type'] = event_type
+			mem['action'] = params['activity'][event_type]['action']				
+		all_member_list.extend(members)
+
 	return all_member_list					
 				
 def getMemberData(member):
 	profile = profiles.Profiles(member['page path'], id=member['page id'], settings = params) 
 	member['title'] = tools.titleFromPath(member['page path'])		
-	if member['event type'] == "joined":
-		pass
-	else:	
-		recent_revs = []
-		main_revs = profile.getPageEditInfo(rvend = date_threshold[1],)
-		if main_revs:
-			recent_revs.extend(main_revs)		
-		if member['talkpage id']:
-			talk_revs = profile.getPageEditInfo(rvend = date_threshold[1], page = member['talkpage id'])		
-			if talk_revs:
-				recent_revs.extend(talk_revs)
-		if recent_revs:
-			member['participants'] = len(list(set([x['user'] for x in recent_revs])))		
-			if member['participants'] > 2:
-				member['action'] = 2
-				recent_revs.sort(key=operator.itemgetter('revid'), reverse=True)			
-				member['timestamp'] = recent_revs[0]['timestamp']				
+	recent_revs = []
+	main_revs = profile.getPageEditInfo(rvend = date_threshold[1],)
+	if main_revs:
+		recent_revs.extend(main_revs)		
+	if member['talkpage id']:
+		talk_revs = profile.getPageEditInfo(rvend = date_threshold[1], page = member['talkpage id'])		
+		if talk_revs:
+			recent_revs.extend(talk_revs)
+	if recent_revs:
+		participants = len(list(set([x['user'] for x in recent_revs])))
+		member['timestamp'] = recent_revs[0]['timestamp']		
+		if participants > 2: #get the number of participants
+			member['participants'] = participants
+			member['action'] = 2
+		else: #get the name of the page creator
+			recent_revs.sort(key=operator.itemgetter('revid'))			
+			member['username'] = recent_revs[0]['user']							
 	return member	
 
 def prepOutput(short_member_list):
 	output = profiles.Profiles(params['output path'], settings = params) #stupid tocreate a new profile object here.
 	for m in short_member_list: #inconsistent. i do this earlier in eval_portal
-		if (m['username'] and "]]" not in m['username']):
-			m['username'] = m['username'] + "]]" #sloppy. makes a wikilink of username
-		else: pass
 		m['profile'] = output.formatProfile(m) #will this work here?		
 	all_profiles = params['header template'] + '\n'.join(m['profile'] for m in short_member_list)
 	edit_summ = params['edit summary'] % (params['subtype'] + " " + params['type'])

@@ -29,6 +29,12 @@ def makeGallery():
 	"""
 	if params['subtype'] == 'intro':
 		featured_list = getIntros()
+	elif params['subtype'] == 'idea':
+		####
+	elif params['subtype'] == 'ieg':
+		#### 
+	elif params['subtype'] == 'participants':		
+		
 	prepOutput(featured_list)				
 
 def getIntros():

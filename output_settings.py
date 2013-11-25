@@ -158,7 +158,11 @@ class Params:
 						'ieg' : {
 							'action' : 4,
 							'category' : 'IEG/Proposals/Draft',	
-							},						
+							},
+						'participants wanted' : {
+							'action' : 3,
+							'category' : 'IdeaLab/Ideas/Participants',	
+							},														
 						'joined' : {
 							'action' : 5,
 							},					
@@ -185,8 +189,8 @@ class Params:
 							'badge' : '^\|\s*badge\s*=',
 							},							
 						},
-					'resource' : {
-						'namespace' : 'Grants:',
+					'page' : {
+						'output path' : 'Grants:IdeaLab/Introductions/Featured/',
 						'action' : 5,
 						'subpage' : 'Introductions/Featured/',
 						'first subpage' : 1,

@@ -98,7 +98,7 @@ class Profiles:
 # 		latest_rev = response['query']['pages'][self.page_id]['lastrevid']
 # 		return latest_rev
                 
-	def getPageEditInfo(self, sort_dir="older", page = False, rvstart = False, rvend = False): 
+	def getPageEditInfo(self, sort_dir="older", page = False, rvstart = False, rvend = False): #should just be 'getPageRecentRevs'
 		"""
 		Returns a list of values from revision properties you specify. Can use the page id associated with the current profiles object, or another one (useful for talkpage)
 		Example: http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&rvdir=newer&rvstart=20130601000000&rvprop=comment|ids|timestamp|user|userid&rvlimit=50&format=jsonfm
@@ -144,19 +144,19 @@ class Profiles:
 		recent_edits = len(response['query']['recentchanges'])		
 		return recent_edits
 		
-	def getRecentIntros(self, rvstart): #should generalize this a bit, like getPageEditInfo
+	def getRecentIntros(self, rvend): #should generalize this a bit, like getPageEditInfo
 		"""
 		Gets recent profiles added to a page. Example:
-http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&rvdir=newer&rvstart=20130601000000&rvprop=comment|ids|timestamp|user|userid&rvlimit=50&format=jsonfm		
+http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&rvdir=older&rvend=20131001000000&rvprop=comment|ids|timestamp|user|userid&rvlimit=50&format=jsonfm	
 		"""
 		params = {
 				'action': 'query',
 				'prop': 'revisions',
 				'pageids': self.page_id,
 				'rvprop' : 'comment|ids|timestamp|user',
-				'rvstart' : rvstart,
+				'rvend' : rvend,
 				'rvlimit' : 100, #arbitrarily high
-				'rvdir' : 'newer',
+				'rvdir' : 'older',
 					}		
 		intro_list = []
 		suffix = "new section"
@@ -165,7 +165,7 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&
 		revs = response['query']['pages'][self.page_id]['revisions']
 		for r in revs:
 			if r['comment'].endswith(suffix):
-				intro = {'username' : r['user'], 'timestamp' : r['timestamp'], 'page path' : self.page_path, 'page id' : self.page_id}#?
+				intro = {'username' : r['user'], 'timestamp' : r['timestamp'], 'page path' : self.page_path, 'page id' : self.page_id}
 				intro_list.append(intro)
 		return intro_list					
 
@@ -281,7 +281,7 @@ class Toolkit:
 		Sort and remove duplicates from a list of dicts based on a specified key/value pair. Also removes things that should be ignored.
 		"""
 		mem_list.sort(key=operator.itemgetter(sort_val), reverse=True)
-		seen_list = ['Grants:IdeaLab/Preload']#why is this here?
+		seen_list = []#why is this here?
 		unique_list = []
 		for mem in mem_list:
 			t = mem[dict_val]
