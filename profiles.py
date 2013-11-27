@@ -82,21 +82,9 @@ class Profiles:
 		text = response['query']['pages'][self.page_id]['revisions'][0]['*']
 		return text
 
-#    def getPageInfo(self): #used to be fancier. just gets latest rev for now. Fix!
-# 		"""
-# 		Retrieve the default page info metadata OR latest revision metadata.
-# 		Sample:
-# http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS_and_Cartography_in_Wikimedia&format=jsonfm
-# 		"""
-# 		params = {
-# 				'action': 'query',
-# 				'titles': self.page_path,
-# 		}
-# 
-# 		req = wikitools.APIRequest(self.wiki, params)
-# 		response = req.query()
+# 		Retrieve latest revision metadata.
+# 		Sample: http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS_and_Cartography_in_Wikimedia&format=jsonfm
 # 		latest_rev = response['query']['pages'][self.page_id]['lastrevid']
-# 		return latest_rev
                 
 	def getPageEditInfo(self, sort_dir="older", page = False, rvstart = False, rvend = False): #should just be 'getPageRecentRevs'
 		"""
@@ -200,10 +188,10 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&
 		"""
 		if sb_page:
 			path += str(sb_page)			
-# 		print path
-# 		print val
-# 		print edit_summ
-# 		print edit_sec
+		print path
+		print val
+		print edit_summ
+		print edit_sec
 		output = wikitools.Page(self.wiki, path)
 		if edit_sec:
 			output.edit(val, section=edit_sec, summary=edit_summ, bot=1)

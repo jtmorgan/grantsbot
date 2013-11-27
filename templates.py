@@ -19,7 +19,7 @@ class Template:
 	"""templates of profiles for wiki pages"""
 	def __init__(self):
 		self.profile_templates = {
-		'gallery' : u"""
+		'evalportal_gallery' : u"""
 {{{{Evaluation/Feature
 | time = {time}
 | image = {image}

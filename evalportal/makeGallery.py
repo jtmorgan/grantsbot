@@ -15,87 +15,76 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 import grantsbot_settings
-import operator
-from collections import OrderedDict
-# from operator import itemgetter
 import output_settings
 import profiles
+import re
 import sys
 import templates
 
-###FUNCTIONS###
-def makeGallery(params):
+###FUNCTIONS
+def makeGallery():
 	"""
-	Make lists of profiles for resources in a portal.
+	Makes featured profiles for Evalportal galleries.
 	"""
-	member_list = getMembers()
-	member_list.sort(key=operator.itemgetter('action', 'datetime'), reverse = True)	
-	i = member_list[0]['action']
-	counter = 0
-	j = 1
-	new_list = [] #this is so slop. need to not be creating a new list here.
-	for member in member_list:
-		if member['action'] == i:
-			if counter < params['number featured']:
-				member['item'] = j
-				member = getMemberData(member)#get some stuff about the member
-				counter += 1
-				prepOutput([member,], j)	
-				j += 1							
-			else:
-				pass	
-		elif member['action'] < i:
-			i = member['action']
-			member['item'] = j
-			member = getMemberData(member)
-			counter = 1	
-			prepOutput([member,], j)				
-			j += 1			
-		else:
-			break 	
-	
-def getMembers(): #no page id for activity
-	"""Returns list already sorted"""
-	member_list = []
-	queries = params[params['subtype']]
-	for k, v in queries.iteritems():
-		rows = tools.queryDB(v['query'])
-		if v['action'] == 4: #should make actions consistent across different templates 
-			members = [{'username' : row[0].decode("utf8"), 'timestamp' : row[1], 'page path' : v['namespace'] + row[2], 'action' : v['action'], 'title' : tools.titleFromComment(row[3])} for row in rows]
-		elif v['action'] == 5:
-			members = [{'username' : row[0].decode("utf8"), 'timestamp' : row[1], 'page path' : v['namespace'] + row[2], 'action' : v['action'], 'title' : row[0].decode("utf8"),} for row in rows]			
-		else:
-			members = [{'timestamp' : row[0], 'page path' : v['namespace'] + row[1], 'page id' : row[2], 'action' : v['action'], 'title' : tools.titleFromPath(row[1])} for row in rows] #very inconsistent with the other queries
-		member_list.extend(members)	
-	member_list = tools.addDefaults(member_list)
-	member_list = tools.setTimeValues(member_list)
-	return member_list		
-		
-def getMemberData(member):
-	member['username'] = tools.formatSummaries(member['username']) #Strips anything that looks like markup.	
-	if member['action'] == 1:
-		profile = profiles.Profiles(member['page path'], id = member['page id'], settings = params) 	
-		text = profile.getPageText(0) #zero is the top section
-		member = profile.scrapeInfobox(member, text, params['infobox params'])
-		member['profile'] = profile.formatProfile(member)			
+	if params['subtype'] in ['learning_pattern', 'case_study', 'learning_module', 'intro', 'question']:
+		featured_list = getFeaturedProfiles()
 	else:
-		profile = profiles.Profiles(member['page path'], settings = params) 	
-		member['profile'] = profile.formatProfile(member)
-	return member		
+		sys.exit("unrecognized featured content type " + params['subtype'])	
+	prepOutput(featured_list)				
 
-def prepOutput(member_list, j):
-	all_profiles = params['header template'] + '\n'.join(member['profile'] for member in member_list) #different from guide
-	edit_summ = params['edit summary'] % (params['subtype'] + " " + params['type'])
-	output = profiles.Profiles(params['output path'], params['type']) #stupid tocreate a new profile object here?
-	output.publishProfile(all_profiles, params['output path'] + params['sub page'], edit_summ, sb_page = j)
+def getFeaturedProfiles():
+	"""
+	Gets info about the top-billed profiles in a guide.
+	"""
+	featured_list = []
+	profile_page = profiles.Profiles(params[params['subtype']]['input page path'], params[params['subtype']]['input page id'], params)
+	profile_list = profile_page.getPageSectionData(level = params[params['subtype']]['profile toclevel'])
+	for profile in profile_list:
+		text = profile_page.getPageText(profile['index'])
+		profile = profile_page.scrapeInfobox(profile, text)
+		if params['subtype'] == 'intro':
+			profile['page path'] = params[params['subtype']]['input page path'] + "#" + profile['title'].lstrip()
+			if len(profile['name']) > 1: 
+				profile['title'] = profile['name']
+			else:
+				pass			
+			featured_list.append(profile)
+		elif params['subtype'] == 'question':
+			profile['summary'] = re.sub("\=\=(.*?)\=\=", "", text) #remove the question title from the summary.
+			profile['page path'] = params[params['subtype']]['input page path'] + "#" + profile['title'].lstrip()
+			featured_list.append(profile)
+		else:
+			if len(profile['summary']) > 1:
+				featured_list.append(profile)
+			else:
+				pass
+	for f in featured_list:
+		f['action'] = params[params['subtype']]['action']
+		f['summary'] = tools.formatSummaries(f['summary'])	
+	return featured_list		
 	
+def prepOutput(featured_list):
+	subpage = params[params['subtype']]['first subpage']
+	i = 0
+	number_featured = params[params['subtype']]['number featured']
+	featured_list = tools.addDefaults(featured_list)       		
+	output = profiles.Profiles(params[params['subtype']]['output path'], settings = params) #stupid tocreate a new profile object here. and stupid to re-specify the path below
+	for f in featured_list:
+		if i < number_featured:
+			f['profile'] = output.formatProfile(f)
+			f['profile'] = params['header template'] + '\n' + f['profile']
+			edit_summ = params['edit summary'] % (params['subtype'] + " " + params['type'])
+			output.publishProfile(f['profile'], params[params['subtype']]['output path'], edit_summ, sb_page = subpage)
+			i += 1
+			subpage += 1 #should fix idealab gallery to make this work there, too
+		else:
+			break	
 
-###MAIN###
+###MAIN
 param = output_settings.Params()
 params = param.getParams(sys.argv[1])
 params['type'] = sys.argv[1]
 params['subtype'] = sys.argv[2]
 tools = profiles.Toolkit()
-makeGallery(params)	
+makeGallery()	

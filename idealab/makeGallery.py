@@ -16,59 +16,65 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import grantsbot_settings
-import operator
 import output_settings
 import profiles
 import sys
 import templates
-import categories
 
 ###FUNCTIONS
 def makeGallery():
-	"""Makes featured profiles for idealab galleries.
 	"""
-	if params['subtype'] == 'intro':
-		featured_list = getIntros()
-	elif params['subtype'] == 'idea':
-		####
-	elif params['subtype'] == 'ieg':
-		#### 
-	elif params['subtype'] == 'participants':		
-		
+	Makes featured profiles for IdeaLab galleries.
+	"""
+	if params['subtype'] in ['intro', 'new_idea', 'ieg_draft', 'participants_wanted']:
+		featured_list = getFeaturedProfiles()
+	else:
+		sys.exit("unrecognized featured content type " + params['subtype'])	
 	prepOutput(featured_list)				
 
-def getIntros():
+def getFeaturedProfiles():
 	"""
-	Gets info about the top-billed participants on the intros page.
+	Gets info about the top-billed profiles in a guide.
 	"""
 	featured_list = []
 	profile_page = profiles.Profiles(params[params['subtype']]['input page path'], params[params['subtype']]['input page id'], params)
 	profile_list = profile_page.getPageSectionData(level = params[params['subtype']]['profile toclevel'])
-	profile_list = profile_list[:6]
 	for profile in profile_list:
 		text = profile_page.getPageText(profile['index'])
 		profile = profile_page.scrapeInfobox(profile, text)
-		if (profile['summary'] and profile['name']):
-			profile['action'] = params[params['subtype']]['action']
-			profile['summary'] = tools.formatSummaries(profile['summary'])
-			profile['username'] = "User:" + profile['title'] 
-			del profile['title'] #title is used for featured ideas, in a different param
-			featured_list.append(profile)
-	
+		if params['subtype'] == 'intro':
+			if (profile['summary'] and profile['name']): #this might not be filtering. see below.
+				profile['action'] = params[params['subtype']]['action']
+				profile['summary'] = tools.formatSummaries(profile['summary'])
+				profile['username'] = "User:" + profile['title'] 
+				del profile['title'] #title is used for featured ideas, in a different param
+				featured_list.append(profile)
+			else:
+				pass	
+		else:
+			if len(profile['summary']) > 1:
+				profile['action'] = params[params['subtype']]['action']
+				profile['summary'] = tools.formatSummaries(profile['summary'])	
+				featured_list.append(profile)
+			else:
+				pass
 	return featured_list		
-
-
-
+	
 def prepOutput(featured_list):
-	i = 1
+	first_subpage = params[params['subtype']]['first subpage']
+	i = 0
+	j = 0
+	number_featured = params[params['subtype']]['number featured']
 	featured_list = tools.addDefaults(featured_list)       		
 	output = profiles.Profiles(params[params['subtype']]['output path'], settings = params) #stupid tocreate a new profile object here. and stupid to re-specify the path below
 	for f in featured_list:
-		if i <= params['number featured']:
+		if i < number_featured:
 			f['profile'] = output.formatProfile(f)
 			f['profile'] = params['header template'] + '\n' + f['profile']
 			edit_summ = params['edit summary'] % (params['subtype'] + " " + params['type'])
-			output.publishProfile(f['profile'], params[params['subtype']]['output path'], edit_summ, sb_page = i)
+			output.publishProfile(f['profile'], params[params['subtype']]['output path'], edit_summ, sb_page = first_subpage + j)
+			if i == 0:
+				j = 1
 			i += 1
 		else:
 			break	
@@ -80,49 +86,3 @@ params['type'] = sys.argv[1]
 params['subtype'] = sys.argv[2]
 tools = profiles.Toolkit()
 makeGallery()	
-
-###CRAPLINE
-# def getMembers():
-# 	all_member_list = []
-# 	event_types = params['featured']
-# 	for k,v in event_types.iteritems():
-# 		profile_type = k
-# 		if v['action'] == 1:
-# 			cat = v['category'] 
-# 			memcat = categories.Categories(cat, namespace = params['main namespace'])
-# 			members = memcat.getCatMembers()
-# 			for mem in members:
-# 				mem['profile type'] = profile_type
-# 				mem['action'] = params['featured'][event_type]['action']
-# 			all_member_list.extend(members)
-# 		elif v['action'] == 5:	
-# 			intro = profiles.Profiles("Grants:IdeaLab/Introductions", id=2101758, settings = params)
-# 			recent_intros = intro.getRecentIntros(date_threshold)
-# 			for i in recent_intros:
-# 				i['profile type'] = profile_type
-# 			all_member_list.extend(recent_intros)
-# 		else:
-# 			pass	
-# 	return all_member_list					
-				
-# def getMemberData(member):
-# 	profile = profiles.Profiles(member['page path'], id=member['page id'], settings = params) 
-# 	member['title'] = tools.titleFromPath(member['page path'])		
-# 	if member['event type'] == "joined":
-# 		pass
-# 	else:	
-# 		recent_revs = []
-# 		main_revs = profile.getPageEditInfo(rvend = date_threshold[1],)
-# 		if main_revs:
-# 			recent_revs.extend(main_revs)		
-# 		if member['talkpage id']:
-# 			talk_revs = profile.getPageEditInfo(rvend = date_threshold[1], page = member['talkpage id'])		
-# 			if talk_revs:
-# 				recent_revs.extend(talk_revs)
-# 		if recent_revs:
-# 			member['participants'] = len(list(set([x['user'] for x in recent_revs])))		
-# 			if member['participants'] > 2:
-# 				member['action'] = 2
-# 				recent_revs.sort(key=operator.itemgetter('revid'), reverse=True)			
-# 				member['timestamp'] = recent_revs[0]['timestamp']				
-# 	return member	
