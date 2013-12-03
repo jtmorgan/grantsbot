@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 import grantsbot_settings
 import operator
 import output_settings
@@ -62,8 +61,6 @@ def getMemberData(member, i):
 	return member		
 
 def prepOutput(member_list):
-
-
 	all_profiles = params['header template'] + '\n'.join(member['profile'] for member in member_list) #different from guide
 	edit_summ = params['edit summary'] % (params['subtype'] + " " + params['type'])
 	output = profiles.Profiles(params['output path'], params['type']) #stupid tocreate a new profile object here?
