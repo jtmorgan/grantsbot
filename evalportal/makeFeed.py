@@ -28,6 +28,7 @@ def makeFeed(params):
 	Make lists of profiles for resources in a portal.
 	"""
 	member_list = getMembers()
+	member_list = tools.excludeSubpages(member_list, 'page path', depth=2, skip_list = ['Programs:Evaluation_portal/Parlor/Introductions', 'Programs:Evaluation_portal/Parlor/Questions']) #excluding translated subpages, but keeps profiles, questions, etc	
 	member_list.sort(key=operator.itemgetter('datetime'), reverse=True)	
 	member_list = member_list[0:6]	
 	i= 1

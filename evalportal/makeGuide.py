@@ -29,6 +29,7 @@ def makeGuide(params):
 	Make lists of profiles for resources in a portal.
 	"""
 	member_list = getMembers()
+	member_list = tools.excludeSubpages(member_list, 'page path', depth=2) #excluding translated subpages
 	member_list.sort(key=operator.itemgetter('datetime'), reverse=True)		
 	for member in member_list:
 		member = getMemberData(member)

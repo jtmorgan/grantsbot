@@ -188,10 +188,10 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&
 		"""
 		if sb_page:
 			path += str(sb_page)			
-		print path
-		print val
-		print edit_summ
-		print edit_sec
+# 		print path
+# 		print val
+# 		print edit_summ
+# 		print edit_sec
 		output = wikitools.Page(self.wiki, path)
 		if edit_sec:
 			output.edit(val, section=edit_sec, summary=edit_summ, bot=1)
@@ -302,12 +302,36 @@ class Toolkit:
 		return rows
 		
 	def pprintDict(self, d, indent=0):
-	   for key, value in d.iteritems():
+		"""
+		Pretty prints a nested dictionary to make it easier 
+		to spot-check structure and content.
+		"""
+		for key, value in d.iteritems():
 		  print '\t' * indent + str(key)
 		  if isinstance(value, dict):
 			 pretty(value, indent+1)
 		  else:
-			 print '\t' * (indent+1) + str(value)		
+			 print '\t' * (indent+1) + str(value)	
+			 
+	def excludeSubpages(self, mem_list, path_key, depth=1, skip_list=False):
+		"""
+		Takes a list of dictionaries that contains data about a bunch of wiki-pages,
+		including the page path. Removes dicts from the list
+		if their page depth ("/") is greater than the defined value.
+		"""
+		depth_constrained_list = []
+		for mem in mem_list:
+			if (skip_list and mem[path_key] in skip_list):
+				depth_constrained_list.append(mem)
+			else:	
+				path_comps = [p for p in mem[path_key].split('/') if p] #rmvs empty strings if path starts or ends in '/'
+				if len(path_comps) == depth:
+					depth_constrained_list.append(mem)
+				else:
+					pass
+		
+		return depth_constrained_list			
+			 	
 			
 	
 
