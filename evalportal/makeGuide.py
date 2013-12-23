@@ -47,7 +47,7 @@ def getMembers():
 def getMemberData(member):
 	profile = profiles.Profiles(member['page path'], id=member['page id'], settings = params) 
 	infobox = profile.getPageText(section = 0) #zero is the top section
-	member = profile.scrapeInfobox(member, infobox)
+	member = profile.scrapeInfobox(member, infobox, trans_tag = "<translate>")
 	member['profile'] = profile.formatProfile(member)				
 	return member		
 

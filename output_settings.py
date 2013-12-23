@@ -109,7 +109,8 @@ class Params:
 							'summary' : '^\|\s*problem\s*=',
 							'endorse' : '^\|\s*endorse\s*=',
 							'image' : '^\|\s*image\s*=',
-							},	
+							},
+					
 						'header template' : """== Learning patterns ==
 					\n</noinclude>\n""",												
 						'category' : 'Learning patterns',

@@ -157,20 +157,41 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&
 				intro_list.append(intro)
 		return intro_list					
 
-	def scrapeInfobox(self, member, infobox, redict = False): #gets the relevant param values from text of an infobox
+	def scrapeInfobox(self, member, infobox, redict = False, trans_tag = False): #gets the relevant param values from text of an infobox
+		"""
+		Method for grabbing the values of parameters from an infobox. Regexes for each infobox param
+		are specified in the settings for the profile object. You can also pass a custom dict
+		of regex strings. Translate tags and other tags that push the param value to the next line
+		can be specified by passing the tag string in the optional trans_tag argument.
+		"""
 		if redict:
 			re_types = redict #this is now very inconsistent, because of the away I'm storing these regexes. Fix!
 		else:
 			re_types = self.profile_settings[self.profile_settings['subtype']]['infobox params']
-		for line in infobox.split('\n'):
-			for k,v in re_types.iteritems():	#params are loaded when the profile object is created
-				if re.search(v, line): #can I just search for the key?
+		second_line = False
+		for k,v in re_types.iteritems():	#params are loaded when the profile object is created		
+			for line in infobox.split('\n'):
+				if second_line:
 					try:
-						member[k] = re.search('(?<=\=)(.*?)(?=<|\||$)',line).group(1) #am I ignoring HTML comments?
+						member[k] = re.sub('(<[^>]+>)+', '', line)
 					except:
-						print "can't find this param in the infobox"
-				else:
-					continue #should I ignore profiles that don't have, say summaries?									
+						pass
+						# print "can't capture the second line"
+					second_line = False	
+					break #we found the value below the param, let's move on to another param
+				else:						
+					if re.search(v, line): #can I just search for the key?
+						if (trans_tag and trans_tag in line):
+							second_line = True
+							continue
+						else:	
+							try:
+								member[k] = re.search('(?<=\=)(.*?)(?=<|\||$)',line).group(1) #am I ignoring HTML comments?
+							except:
+								pass
+# 								print "can't find this param in the infobox"
+					else:
+						continue #should I ignore profiles that don't have, say summaries?									
 		return member
 			
 	def formatProfile(self, val):
