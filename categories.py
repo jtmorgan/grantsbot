@@ -43,7 +43,8 @@ class Categories:
 		"""
 		Get the members of the specified category and their metadata.
 		Example: http://meta.wikimedia.org/w/api.php?action=query&list=categorymembers&cmtype=page&cmtitle=Category:IEG/Proposals/IdeaLab&cmnamespace=200&cmprop=title|timestamp|ids&cmsort=timestamp&cmdir=desc&format=jsonfm
-		will return a dict like {'page id' : 'someid', 'page path' : 'somepath', 'datetime added' : 'sometimestamp'}
+		...will return a dict like 
+		{'page id' : someid, 'page path' : 'somepath', 'datetime added' : 'sometimestamp'}
 		"""
 		if self.mem_type == 'page':
 			query_params = {
@@ -65,9 +66,10 @@ class Categories:
 		else: 
 			print "not set up to get " + self.mem_type + " category members yet"
 
-	def getPageMetaData(self, mempage):
+	def getPageMetaData(self, mempage): #Need to make this a call to profiles.py.
 		"""
-		Gets some additional metadata about each page. Currently just the local talkpage id or subjectid and the full url. Need to make this a call to profiles.py.
+		Gets some additional metadata about each page. 
+		Currently just the local talkpage id or subjectid and the full url. 
 		"""
 		params = {
 			'action': 'query',
@@ -83,24 +85,5 @@ class Categories:
 		except KeyError:
 			mempage['talkpage id'] = "" #probably not necessary anymore, if I add these default params in to every one anyway.
 		return mempage
-
-
-#this was some 'supercat' that was below for mem in mem_list:
-# 				print mem['talkpage id']
-# 			if self.cat_title == "Category:IdeaLab/Ideas/Participants":
-# 				print "participants FTW"
-# 				query_params['cmtitle'] = self.supercat
-# 				req = wikitools.APIRequest(self.wiki, query_params)
-# 				response = req.query()
-# 				super_list = [{'page id' : x['pageid'], 'page path' : x['title'], 'datetime added' : x['timestamp']} for x in response['query']['categorymembers']]
-# 				active_pages = [x['page id'] for x in super_list]
-# 				mem_list = [x for x in mem_list if x['page id'] in active_pages]
-# 			else:
-# 				pass
-
-
-#other stuff I could be getting
-# 		mempage['subject id'] = response['query']['pages'][pageid]['subjectid']
-# 		mempage['url'] = response['query']['pages'][pageid]['fullurl']
 
 

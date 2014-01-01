@@ -100,6 +100,9 @@ class Template:
 }
 
 	def getTemplate(self, member):
+		"""
+		Select a profile template that matches the passed template name.
+		""" 
 		tmplt = self.profile_templates[member]
 		return tmplt
 

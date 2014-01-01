@@ -16,7 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class Query:
-	"""queries for database tracking tables"""
+	"""
+	 Bunch of queries used by GrantsBot to manage various portals.
+	"""
 
 	def __init__(self):
 		self.mysql_queries = {

@@ -30,11 +30,11 @@ import re
 import time
 
 class Profiles:
-	"""A grab-bag of operations you might want to perform on and with profiles."""
+	"""Operations you might want to perform on and with profiles."""
 
 	def __init__(self, path, id = False, settings = False):
 		"""
-		Instantiates page-level variables for building a set of profiles.
+		Instantiate page-level variables for building a set of profiles.
 		"""
 		self.page_path = path
 		if id:
@@ -48,6 +48,7 @@ class Profiles:
 	def getPageSectionData(self, level = False):
 		"""
 		Returns the section titles and numbers for a given page.
+		Level arg can be used to return only sections of a given indentation level.
 		Sample request: http://meta.wikimedia.org/w/api.php?action=parse&page=Grants:IdeaLab/Introductions&prop=sections&format=jsonfm
 		"""
 		params = {
@@ -88,7 +89,7 @@ class Profiles:
                 
 	def getPageEditInfo(self, sort_dir="older", page = False, rvstart = False, rvend = False): #should just be 'getPageRecentRevs'
 		"""
-		Returns a list of values from revision properties you specify. Can use the page id associated with the current profiles object, or another one (useful for talkpage)
+		Returns a list of values for revision properties you specify. Can use the page id associated with the current profiles object, or another one specified through the page arg.
 		Example: http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&rvdir=newer&rvstart=20130601000000&rvprop=comment|ids|timestamp|user|userid&rvlimit=50&format=jsonfm
 		"""
 		if page:
@@ -118,7 +119,8 @@ class Profiles:
 
 	def getUserRecentEditInfo(self, user_name, edit_namespace = False): #rename
 		"""
-		Get edits by a user in a given namespace within the past month, and the time of their most recent edit.
+		Get edits by a user in a given namespace within the past month 
+		(or whatever range recentchanges is set to on your wiki).
 		Sample: http://meta.wikimedia.org/w/api.php?action=query&list=recentchanges&rcnamespace=200&rcuser=Jmorgan_(WMF)&rclimit=500&format=jsonfm
 		"""
 		params = {
@@ -157,18 +159,20 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&
 				intro_list.append(intro)
 		return intro_list					
 
-	def scrapeInfobox(self, member, infobox, redict = False, trans_tag = False): #gets the relevant param values from text of an infobox
+	def scrapeInfobox(self, member, infobox, redict = False, trans_tag = False):
 		"""
-		Method for grabbing the values of parameters from an infobox. Regexes for each infobox param
-		are specified in the settings for the profile object. You can also pass a custom dict
-		of regex strings. Translate tags and other tags that push the param value to the next line
-		can be specified by passing the tag string in the optional trans_tag argument.
+		Method for grabbing the values of parameters from an infobox. 
+		Regexes for each infobox param are specified in the settings for the profile object. 
+		You can also pass a custom dict of regex strings to look for, via redict. 
+		Translate tags ('<translate>') and other tags that push 
+		the param value to the next line can be specified by passing the tag string 
+		in the optional trans_tag argument.
 		"""
 		if redict:
 			re_types = redict #this is now very inconsistent, because of the away I'm storing these regexes. Fix!
 		else:
 			re_types = self.profile_settings[self.profile_settings['subtype']]['infobox params']
-		second_line = False
+		second_line = False #used to test for translate tags
 		for k,v in re_types.iteritems():	#params are loaded when the profile object is created		
 			for line in infobox.split('\n'):
 				if second_line:
@@ -196,7 +200,8 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&
 			
 	def formatProfile(self, val):
 		"""
-		takes in a dictionary of parameter values and plugs them into the specified template
+		Takes in a dictionary of parameter values and plugs them 
+		into the specified template by matching keys.
 		"""
 		page_templates = templates.Template()
 		tmplt = page_templates.getTemplate(self.profile_settings['type'])
@@ -221,7 +226,8 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&
 		
 class Toolkit:
 	"""
-	Handy ready-to-use methods that you don't need to create a complex object for.
+	Handy ready-to-use methods. 
+	You don't need to create an object beforehand to use these.
 	"""
 
 	def addDefaults(self, member_list):
@@ -239,22 +245,25 @@ class Toolkit:
 	def setTimeValues(self, member_list, val="timestamp"):
 		"""
 		Adds a python date object and a pretty formatted date string 
-		to each dict in a list of dicts that contains a 'timestamp' key that contains a
-		a 12-digit date string (like rev_timestamp) or an ISO 8601 date string
-		(like API timestamp)
+		to each dict in a list of dicts.
+		Requires that dict contains a 'timestamp' key with a
+		a 12-digit date string (like rev_timestamp from MediaWiki database)
+		or an ISO 8601 date string (like MediaWiki API timestamp)
 		"""
 		for m in member_list:
 			try:
 				m['datetime'] = dateutil.parser.parse(m[val])						
 				m['time'] = datetime.strftime(m['datetime'], '%d %B %Y')
 			except:
-				print "no timestamp available for " + m['title']							
+				pass
+# 				print "no timestamp available for " + m['title']							
 		return member_list		
 	
 		
 	def getSubDate(self, day_interval):
 		"""
-		Returns the date a specified number of days before the current date as an API and database-friendly 14-digit timestamp string. Also handy for getting a date formatted for pretty output.
+		Returns the date a specified number of days before the current date
+		as an API and database-friendly 14-digit timestamp string.
 		"""
 		today = datetime.utcnow()
 		sd_datetime = today - relativedelta(days=day_interval)
@@ -263,20 +272,30 @@ class Toolkit:
 		subdate = (sd_datetime, sd_string)
 		return subdate
 
-	def titleFromPath(self, path): #making this less abstract, unfortunately
+	def titleFromPath(self, path):
+		"""
+		Get the title of the lowest subpage from a long path.
+		Example: "IdeaLab/Ideas/My_great_idea" returns "My great idea".
+		"""
 		title = re.search('([^/]+$)', path).group(1).replace("_", " ")	
 		return title
 	
 	def titleFromComment(self, comment):
+		"""
+		Gets the title of a page section from an edit comment
+		that contains the section title.
+		Example: "\*How do I edit a section?*\reply"
+		returns "How do I edit a section?"
+		"""
 		title = re.search('\*(.*?)\*', comment).group(1)
 		for sub in ['* ', ' *']:
 			if sub in title:
 				title.replace(sub,"")
 		return title	
 		
-	def formatSummaries(self, text):
+	def formatSummaries(self, text): #need to be able to pass in a custom dict here, like in scrapeInfobox above
 		"""
-		Cleans markup from strings of profile summary text and trims them to 140 chars.
+		Cleans markup from strings of profile summary text. Trims them to 140 chars.
 		"""
 		text = text.strip()
 		text = re.sub("(\[\[)(.*?)(\|)","",text)
@@ -287,7 +306,8 @@ class Toolkit:
 
 	def dedupeMemberList(self, mem_list, sort_val, dict_val):
 		"""
-		Sort and remove duplicates from a list of dicts based on a specified key/value pair. Also removes things that should be ignored.
+		Sort and remove duplicates from a list of dicts 
+		based on a specified key/value pair. 
 		"""
 		mem_list.sort(key=operator.itemgetter(sort_val), reverse=True)
 		seen_list = []#why is this here?
