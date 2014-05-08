@@ -39,7 +39,7 @@ class Profiles:
 		self.page_path = path
 		if id:
 			self.page_id = str(id)
-		if settings:			
+		if settings:
 			self.profile_settings = settings
 		self.tools = Toolkit()
 		self.wiki = wikitools.Wiki(grantsbot_settings.apiurl)
@@ -61,8 +61,8 @@ class Profiles:
 		if level:
 			secs_list = [{'title' : unicode(x['line']), 'index' : x['index']} for x in response['parse']['sections'] if x['toclevel'] == level]
 		else:
-			secs_list = [{'title' : unicode(x['line']), 'index' : x['index']} for x in response['parse']['sections']]				
-		return secs_list				
+			secs_list = [{'title' : unicode(x['line']), 'index' : x['index']} for x in response['parse']['sections']]
+		return secs_list
 
 	def getPageText(self, section = False):
 		"""
@@ -86,7 +86,7 @@ class Profiles:
 # 		Retrieve latest revision metadata.
 # 		Sample: http://meta.wikimedia.org/w/api.php?action=query&prop=info&titles=Grants:IEG/GIS_and_Cartography_in_Wikimedia&format=jsonfm
 # 		latest_rev = response['query']['pages'][self.page_id]['lastrevid']
-                
+
 	def getPageEditInfo(self, sort_dir="older", page = False, rvstart = False, rvend = False): #should just be 'getPageRecentRevs'
 		"""
 		Returns a list of values for revision properties you specify. Can use the page id associated with the current profiles object, or another one specified through the page arg.
@@ -95,8 +95,8 @@ class Profiles:
 		if page:
 			page_id = page
 		else:
-			page_id = self.page_id	
-	
+			page_id = self.page_id
+
 		params = {
 				'action': 'query',
 				'prop': 'revisions',
@@ -106,20 +106,20 @@ class Profiles:
 				'rvdir' : sort_dir,
 					}
 		if rvstart:
-			params['rvstart'] = rvstart	
+			params['rvstart'] = rvstart
 		if rvend:
-			params['rvend'] = rvend	
+			params['rvend'] = rvend
 		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
 		try:
 			revs = response['query']['pages'][page_id]['revisions']
 		except:
-			revs = []		
-		return revs		
+			revs = []
+		return revs
 
 	def getUserRecentEditInfo(self, user_name, edit_namespace = False): #rename
 		"""
-		Get edits by a user in a given namespace within the past month 
+		Get edits by a user in a given namespace within the past month
 		(or whatever range recentchanges is set to on your wiki).
 		Sample: http://meta.wikimedia.org/w/api.php?action=query&list=recentchanges&rcnamespace=200&rcuser=Jmorgan_(WMF)&rclimit=500&format=jsonfm
 		"""
@@ -131,13 +131,13 @@ class Profiles:
 		}
 		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
-		recent_edits = len(response['query']['recentchanges'])		
+		recent_edits = len(response['query']['recentchanges'])
 		return recent_edits
-		
+
 	def getRecentIntros(self, rvend): #should generalize this a bit, like getPageEditInfo
 		"""
 		Gets recent profiles added to a page. Example:
-http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&rvdir=older&rvend=20131001000000&rvprop=comment|ids|timestamp|user|userid&rvlimit=50&format=jsonfm	
+http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&rvdir=older&rvend=20131001000000&rvprop=comment|ids|timestamp|user|userid&rvlimit=50&format=jsonfm
 		"""
 		params = {
 				'action': 'query',
@@ -147,7 +147,7 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&
 				'rvend' : rvend,
 				'rvlimit' : 100, #arbitrarily high
 				'rvdir' : 'older',
-					}		
+					}
 		intro_list = []
 		suffix = "new section"
 		req = wikitools.APIRequest(self.wiki, params)
@@ -157,15 +157,15 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&
 			if r['comment'].endswith(suffix):
 				intro = {'username' : r['user'], 'timestamp' : r['timestamp'], 'page path' : self.page_path, 'page id' : self.page_id}
 				intro_list.append(intro)
-		return intro_list					
+		return intro_list
 
 	def scrapeInfobox(self, member, infobox, redict = False, trans_tag = False):
 		"""
-		Method for grabbing the values of parameters from an infobox. 
-		Regexes for each infobox param are specified in the settings for the profile object. 
-		You can also pass a custom dict of regex strings to look for, via redict. 
-		Translate tags ('<translate>') and other tags that push 
-		the param value to the next line can be specified by passing the tag string 
+		Method for grabbing the values of parameters from an infobox.
+		Regexes for each infobox param are specified in the settings for the profile object.
+		You can also pass a custom dict of regex strings to look for, via redict.
+		Translate tags ('<translate>') and other tags that push
+		the param value to the next line can be specified by passing the tag string
 		in the optional trans_tag argument.
 		"""
 		if redict:
@@ -173,7 +173,7 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&
 		else:
 			re_types = self.profile_settings[self.profile_settings['subtype']]['infobox params']
 		second_line = False #used to test for translate tags
-		for k,v in re_types.iteritems():	#params are loaded when the profile object is created		
+		for k,v in re_types.iteritems():	#params are loaded when the profile object is created
 			for line in infobox.split('\n'):
 				if second_line:
 					try:
@@ -181,26 +181,26 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&
 					except:
 						pass
 						# print "can't capture the second line"
-					second_line = False	
+					second_line = False
 					break #we found the value below the param, let's move on to another param
-				else:						
+				else:
 					if re.search(v, line): #can I just search for the key?
 						if (trans_tag and trans_tag in line):
 							second_line = True
 							continue
-						else:	
+						else:
 							try:
 								member[k] = re.search('(?<=\=)(.*?)(?=<|\||$)',line).group(1) #am I ignoring HTML comments?
 							except:
 								pass
 # 								print "can't find this param in the infobox"
 					else:
-						continue #should I ignore profiles that don't have, say summaries?									
+						continue #should I ignore profiles that don't have, say summaries?
 		return member
-			
+
 	def formatProfile(self, val):
 		"""
-		Takes in a dictionary of parameter values and plugs them 
+		Takes in a dictionary of parameter values and plugs them
 		into the specified template by matching keys.
 		"""
 		page_templates = templates.Template()
@@ -213,7 +213,7 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&
 		Publishes a profile or set of concatenated profiles to a page on a wiki.
 		"""
 		if sb_page:
-			path += str(sb_page)			
+			path += str(sb_page)
 # 		print path
 # 		print val
 # 		print edit_summ
@@ -223,10 +223,10 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&
 			output.edit(val, section=edit_sec, summary=edit_summ, bot=1)
 		else:
 			output.edit(val, summary=edit_summ, bot=1)
-		
+
 class Toolkit:
 	"""
-	Handy ready-to-use methods. 
+	Handy ready-to-use methods.
 	You don't need to create an object beforehand to use these.
 	"""
 
@@ -235,7 +235,7 @@ class Toolkit:
 		Adds pre-specified set of default (null) fields to a dictionary.
 		"""
 		params = output_settings.Params()
-		mem_defaults = dict.fromkeys(params.getParams('profile defaults'), "")	
+		mem_defaults = dict.fromkeys(params.getParams('profile defaults'), "")
 		for m in member_list:
 			for k,v in mem_defaults.iteritems():
 				if k not in m.keys():
@@ -244,7 +244,7 @@ class Toolkit:
 
 	def setTimeValues(self, member_list, val="timestamp"):
 		"""
-		Adds a python date object and a pretty formatted date string 
+		Adds a python date object and a pretty formatted date string
 		to each dict in a list of dicts.
 		Requires that dict contains a 'timestamp' key with a
 		a 12-digit date string (like rev_timestamp from MediaWiki database)
@@ -252,14 +252,14 @@ class Toolkit:
 		"""
 		for m in member_list:
 			try:
-				m['datetime'] = dateutil.parser.parse(m[val])						
+				m['datetime'] = dateutil.parser.parse(m[val])
 				m['time'] = datetime.strftime(m['datetime'], '%d %B %Y')
 			except:
 				pass
-# 				print "no timestamp available for " + m['title']							
-		return member_list		
-	
-		
+# 				print "no timestamp available for " + m['title']
+		return member_list
+
+
 	def getSubDate(self, day_interval):
 		"""
 		Returns the date a specified number of days before the current date
@@ -277,9 +277,9 @@ class Toolkit:
 		Get the title of the lowest subpage from a long path.
 		Example: "IdeaLab/Ideas/My_great_idea" returns "My great idea".
 		"""
-		title = re.search('([^/]+$)', path).group(1).replace("_", " ")	
+		title = re.search('([^/]+$)', path).group(1).replace("_", " ")
 		return title
-	
+
 	def titleFromComment(self, comment):
 		"""
 		Gets the title of a page section from an edit comment
@@ -291,8 +291,8 @@ class Toolkit:
 		for sub in ['* ', ' *']:
 			if sub in title:
 				title.replace(sub,"")
-		return title	
-		
+		return title
+
 	def formatSummaries(self, text): #need to be able to pass in a custom dict here, like in scrapeInfobox above
 		"""
 		Cleans markup from strings of profile summary text. Trims them to 140 chars.
@@ -301,13 +301,13 @@ class Toolkit:
 		text = re.sub("(\[\[)(.*?)(\|)","",text)
 		text = re.sub("\]","",text)
 		text = re.sub("\[","",text)
-		text = (text[:140] + '...') if len(text) > 140 else text
+		text = (text[:200] + '...') if len(text) > 200 else text
 		return text
 
 	def dedupeMemberList(self, mem_list, sort_val, dict_val):
 		"""
-		Sort and remove duplicates from a list of dicts 
-		based on a specified key/value pair. 
+		Sort and remove duplicates from a list of dicts
+		based on a specified key/value pair.
 		"""
 		mem_list.sort(key=operator.itemgetter(sort_val), reverse=True)
 		seen_list = []#why is this here?
@@ -320,7 +320,7 @@ class Toolkit:
 			else:
 				pass
 		return unique_list
-	
+
 	def compareDates(self, date_one, date_two):
 		"""
 		Compares two date objects and returns the most recent one.
@@ -328,8 +328,8 @@ class Toolkit:
 		if date_one >= date_two:
 			return date_one
 		else:
-			return date_two		
-			
+			return date_two
+
 	def queryDB(self, query_type):
 		"""
 		MySQL queries for the evaluation portal.
@@ -341,10 +341,10 @@ class Toolkit:
 		cursor.execute(query)
 		rows = cursor.fetchall()
 		return rows
-		
+
 	def pprintDict(self, d, indent=0):
 		"""
-		Pretty prints a nested dictionary to make it easier 
+		Pretty prints a nested dictionary to make it easier
 		to spot-check structure and content.
 		"""
 		for key, value in d.iteritems():
@@ -352,8 +352,8 @@ class Toolkit:
 		  if isinstance(value, dict):
 			 pretty(value, indent+1)
 		  else:
-			 print '\t' * (indent+1) + str(value)	
-			 
+			 print '\t' * (indent+1) + str(value)
+
 	def excludeSubpages(self, mem_list, path_key, depth=1, skip_list=False):
 		"""
 		Takes a list of dictionaries that contains data about a bunch of wiki-pages,
@@ -364,17 +364,17 @@ class Toolkit:
 		for mem in mem_list:
 			if (skip_list and mem[path_key] in skip_list):
 				depth_constrained_list.append(mem)
-			else:	
+			else:
 				path_comps = [p for p in mem[path_key].split('/') if p] #rmvs empty strings if path starts or ends in '/'
 				if len(path_comps) == depth:
 					depth_constrained_list.append(mem)
 				else:
 					pass
-		
-		return depth_constrained_list			
-			 	
-			
-	
 
-			
-			
+		return depth_constrained_list
+
+
+
+
+
+

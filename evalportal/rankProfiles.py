@@ -28,7 +28,7 @@ def rankProfiles():
 	"""
 	profile_page = profiles.Profiles(params['output path'], params['output page id'], params)
 	profile_list = profile_page.getPageSectionData(level = params['profile toclevel'])
-	print profile_list
+# 	print profile_list
 	for profile in profile_list:
 		profile['title'].encode("utf8")#so redundant!
 	quote1 = "'"
@@ -42,13 +42,18 @@ def rankProfiles():
 	cursor.execute(query)
 	rows = cursor.fetchall()
 	output = [{'edits' : row[1], 'username' : row[0].decode("utf8")} for row in rows]
+# 	print output
 	for profile in profile_list:
 		for o in output:
 			if profile['title'] == o['username']:
 				profile['edits'] = o['edits']
-				continue
+				break
+# 			continue
 	for profile in profile_list:
-		profile['text'] = profile_page.getPageText(profile['index'])		
+		if "edits" not in profile:
+			profile['edits'] = 0
+		profile['text'] = profile_page.getPageText(profile['index'])
+	print len(profile_list)			
 	plist_sorted = sorted(profile_list, key=lambda item: item['edits'], reverse = True)
 	plist_text = {'profiles' :'\n\n'.join([x['text'] for x in plist_sorted])} 
 	formatted_profiles = profile_page.formatProfile(plist_text)

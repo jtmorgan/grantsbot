@@ -26,7 +26,7 @@ class Query:
 	'string' : u"""
 SELECT pc_username, pc_date, p_path 
 	FROM eval_patterns 
-		WHERE pc_date > DATE_FORMAT(DATE_SUB(NOW(),INTERVAL 14 DAY),'%s') 
+		WHERE pc_date > DATE_FORMAT(DATE_SUB(NOW(),INTERVAL 28 DAY),'%s') 
 		AND ignored IS NULL;
 	""",
 	'variables' : True, #this should be a list of string formatting variables, not boolean

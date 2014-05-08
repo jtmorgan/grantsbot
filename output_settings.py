@@ -126,7 +126,7 @@ class Params:
 					'username' : '',
 					'output section' : '',
 					'edit summary' : 'Updating %s entries',
-					'header template' : '<noinclude>[[Category:Evaluation portal]]</noinclude>\n',
+					'header template' : '<noinclude>[[Category:Evaluation portal]]</noinclude>\n__NOTOC__\n',
 					'activity' : {
 						'intro' : {
 							'action' : 5,
