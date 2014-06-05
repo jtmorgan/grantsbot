@@ -35,7 +35,7 @@ insert ignore into eval_profiles
 		(rev_id, rev_user, rev_user_text, rev_timestamp, rev_comment, post_date, p_path, page_id)
 		select rev_id, rev_user, rev_user_text, rev_timestamp, rev_comment, str_to_date(rev_timestamp, '%s'), page_title, page_id
 		from metawiki_p.revision as r, metawiki_p.page as p
-		where r.rev_page = 2344396 
+		where r.rev_page = 2344396
 		AND r.rev_page = p.page_id
 		and rev_comment like "/* {{subst:REVISIONUSER}} */ new section"
 	''' % ("%Y%m%d%H%i%s",))
@@ -44,9 +44,9 @@ insert ignore into eval_profiles
 #actually updates now!
 	cursor.execute('''
 UPDATE  eval_profiles a
-        LEFT JOIN 
+        LEFT JOIN
         (
-            SELECT  rev_user_text, COUNT(*) RecentRevs 
+            SELECT  rev_user_text, COUNT(*) RecentRevs
             FROM    metawiki_p.revision
             WHERE   rev_timestamp > DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 14 DAY), '%s')
             AND rev_page IN (SELECT page_id FROM eval_pages UNION SELECT page_id FROM eval_patterns)
@@ -54,7 +54,7 @@ UPDATE  eval_profiles a
         ) b ON a.rev_user_text = b.rev_user_text
 SET     a.recent_edits = COALESCE(b.RecentRevs, 0);
 	''' % ("%Y%m%d%H%i%s",))
-	conn.commit()	
+	conn.commit()
 
 def updatePagelist(cursor):
 	"""
@@ -65,21 +65,21 @@ def updatePagelist(cursor):
 	''')
 	conn.commit()
 	cursor.execute('''
-	INSERT IGNORE INTO eval_pages (page_id, p_path, p_namespace, re_rev) 
-SELECT 
+	INSERT IGNORE INTO eval_pages (page_id, p_path, p_namespace, re_rev)
+SELECT
 	m.page_id,
 	m.page_title,
 	m.page_namespace,
 	m.page_latest
-FROM 
+FROM
 	metawiki_p.page AS m
-	INNER JOIN 
+	INNER JOIN
 	metawiki_p.categorylinks AS cl
-ON 
-	m.page_id = cl.cl_from 
-WHERE 
-	cl.cl_to IN ('Evaluation_portal') 
-AND 
+ON
+	m.page_id = cl.cl_from
+WHERE
+	cl.cl_to IN ('Evaluation_portal')
+AND
 	cl.cl_type = 'page';
 	''')
 	conn.commit()
@@ -89,27 +89,27 @@ def updatePatternInfo(cursor):
 	Adds in newly-created patterns, updates endorsements of patterns
 	"""
 	cursor.execute('''
-	INSERT IGNORE INTO eval_patterns (page_id, p_path, p_namespace, re_rev) 
-SELECT 
+	INSERT IGNORE INTO eval_patterns (page_id, p_path, p_namespace, re_rev)
+SELECT
 	m.page_id,
 	m.page_title,
 	m.page_namespace,
 	m.page_latest
-FROM 
+FROM
 	metawiki_p.page AS m
-	INNER JOIN 
+	INNER JOIN
 	metawiki_p.categorylinks AS cl
-ON 
-	m.page_id = cl.cl_from 
-WHERE 
-	cl.cl_to IN ('Learning_patterns') 
-AND 
+ON
+	m.page_id = cl.cl_from
+WHERE
+	cl.cl_to IN ('Learning_patterns')
+AND
 	cl.cl_type = 'page';
 	''')
 	conn.commit()
 	#number of endorsements
 	cursor.execute('''
-	UPDATE eval_patterns AS lp, (SELECT COUNT(rev_comment) as endorse, rev_page FROM metawiki_p.revision AS r WHERE r.rev_page IN (SELECT page_id FROM eval_patterns) AND r.rev_comment LIKE "endorse%" GROUP BY rev_page) AS tmp SET lp.endorsements = 
+	UPDATE eval_patterns AS lp, (SELECT COUNT(rev_comment) as endorse, rev_page FROM metawiki_p.revision AS r WHERE r.rev_page IN (SELECT page_id FROM eval_patterns) AND r.rev_comment LIKE "endorse%" GROUP BY rev_page) AS tmp SET lp.endorsements =
 CASE
 	WHEN tmp.endorse = 0 THEN 0
 	ELSE tmp.endorse
@@ -119,16 +119,16 @@ WHERE lp.page_id = tmp.rev_page;
 	conn.commit()
 	#first edit to pattern
 	cursor.execute('''
-	UPDATE eval_patterns AS lp, (SELECT MIN(rev_timestamp) as time, rev_page, rev_id, rev_user, user_name FROM metawiki_p.revision AS r, metawiki_p.user AS u WHERE r.rev_page IN (SELECT page_id FROM eval_patterns) AND r.rev_user = u.user_id GROUP BY rev_page) AS tmp SET lp.pc_date = tmp.time, lp.pc_rev = tmp.rev_id, lp.p_creator = tmp.rev_user, lp.pc_username = tmp.user_name WHERE lp.page_id = tmp.rev_page;	
+	UPDATE eval_patterns AS lp, (SELECT MIN(rev_timestamp) as time, rev_page, rev_id, rev_user, user_name FROM metawiki_p.revision AS r, metawiki_p.user AS u WHERE r.rev_page IN (SELECT page_id FROM eval_patterns) AND r.rev_user = u.user_id GROUP BY rev_page) AS tmp SET lp.pc_date = tmp.time, lp.pc_rev = tmp.rev_id, lp.p_creator = tmp.rev_user, lp.pc_username = tmp.user_name WHERE lp.page_id = tmp.rev_page;
 	''')
 	conn.commit()
-	#add recent edit metadata	
+	#add recent edit metadata
 	cursor.execute('''
-UPDATE eval_patterns AS ep, (SELECT page_title, MAX(max) as maxmax FROM 
+UPDATE eval_patterns AS ep, (SELECT page_title, MAX(max) as maxmax FROM
 	(SELECT page_title, page_id, rev_user, rev_user_text, page_namespace, MAX(rev_id) as max FROM metawiki_p.revision AS r, metawiki_p.page AS p WHERE r.rev_page = p.page_id AND p.page_namespace = 201 AND p.page_title IN (SELECT p_path FROM eval_patterns) GROUP BY page_id
-		UNION 
-	SELECT page_title, page_id, rev_user, rev_user_text, page_namespace, MAX(rev_id) as max FROM metawiki_p.revision AS r, metawiki_p.page AS p WHERE r.rev_page = p.page_id AND p.page_namespace = 200 AND p.page_title IN (SELECT p_path FROM eval_patterns) GROUP BY page_id) as tmp GROUP BY page_title) AS tmp2 
-	SET ep.re_rev = tmp2.maxmax WHERE ep.p_path = tmp2.page_title; 
+		UNION
+	SELECT page_title, page_id, rev_user, rev_user_text, page_namespace, MAX(rev_id) as max FROM metawiki_p.revision AS r, metawiki_p.page AS p WHERE r.rev_page = p.page_id AND p.page_namespace = 200 AND p.page_title IN (SELECT p_path FROM eval_patterns) GROUP BY page_id) as tmp GROUP BY page_title) AS tmp2
+	SET ep.re_rev = tmp2.maxmax WHERE ep.p_path = tmp2.page_title;
 	''')
 	conn.commit()
 	cursor.execute('''
@@ -140,16 +140,16 @@ UPDATE eval_patterns AS ep, (SELECT page_title, MAX(max) as maxmax FROM
 	INSERT IGNORE INTO eval_pattern_endorsements (rev_id, rev_user, rev_user_text, rev_timestamp, rev_comment, page_id, p_path) SELECT rev_id, rev_user, rev_user_text, rev_timestamp, rev_comment, page_id, p_path FROM eval_patterns as ep, metawiki_p.revision AS r WHERE r.rev_comment LIKE "endorse%" AND r.rev_page = ep.page_id;
 	''')
 	conn.commit()
-	
+
 def updateQuestionInfo(cursor):
-	"""		
+	"""
 	Add recent question info.
 	"""
 	cursor.execute('''
 	INSERT IGNORE INTO eval_questions (rev_id, rev_user, rev_user_text, rev_timestamp, rev_comment, p_path, page_id) SELECT rev_id, rev_user, rev_user_text, rev_timestamp, rev_comment, page_title, rev_page FROM metawiki_p.revision AS r, metawiki_p.page AS p WHERE r.rev_page = 2344395 AND p.page_id = r.rev_page AND r.rev_comment LIKE "%new section";
 	''')
 	conn.commit()
-	
+
 ##MAIN##
 updateProfiles(cursor)
 updatePagelist(cursor)

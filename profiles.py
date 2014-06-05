@@ -295,13 +295,13 @@ class Toolkit:
 
 	def formatSummaries(self, text): #need to be able to pass in a custom dict here, like in scrapeInfobox above
 		"""
-		Cleans markup from strings of profile summary text. Trims them to 140 chars.
+		Cleans markup from strings of profile summary text.
 		"""
 		text = text.strip()
-		text = re.sub("(\[\[)(.*?)(\|)","",text)
-		text = re.sub("\]","",text)
-		text = re.sub("\[","",text)
-		text = (text[:200] + '...') if len(text) > 200 else text
+# 		text = re.sub("(\[\[)(.*?)(\|)","",text)
+# 		text = re.sub("\]","",text)
+# 		text = re.sub("\[","",text)
+# 		text = (text[:200] + '...') if len(text) > 200 else text
 		return text
 
 	def dedupeMemberList(self, mem_list, sort_val, dict_val):
