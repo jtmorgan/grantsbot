@@ -53,7 +53,7 @@ def rankProfiles():
 		if "edits" not in profile:
 			profile['edits'] = 0
 		profile['text'] = profile_page.getPageText(profile['index'])
-	print len(profile_list)			
+# 	print len(profile_list)			
 	plist_sorted = sorted(profile_list, key=lambda item: item['edits'], reverse = True)
 	plist_text = {'profiles' :'\n\n'.join([x['text'] for x in plist_sorted])} 
 	formatted_profiles = profile_page.formatProfile(plist_text)
