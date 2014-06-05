@@ -26,9 +26,9 @@ class Params:
 					'edit summary' : 'Updating %s profiles',
 					'header template' : '<noinclude>[[Category:Evaluation portal]]</noinclude>',
 					'learning_pattern' : {
-						'output path' : 'Programs:Evaluation_portal/Library/Featured/',
+						'output path' : 'Grants:Evaluation/Library/Featured/',
 						'action' : 1,
-						'input page path' : 'Programs:Evaluation_portal/Library/Learning_patterns',
+						'input page path' : 'Grants:Learning_patterns',
 						'input page id' : 2344400,
 						'profile toclevel' : 2,
 						'first subpage' : 1,
@@ -41,9 +41,9 @@ class Params:
 							},
 						},
 					'case_study' : {
-						'output path' : 'Programs:Evaluation_portal/Library/Featured/',
+						'output path' : 'Grants:Evaluation/Library/Featured/',
 						'action' : 3,
-						'input page path' : 'Programs:Evaluation_portal/Library/Case_studies',
+						'input page path' : 'Grants:Evaluation/Library/Case_studies',
 						'input page id' : 2344401,
 						'first subpage' : 5,
 						'number featured' : 1,
@@ -56,9 +56,9 @@ class Params:
 							},
 						},
 					'learning_module' : {
-						'output path' : 'Programs:Evaluation_portal/Library/Featured/',
+						'output path' : 'Grants:Evaluation/Library/Featured/',
 						'action' : 2, #not ready for this yet
-						'input page path' : 'Programs:Evaluation_portal/Library/Learning_modules',
+						'input page path' : 'Grants:Evaluation/Library/Learning_modules',
 						'input page id' : 2344399,
 						'first subpage' : 6,
 						'number featured' : 1,
@@ -71,9 +71,9 @@ class Params:
 							},
 						},
 					'intro' : {
-						'output path' : 'Programs:Evaluation_portal/Parlor/Featured/',
+						'output path' : 'Grants:Evaluation/Parlor/Featured/',
 						'action' : 5,
-						'input page path' : 'Programs:Evaluation_portal/Parlor/Introductions',
+						'input page path' : 'Grants:Evaluation/Parlor/Introductions',
 						'input page id' : 2344396,
 						'first subpage' : 1,
 						'number featured' : 3,
@@ -85,9 +85,9 @@ class Params:
 							},
 						},
 					'question' : {
-						'output path' : 'Programs:Evaluation_portal/Parlor/Featured/',
+						'output path' : 'Grants:Evaluation/Parlor/Featured/',
 						'action' : 4,
-						'input page path' : 'Programs:Evaluation_portal/Parlor/Questions',
+						'input page path' : 'Grants:Evaluation/Parlor/Questions',
 						'input page id' : 2344395,
 						'first subpage' : 4,
 						'number featured' : 3,
@@ -119,9 +119,9 @@ class Params:
 						},
 					},
 			'feed' : { #fixme
-					'output path' : 'Programs:Evaluation portal/Activity',
+					'output path' : 'Grants:Evaluation/Activity',
 					'number featured' : 6,
-					'main page' : 'Programs:Evaluation portal',
+					'main page' : 'Grants:Evaluation',
 					'username' : '',
 					'output section' : '',
 					'edit summary' : 'Updating %s entries',
@@ -277,7 +277,7 @@ class Params:
 						},
 					},
 			'evalportal_intro' : {
-				'output path' : 'Programs:Evaluation portal/Parlor/Introductions',
+				'output path' : 'Grants:Evaluation/Parlor/Introductions',
 				'output page id' : 2344396,
 				'profile toclevel' : 2,
 				'output section' : 1,
@@ -293,7 +293,7 @@ class Params:
 			'profile defaults' : ['action','badge','datetime','image','page id','page path','participants','summary', 'create date', 'talkpage id','time','timestamp','title','title link','username','item', 'name', ]
 			,
 			'learning reports' : {
-				'output path' : 'Programs:Evaluation portal/Boiler room/Grants lessons 2012',
+				'output path' : 'Grants:Evaluation/Boiler room/Grants lessons 2012',
 				'header template' : '<noinclude>[[Category:Evaluation portal]]</noinclude>\n',
 				'edit summary' : 'adding lessons learned sections of grant reports',
 				},
