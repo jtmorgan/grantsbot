@@ -140,6 +140,11 @@ UPDATE eval_patterns AS ep, (SELECT page_title, MAX(max) as maxmax FROM
 	INSERT IGNORE INTO eval_pattern_endorsements (rev_id, rev_user, rev_user_text, rev_timestamp, rev_comment, page_id, p_path) SELECT rev_id, rev_user, rev_user_text, rev_timestamp, rev_comment, page_id, p_path FROM eval_patterns as ep, metawiki_p.revision AS r WHERE r.rev_comment LIKE "endorse%" AND r.rev_page = ep.page_id;
 	''')
 	conn.commit()
+	#ignore language subpages
+	cursor.execute('''
+	update eval_patterns as lp set ignored = 1 where p_path like "%/%/%";
+	''')
+	conn.commit()
 
 def updateQuestionInfo(cursor):
 	"""

@@ -30,7 +30,7 @@ def makeGuide(params):
 	"""
 	member_list = getMembers()
 # 	print member_list
-	member_list = tools.excludeSubpages(member_list, 'page path', depth=2) #excluding translated subpages
+# 	member_list = tools.excludeSubpages(member_list, 'page path', depth=2) #excluding translated subpages
 	member_list.sort(key=operator.itemgetter('datetime'), reverse=True)		
 	for member in member_list:
 		try:
@@ -57,7 +57,7 @@ def getMemberData(member):
 
 def prepOutput(member_list):			
 	all_profiles = params[params['subtype']]['header template'] + '\n'.join(member['profile'] for member in member_list if 'profile' in member.keys())#if no profile field was created for some reason, ignore 
-	edit_summ = params['edit summary'] % (params['subtype'] + " " + params['type'])
+	edit_summ = params['edit summary'] % (params['type'] + " " + params['subtype'])
 	output = profiles.Profiles(params['output path'], params['type']) #stupid tocreate a new profile object here.
 	output.publishProfile(all_profiles, params['output path'], edit_summ, sb_page = params[params['subtype']]['subpage'], edit_sec = params['output section'])
 	

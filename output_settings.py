@@ -102,8 +102,8 @@ class Params:
 					},
 			'guide' : {
 					'output path' : 'Grants:Learning_patterns',
-					'output section' : 5,
-					'edit summary' : 'Updating list of: %ss',
+					'output section' : 1,
+					'edit summary' : 'Updating %s',
 					'patterns' : {
 						'infobox params' : {
 							'summary' : '^\|\s*problem\s*=',
@@ -111,7 +111,7 @@ class Params:
 							'image' : '^\|\s*image\s*=',
 							},
 
-						'header template' : """== <noinclude>Learning patterns</noinclude> ==\n""",
+						'header template' : """== <noinclude>Patterns</noinclude> ==\n""",
 						'category' : 'Learning patterns',
 						'subpage' : '',
 						'query' : 'list patterns',
