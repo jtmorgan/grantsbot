@@ -111,7 +111,7 @@ class Params:
 							'image' : '^\|\s*image\s*=',
 							},
 
-						'header template' : """== <noinclude>Patterns</noinclude> ==\n""",
+						'header template' : """== Patterns ==\n</noinclude>""",
 						'category' : 'Learning patterns',
 						'subpage' : '',
 						'query' : 'list patterns',
