@@ -62,23 +62,20 @@ def getFeaturedProfiles():
 	
 def prepOutput(featured_list):
 	first_subpage = params[params['subtype']]['first subpage']
-	i = 0
-	j = 0
-	number_featured = params[params['subtype']]['number featured']
+	number_featured = params[params['subtype']]['number featured']	
 	featured_list = tools.addDefaults(featured_list)       		
 	output = profiles.Profiles(params[params['subtype']]['output path'], settings = params) #stupid tocreate a new profile object here. and stupid to re-specify the path below
+	i = first_subpage
 	for f in featured_list:
-		if i < number_featured:
+		if i <= first_subpage + (number_featured - 1):
 			f['profile'] = output.formatProfile(f)
 			f['profile'] = params['header template'] + '\n' + f['profile']
 			edit_summ = params['edit summary'] % (params['subtype'] + " " + params['type'])
-			output.publishProfile(f['profile'], params[params['subtype']]['output path'], edit_summ, sb_page = first_subpage + j)
-			if i == 0:
-				j = 1
+			output.publishProfile(f['profile'], params[params['subtype']]['output path'], edit_summ, sb_page = i)
 			i += 1
 		else:
 			break	
-
+			
 ###MAIN
 param = output_settings.Params()
 params = param.getParams(sys.argv[1])

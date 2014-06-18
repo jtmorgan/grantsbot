@@ -298,9 +298,10 @@ class Toolkit:
 		Cleans markup from strings of profile summary text.
 		"""
 		text = text.strip()
-# 		text = re.sub("(\[\[)(.*?)(\|)","",text)
-# 		text = re.sub("\]","",text)
-# 		text = re.sub("\[","",text)
+		text = re.sub("(\[\[)(.*?)(\|)","",text)
+		text = re.sub("\]","",text)
+		text = re.sub("\[","",text)
+		text = text + "..."
 # 		text = (text[:200] + '...') if len(text) > 200 else text
 		return text
 
