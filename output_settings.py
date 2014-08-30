@@ -157,6 +157,7 @@ class Params:
 					'header template' : """<noinclude>[[Category:IdeaLab]]</noinclude>""",
 					'main namespace' : 200,
 					'output path' : 'Grants:IdeaLab/Ideas/',
+					'ignored pages' : ['Grants:IdeaLab/Preload',],
 					'edit summary' : 'Updating %s',
 					'participants' : {
 							'category' : 'IdeaLab/Ideas/Participants',
@@ -186,6 +187,7 @@ class Params:
 					},
 			'idealab_feed' : { #fixme
 					'output path' : 'Grants:IdeaLab/Ideas/Activity',
+					'ignored pages' : ['Grants:IdeaLab/Preload',],					
 					'number featured' : 6,
 					'main page' : 'Grants:IdeaLab/Ideas/Activity',
 					'main namespace' : 200,

@@ -38,6 +38,10 @@ def makeFeed():
 	all_member_list = tools.setTimeValues(all_member_list)			
 	recently_active = [m for m in all_member_list if m['datetime'] > date_threshold[0]]
 	recently_active = tools.dedupeMemberList(recently_active, 'datetime', 'page path')
+	#remove pages we don't want to display in the list, like Grants:IdeaLab/Preload
+	for r in recently_active:
+		if r['page path'] in params['ignored pages']:
+			recently_active.remove(r)
 	recently_active = recently_active[:6]						
 	prepOutput(recently_active)				
 	

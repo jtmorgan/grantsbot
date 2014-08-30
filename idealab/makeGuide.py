@@ -37,7 +37,13 @@ def makeGuide():
 	member_list.sort(key=operator.itemgetter('datetime'), reverse=True)	
 	if params['subtype'] == "new":
 		member_list = member_list[:10]		
-	unique_list = tools.dedupeMemberList(member_list, "datetime", "page id") 	
+	unique_list = tools.dedupeMemberList(member_list, "datetime", "page id")
+	#remove pages we don't want to display in the list, like Grants:IdeaLab/Preload
+	for u in unique_list:
+		if u['page path'] in params['ignored pages']:
+# 			print u['page path']
+			unique_list.remove(u)
+# 	print unique_list		 	
 	prepOutput(unique_list)				
 	
 def getMembers():
