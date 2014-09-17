@@ -170,7 +170,7 @@ class Params:
 							'time value' : 'timestamp',
 							},
 					'new' : {
-							'category' : 'IdeaLab/Ideas/Active',
+							'category' : 'IdeaLab/Ideas/IdeaLab',
 							'subpage' : 'New',
 							'time value' : 'created',
 							},
@@ -187,7 +187,7 @@ class Params:
 					},
 			'idealab_feed' : { #fixme
 					'output path' : 'Grants:IdeaLab/Ideas/Activity',
-					'ignored pages' : ['Grants:IdeaLab/Preload',],					
+					'ignored pages' : ['Grants:IdeaLab/Preload',],
 					'number featured' : 6,
 					'main page' : 'Grants:IdeaLab/Ideas/Activity',
 					'main namespace' : 200,
