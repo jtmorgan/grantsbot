@@ -22,133 +22,22 @@ class Params:
 
 	def __init__(self):
 		self.output_params = {
-			'evalportal_gallery' : {
-					'edit summary' : 'Updating %s profiles',
-					'header template' : '<noinclude>[[Category:Evaluation portal]]</noinclude>',
-					'learning_pattern' : {
-						'output path' : 'Grants:Evaluation/Library/Featured/',
-						'action' : 1,
-						'input page path' : 'Grants:Learning_patterns',
-						'input page id' : 2344400,
-						'profile toclevel' : 2,
-						'first subpage' : 1,
-						'number featured' : 4,
-						'infobox params' : {
-							'summary' : '^\|\s*summary\s*=',
-							'image' : '^\|\s*image\s*=',
-							'page path' : '^\|\s*title link\s*=',
-							'time' : '^\|\s*time\s*=',
-							},
+			'pattern_guide' : {
+					'infobox params' : {
+						'summary' : '^\|\s*problem\s*=',
+						'image' : '^\|\s*image\s*=',
 						},
-					'case_study' : {
-						'output path' : 'Grants:Evaluation/Library/Featured/',
-						'action' : 3,
-						'input page path' : 'Grants:Evaluation/Library/Case_studies',
-						'input page id' : 2344401,
-						'first subpage' : 5,
-						'number featured' : 1,
-						'profile toclevel' : 2,
-						'infobox params' : {
-							'summary' : '^\|\s*summary\s*=',
-							'image' : '^\|\s*image\s*=',
-							'page path' : '^\|\s*title link\s*=',
-							'time' : '^\|\s*time\s*=',
-							},
-						},
-					'learning_module' : {
-						'output path' : 'Grants:Evaluation/Library/Featured/',
-						'action' : 2, #not ready for this yet
-						'input page path' : 'Grants:Evaluation/Library/Learning_modules',
-						'input page id' : 2344399,
-						'first subpage' : 6,
-						'number featured' : 1,
-						'profile toclevel' : 2,
-						'infobox params' : {
-							'summary' : '^\|\s*summary\s*=',
-							'image' : '^\|\s*image\s*=',
-							'page path' : '^\|\s*title link\s*=',
-							'time' : '^\|\s*time\s*=',
-							},
-						},
-					'intro' : {
-						'output path' : 'Grants:Evaluation/Parlor/Featured/',
-						'action' : 5,
-						'input page path' : 'Grants:Evaluation/Parlor/Introductions',
-						'input page id' : 2344396,
-						'first subpage' : 1,
-						'number featured' : 3,
-						'profile toclevel' : 2,
-						'infobox params' : {
-							'summary' : '^\|\s*story\s*=',
-							'name' : '^\|\s*name\s*=',
-							'image' : '^\|\s*image\s*=',
-							},
-						},
-					'question' : {
-						'output path' : 'Grants:Evaluation/Parlor/Featured/',
-						'action' : 4,
-						'input page path' : 'Grants:Evaluation/Parlor/Questions',
-						'input page id' : 2344395,
-						'first subpage' : 4,
-						'number featured' : 3,
-						'profile toclevel' : 1,
-						'infobox params' : {
-							'summary' : '^\|\s*summary\s*=',
-							'image' : '^\|\s*image\s*=',
-							'page path' : '^\|\s*title link\s*=',
-							'time' : '^\|\s*time\s*=',
-							},
-						},
-					},
-			'guide' : {
-					'output path' : 'Grants:Learning_patterns',
-					'output section' : 1,
+					'header template' : """<noinclude>[[Category:Learning_Pattern_Library]] {{mbox|text='''This page is updated daily by [[User:GrantsBot|GrantsBot]].''' Edits made by others may be inadvertently overwritten the next time the bot runs. If you have a question, or see an error that needs to be fixed, please post to the [[Grants_talk:Learning_patterns|Library talk page]]. You may also contact [[User:Jmorgan (WMF)|GrantsBot's maintainer]] directly.}}</noinclude>""",
+					'main namespace' : 200,
+					'output path' : 'Grants:Learning_patterns/',
+					'ignored pages' : ['Grants:IdeaLab/Preload',],
 					'edit summary' : 'Updating %s',
-					'patterns' : {
-						'infobox params' : {
-							'summary' : '^\|\s*problem\s*=',
-							'endorse' : '^\|\s*endorse\s*=',
-							'image' : '^\|\s*image\s*=',
+					'all' :        {
+							'category' : 'Learning_patterns',
+							'subpage' : 'All',
+							'time value' : 'timestamp',
 							},
-
-						'header template' : """== Patterns ==\n</noinclude>""",
-						'category' : 'Learning patterns',
-						'subpage' : '',
-						'query' : 'list patterns',
-						'namespace' : 'Grants:',
-						},
-					},
-			'feed' : { #fixme
-					'output path' : 'Grants:Evaluation/Activity',
-					'number featured' : 6,
-					'main page' : 'Grants:Evaluation',
-					'username' : '',
-					'output section' : '',
-					'edit summary' : 'Updating %s entries',
-					'header template' : '<noinclude>[[Category:Evaluation portal]]</noinclude>\n__NOTOC__\n',
-					'activity' : {
-						'intro' : {
-							'action' : 5,
-							'query' : 'recent intros',
-							'namespace' : 'Programs:',
-							},
-						'pattern' : {
-							'action' : 1,
-							'query' : 'recent patterns',
-							'namespace' : 'Grants:',
-							},
-						'endorse' : {
-							'action' : 3,
-							'query' : 'recent endorsements',
-							'namespace' : 'Grants:',
-							},
-						'question' : {
-							'action' : 2,
-							'query' : 'recent questions',
-							'namespace' : 'Programs:',
-							},
-						},
-					},
+					},					
 			'idealab_guide' : {
 					'infobox params' : {
 						'summary' : '^\|\s*summary\s*=',
@@ -173,11 +62,6 @@ class Params:
 							'category' : 'IdeaLab/Ideas/IdeaLab',
 							'subpage' : 'New',
 							'time value' : 'created',
-							},
-					'ineligible' : {
-							'category' : 'IEG/Proposals/Ineligible', #ineligible ideas?
-							'subpage' : 'Ineligible',
-							'time value' : 'timestamp',
 							},
 					'all' : {
 							'category' : 'IdeaLab/Ideas/IdeaLab',
@@ -278,13 +162,6 @@ class Params:
 							},
 						},
 					},
-			'evalportal_intro' : {
-				'output path' : 'Grants:Evaluation/Parlor/Introductions',
-				'output page id' : 2344396,
-				'profile toclevel' : 2,
-				'output section' : 1,
-				'edit summary' : 'Reordering %ss, putting recently active participants at the top',
-				},
 			'idealab_intro' : {
 				'output path' : 'Grants:IdeaLab/Introductions',
 				'output page id' : 2101758,
@@ -292,7 +169,7 @@ class Params:
 				'talk namespace' : 201,
 				'edit summary' : 'Reordering %ss, putting recently active participants at the top',
 				},
-			'profile defaults' : ['action','badge','datetime','image','page id','page path','participants','summary', 'create date', 'talkpage id','time','timestamp','title','title link','username','item', 'name', ]
+			'profile defaults' : ['action','badge','datetime','image','page id','page path','participants', 'problem', 'summary', 'create date', 'talkpage id','time','timestamp','title','title link','username','item', 'name', ]
 			,
 			'learning reports' : {
 				'output path' : 'Grants:Evaluation/Boiler room/Grants lessons 2012',

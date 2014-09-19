@@ -30,6 +30,7 @@ def makeGuide():
 	Make lists of profiles for resources in a portal.
 	"""
 	member_list = getMembers()
+	member_list = tools.excludeSubpages(member_list, 'page path', depth=2) #excluding translated subpages
 	for member in member_list:
 		member = getMemberData(member)
 	member_list = tools.setTimeValues(member_list, val = params[params['subtype']]['time value'])		
@@ -77,7 +78,7 @@ def prepOutput(member_list):
 	for member in member_list: #inconsistent. i do this earlier in eval_portal
 		member['profile'] = output.formatProfile(member)		
 	all_profiles = params['header template'] + '\n'.join(member['profile'] for member in member_list)
-	edit_summ = params['edit summary'] % (params['subtype'] + " " + params['type'])
+	edit_summ = params['edit summary'] % (params['type'] + " " + params['subtype'])
 	output.publishProfile(all_profiles, params['output path'], edit_summ, sb_page = params[params['subtype']]['subpage'])
 	
 

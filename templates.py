@@ -19,33 +19,16 @@ class Template:
 	"""templates of profiles for wiki pages"""
 	def __init__(self):
 		self.profile_templates = {
-		'evalportal_gallery' : u"""
-{{{{Evaluation/Feature
-| time = {time}
-| image = {image}
-| title = {title}
-| action = {action}
-| title link = {page path}
-| summary = {summary}
-}}}}""",
-		'guide' : u"""
+		'pattern_guide' : u"""
 ===<noinclude>{title}</noinclude>===
 {{{{Evaluation/Resource/Summary
 | time= {time}
 | title = {title}
 | title link= {page path}
 | summary= {summary}
+| creator= {username}
 | image = {image}
 }}}}""",
-		'feed' :u"""
-==<noinclude>{item}</noinclude>==
-{{{{Evaluation/Activity/Entry
-| time = {time}
-| username = {username}
-| action = {action}
-| title = {title}
-| title link = {page path}
-}}}}"""	,
 'idealab_guide' : u"""
 ==<noinclude>{title}</noinclude>==
 {{{{IdeaLab/Idea/Summary
@@ -79,8 +62,6 @@ class Template:
 | idea link = {page path}
 | summary = {summary}
 }}}}""",
-	'evalportal_intro' : u"""==Profiles==\n
-{profiles}""",
 	'idealab_intro' : u"""<noinclude><div style="font-family: Helvetica Neue, Helvetica, arial, sans-serif; line-height: 1.5em; background-color: #ffffff; color: #{{{{IEG/Color/Gray}}}}; min-width: 810px; margin-top: -60px; padding: 40px 0 20px">
 <div style="margin:0 15%">
 <span style="font-size: 3em; color: #{{{{IEG/Color/Light blue}}}};">'''IdeaLab'''</span>
@@ -90,13 +71,6 @@ class Template:
 </div>
 </div></noinclude>
 {profiles}""",
-	'learning reports' :u"""
-=={title}==
-{{{{main|{page path}}}}}
-
-{lessons}
-
-""",
 }
 
 	def getTemplate(self, member):

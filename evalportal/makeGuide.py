@@ -30,7 +30,7 @@ def makeGuide(params):
 	"""
 	member_list = getMembers()
 # 	print member_list
-# 	member_list = tools.excludeSubpages(member_list, 'page path', depth=2) #excluding translated subpages
+	member_list = tools.excludeSubpages(member_list, 'page path', depth=2) #excluding translated subpages
 	member_list.sort(key=operator.itemgetter('datetime'), reverse=True)		
 	for member in member_list:
 		try:
