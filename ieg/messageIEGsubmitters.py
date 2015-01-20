@@ -1,4 +1,4 @@
-#! /home/jtmorgan/.local/bin/python
+#! /usr/bin/python2.7
 
 # Copyright 2013 Jtmorgan
 
@@ -17,15 +17,24 @@
 
 import MySQLdb
 import wikitools
-import settings
+import grantsbot_settings
 from datetime import datetime
 import logging
+import categories
+import profiles.py
 
-wiki = wikitools.Wiki(settings.apiurl)
-wiki.login(settings.username, settings.password)
-logging.basicConfig(filename='/home/jtmorgan/grantsbot/logs/reminders.log',level=logging.INFO)
-conn = MySQLdb.connect(host = 'metawiki-p.userdb.toolserver.org', db = 'u_jtmorgan_p', read_default_file = '~/.my.cnf', use_unicode=1, charset="utf8" )
+wiki = wikitools.Wiki(grantsbot_settings.apiurl)
+wiki.login(grantsbot_settings.username, grantsbot_settings.password)
+conn = MySQLdb.connect(host = grantsbot_settings.host, db = grantsbot_settings.dbname, read_default_file = grantsbot_settings.defaultcnf, use_unicode=1, charset="utf8")
 cursor = conn.cursor()
+
+
+##GLOBAL VARIABLES##
+curtime = str(datetime.utcnow())
+page_namespace = "User_talk:"
+
+# lists to track who needs a reminder
+recipients = []
 
 
 ##GLOBAL VARIABLES##
@@ -41,16 +50,21 @@ message_template = u'{{subst:Template:IEG/GrantsBot/Reminder|signature=~~~~}}'
 
 ##FUNCTIONS##
 #gets a list of editor's to message
+def getPages():
+	category = categories.Categories("IEG_2013_round_2", 200) #namespace redundancy
+	member_list = category.getCatMembers()
+	print member_list
+
+##FUNCTIONS##
+#gets a list of editor's to message
 def getUsernames(cursor):
-	cursor.execute('SELECT pc_username FROM ieg_proposals WHERE p_status = "draft" AND p_creator_userid != 0 AND pc_reminded != 1')
+	cursor.execute('SELECT pc_username FROM ieg_proposals WHERE p_status = "draft" AND p_creator_userid != 0 AND ieg_round_2 = 1')
 	rows = cursor.fetchall()
 	if rows:
 		return rows
 	else:
 		pass
-		
-
-#send the reminder message		
+#send the reminder message
 def messageUsers():
 	for name in recipients:
 		page_title = page_namespace + name
@@ -60,22 +74,22 @@ def messageUsers():
 			try: #update the db to show that this user has been reminded
 				cursor.execute('UPDATE ieg_proposals SET pc_reminded = 1 WHERE pc_username = "%s"' % (name,))
 				conn.commit()
-			except:	
+			except:
 				logging.info('UPDATE: Could not update reminded status for User:' + name + ' at ' + curtime)
-				continue	
+				continue
 		except:
 			logging.info('REMIND: Reminder to User:' + name + ' failed at to send at ' + curtime)
 			continue
 
-			
+
 ##MAIN##
 rows = getUsernames(cursor)
 if rows:
 	for row in rows:
 		name = row[0]
-		recipients.append(name)		
+		recipients.append(name)
 	messageUsers()
-	logging.info('REMIND: Sent reminders to ' + ' '.join(recipients) + ' ' + curtime)	
+	logging.info('REMIND: Sent reminders to ' + ' '.join(recipients) + ' ' + curtime)
 else:
 	logging.info('REMIND: No reminders on ' + curtime)
 cursor.close()

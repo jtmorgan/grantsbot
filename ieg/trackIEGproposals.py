@@ -17,20 +17,23 @@
 
 import csv
 from datetime import datetime
+import grantsbot_settings
 import logging
 import MySQLdb
-import pageData as p
-import settings
+# import pageData as p
 import sys
 import wikitools
 
-conn = MySQLdb.connect(host = 'metawiki-p.userdb.toolserver.org', db = 'u_jtmorgan_p', read_default_file = '~/.my.cnf', use_unicode=1, charset="utf8" )
-cursor = conn.cursor()
+# conn = MySQLdb.connect(host = 'metawiki-p.userdb.toolserver.org', db = 'u_jtmorgan_p', read_default_file = '~/.my.cnf', use_unicode=1, charset="utf8" )
+# cursor = conn.cursor()
 curtime = str(datetime.utcnow())
-logging.basicConfig(filename='/home/jtmorgan/grantsbot/logs/proposals.log',level=logging.INFO)
+# logging.basicConfig(filename='/home/jtmorgan/grantsbot/logs/proposals.log',level=logging.INFO)
 page_namespace = 'Grants:'
-wiki = wikitools.Wiki(settings.apiurl)
-wiki.login(settings.username, settings.password)
+
+wiki = wikitools.Wiki(grantsbot_settings.apiurl)
+wiki.login(grantsbot_settings.username, grantsbot_settings.password)
+conn = MySQLdb.connect(host = grantsbot_settings.host, db = grantsbot_settings.dbname, read_default_file = grantsbot_settings.defaultcnf, use_unicode=1, charset="utf8")
+cursor = conn.cursor()
 
 ##FUNCTIONS##
 def updateActivity():
@@ -40,7 +43,7 @@ def updateActivity():
 	#first, updates proposal activity table with new revs
 	cursor.execute('''
 INSERT IGNORE INTO ieg_proposal_edits (rev_id, rev_user, rev_user_text, rev_timestamp, rev_comment, page_id, page_title, page_namespace) SELECT rev_id, rev_user, rev_user_text, rev_timestamp, rev_comment, page_id, page_title, page_namespace FROM metawiki_p.page as p, metawiki_p.revision as r WHERE p.page_namespace IN (200, 201) AND p.page_title LIKE '%s' AND p.page_title NOT LIKE '%s' AND p.page_id = r.rev_page
-	''' % ("IEG/%", "IEG/%/%"))
+	''' % ("IdeaLab/%", "IdeaLab/%/%"))
 	conn.commit()
 	rowsaffected = cursor.rowcount
 	if rowsaffected > 0:
@@ -70,38 +73,8 @@ def updateStatus():
 	cursor.execute('''UPDATE ieg_proposals SET p_status = 'category removed' WHERE p_status IN ("ineligible", "withdrawn", "draft", "proposed") AND page_id NOT IN (SELECT cl_from FROM metawiki_p.categorylinks WHERE cl_to IN ("IEG/Proposals/Draft", "IEG/Proposals/Proposed", "IEG/Proposals/Ineligible", "IEG/Proposals/Withdrawn"))''')
 	conn.commit()
 
-
-def checkCompleteness():
-	"""
-	Checks whether certain sections of a proposal have been completed.
-	If so, removes a button template from the proposal page
-	"""
-	prop_list = []
-	cursor.execute('SELECT page_id, page_title, max(part2), max(part3) FROM (SELECT e.page_id, p.page_title, (CASE WHEN e.rev_comment LIKE "/* Part 2:%" THEN 1 ELSE 0 END) AS part2, (CASE WHEN e.rev_comment LIKE "/* Part 3:%" THEN 1 ELSE 0 END) AS part3 from ieg_proposal_edits AS e, ieg_proposals AS p WHERE (e.rev_comment = "/* Part 3: Community Discussion */ new section" or e.rev_comment = "/* Part 2: The Project Plan */ new section") AND e.page_id = p.page_id AND p.p_status IN ("ineligible", "withdrawn", "draft", "proposed")) AS tmp GROUP BY page_id')
-	rows = cursor.fetchall()
-	for row in rows:
-		prop_list.append([row[0], row[1], row[2], row[3]])
-	for item in prop_list:
-		getSecs = p.Page(item[1], page_namespace, 2)
-		text = ''
-		edits = getSecs.removeButtons(item[2], item[3])
-		if edits[1]: #only edit page if something was actually found & removed
-			text = edits[0]
-			page = wikitools.Page(wiki, page_namespace + item[1])
-			page_text = text
-			page.edit(page_text, summary = 'Removing button templates used to create new sections', bot = 1)
-		else:
-			pass
-	return prop_list
-
-
-#updates the completed status of proposals
-def updateDB(list):
-		for item in list:
-			cursor.execute('''
-	UPDATE ieg_proposals SET p_has_sec2 = %d, p_has_sec3 = %d WHERE page_id = %s
-			''' % (item[2], item[3], item[0]))
-			conn.commit()
+	cursor.execute('''UPDATE ieg_proposals AS p, (SELECT cl_from, cl_to FROM metawiki_p.categorylinks AS c, ieg_proposals AS pp WHERE c.cl_from = pp.page_id AND c.cl_to = "IEG_2013_round_2") AS tmp SET p.ieg_round_2 = 1 WHERE tmp.cl_from = p.page_id;''')
+	conn.commit()
 
 
 def updateDB(): #need to reconcile this with the similar function above
@@ -143,7 +116,7 @@ def writeReport():
 ##MAIN##
 updateActivity()
 updateStatus()
-proposals = checkCompleteness()
+# proposals = checkCompleteness()
 updateDB()
 # writeReport()
 cursor.close()
