@@ -22,7 +22,6 @@ from warnings import filterwarnings
 
 conn = MySQLdb.connect(host = grantsbot_settings.host, db = grantsbot_settings.dbname, read_default_file = grantsbot_settings.defaultcnf, use_unicode=True, charset="utf8")
 cursor = conn.cursor()
-curtime = str(datetime.utcnow())
 filterwarnings('ignore', category = MySQLdb.Warning)
 
 ##FUNCTIONS##
@@ -68,28 +67,66 @@ def update_endorsements(cursor):
 	Add in how many endorsements there have been for each idea.
 	"""
 	cursor.execute('''
-	UPDATE idealab_ideas AS i,
-(SELECT COUNT(distinct rev_user) AS endorsements, idea_id FROM
-(SELECT r.rev_user, i.idea_id FROM metawiki_p.page AS p 
-JOIN metawiki_p.categorylinks AS cl 
-ON p.page_id = cl.cl_from 
-JOIN metawiki_p.revision AS r
-ON p.page_id = r.rev_page
-JOIN idealab_ideas AS i
-ON p.page_id = i.idea_id
-WHERE rev_user != 0 
-AND (r.rev_comment LIKE ("%Endorse%") OR r.rev_comment LIKE ("%endorse%"))
-AND r.rev_user_text NOT LIKE "%(WMF)") AS tmp1
-GROUP BY idea_id) AS tmp2
-SET i.idea_endorsements = tmp2.endorsements
-WHERE i.idea_id = tmp2.idea_id;
+	UPDATE idealab_ideas AS ii, (SELECT COUNT(rev_comment) as endorsements, rev_page 
+	FROM metawiki_p.revision AS r WHERE r.rev_page IN (SELECT idea_id FROM idealab_ideas) 
+	AND (r.rev_comment LIKE ("%Endorse%") OR r.rev_comment LIKE ("%endorse%")) GROUP BY 	rev_page) AS tmp 
+	SET ii.idea_endorsements =
+	CASE
+	WHEN tmp.endorsements = 0 THEN 0
+	ELSE tmp.endorsements
+	END
+	WHERE ii.idea_id = tmp.rev_page
 	''')
-	conn.commit()	
+	conn.commit()
+
+#this version doesn't work yet 	
+# 	cursor.execute('''
+# 	UPDATE idealab_ideas AS i,
+# (SELECT COUNT(distinct rev_user) AS endorsements, idea_id FROM
+# (SELECT r.rev_user, i.idea_id FROM metawiki_p.page AS p 
+# JOIN metawiki_p.categorylinks AS cl 
+# ON p.page_id = cl.cl_from 
+# JOIN metawiki_p.revision AS r
+# ON p.page_id = r.rev_page
+# JOIN idealab_ideas AS i
+# ON p.page_id = i.idea_id
+# WHERE rev_user != 0 
+# AND (r.rev_comment LIKE ("%Endorse%") OR r.rev_comment LIKE ("%endorse%"))
+# AND r.rev_user_text NOT LIKE "%(WMF)") AS tmp1
+# GROUP BY idea_id) AS tmp2
+# SET i.idea_endorsements = tmp2.endorsements
+# WHERE i.idea_id = tmp2.idea_id;
+# 	''')
+
+def update_recent_editors(cursor):
+	"""
+	Add in all edits to the idea page within the past two weeks.
+	"""
+	cursor.execute('''
+	UPDATE idealab_ideas AS ii INNER JOIN 
+	(
+	SELECT COUNT(distinct r.rev_user) AS recent_editors, r.rev_page 
+	FROM metawiki_p.revision r INNER JOIN idealab_ideas i ON r.rev_page = i.idea_id 
+	WHERE STR_TO_DATE(r.rev_timestamp, '%Y%m%d%H%i%s') > DATE_FORMAT(DATE_SUB(NOW(),INTERVAL 14 DAY),'%Y%m%d%H%i%s') 
+	GROUP BY r.rev_page
+	) AS tmp 
+	ON ii.idea_id = tmp.rev_page
+	SET ii.idea_recent_editors = 
+	CASE
+	  WHEN tmp.recent_editors = 0 THEN 0
+	  ELSE tmp.recent_editors
+	 END
+	 ''')
+	conn.commit()
+
+# this version doesn't work yet	 
+# UPDATE idealab_ideas AS ii, (SELECT COUNT(distinct r.rev_user) AS recent_editors, p.page_title FROM metawiki_p.revision r, metawiki_p.page p WHERE r.rev_page = p.page_id AND p.page_namespace IN (200, 201) AND p.page_title IN (SELECT idea_title FROM idealab_ideas) AND STR_TO_DATE(r.rev_timestamp, '%Y%m%d%H%i%s') > DATE_FORMAT(DATE_SUB(NOW(),INTERVAL 14 DAY),'%Y%m%d%H%i%s') GROUP BY page_title) AS tmp SET ii.idea_recent_editors = tmp.recent_editors WHERE ii.idea_title = tmp.page_title;
 
 
 ##MAIN##
 add_ideas(cursor)
 add_talk_pages(cursor)
 update_endorsements(cursor)
+update_recent_editors(cursor)
 cursor.close()
 conn.close()
