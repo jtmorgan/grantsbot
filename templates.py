@@ -39,8 +39,26 @@ class Template:
 | creator= {username}
 | image = {image}
 }}}}""",
+'idealab_profile_guide' : u"""
+==<noinclude>{title}</noinclude>==
+{{{{IdeaLab/Inspire/Profile
+| title= {title}
+| link= {page path}
+| story= {story}
+| skills= {skills}
+| image = {image}
+| timestamp = {time}
+}}}}""",
 'idealab_feed' :u"""
-==<noinclude>{item}</noinclude>==
+{{{{IdeaLab/Activity/Entry
+| time = {time}
+| username = {username}
+| number of people = {participants}
+| action = {action}
+| idea = {title}
+| idea link = {page path}
+}}}}""",
+'inspire_feed' :u"""
 {{{{IdeaLab/Activity/Entry
 | time = {time}
 | username = {username}
@@ -76,7 +94,7 @@ class Template:
 	def getTemplate(self, member):
 		"""
 		Select a profile template that matches the passed template name.
-		""" 
+		"""
 		tmplt = self.profile_templates[member]
 		return tmplt
 
