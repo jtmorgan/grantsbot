@@ -35,7 +35,11 @@ def makeFeed():
 			pass					
 		else:	
 			member = getMemberData(member)
-	all_member_list = tools.setTimeValues(all_member_list)			
+	print('GOT MEMBER DATA')
+	print(all_member_list)
+	all_member_list = tools.setTimeValues(all_member_list)
+	print('SET TIME VALUES')
+	print(all_member_list)
 	recently_active = [m for m in all_member_list if m['datetime'] > date_threshold[0]]
 	recently_active = tools.dedupeMemberList(recently_active, 'datetime', 'page path')
 	#remove pages we don't want to display in the list, like Grants:IdeaLab/Preload
@@ -99,6 +103,7 @@ def getMemberData(member):
 
 def prepOutput(short_member_list):
 	output = profiles.Profiles(params['output path'], settings = params) #stupid tocreate a new profile object here.
+	print(output)
 	for m in short_member_list: #inconsistent. i do this earlier in eval_portal
 		m['profile'] = output.formatProfile(m) #will this work here?		
 	all_profiles = params['header template'] + '\n'.join(m['profile'] for m in short_member_list)
@@ -112,4 +117,4 @@ params['type'] = sys.argv[1]
 params['subtype'] = sys.argv[2]
 tools = profiles.Toolkit()
 date_threshold = tools.getSubDate(30)
-makeFeed()	
+makeFeed()
