@@ -74,6 +74,11 @@ class Params:
                             'subpage' : 'Inspire/All',
                             'time value' : 'timestamp',
                             },
+                    'inspire-draft' : {
+                            'category' : 'IdeaLab/Ideas/Proposal',
+                            'subpage' : 'Inspire/Drafts',
+                            'time value' : 'timestamp',
+                            },
                     },
             'idealab_profile_guide' : {
                     'infobox params' : {
