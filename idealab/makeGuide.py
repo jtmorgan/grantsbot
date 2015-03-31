@@ -73,7 +73,10 @@ def getMemberData(member):
     member['created'] = revs[0]['timestamp']
     if params['formatted fields']:
         for field in params['formatted fields']: #do I need the 'if' above this line?
-          member[field] = tools.formatSummaries(member[field])
+            try:
+                member[field] = tools.formatSummaries(member[field])
+            except:    
+                pass
 #             print member[field]
     return member
 

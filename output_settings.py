@@ -31,6 +31,7 @@ class Params:
                     'main namespace' : 200,
                     'output path' : 'Grants:Learning_patterns/',
                     'ignored pages' : ['Grants:IdeaLab/Preload',], #more ignored pages for inspire?
+                    'formatted fields' : ['problem'],
                     'edit summary' : 'Updating %s',
                     'all' :        {
                             'category' : 'Learning_patterns',
