@@ -35,11 +35,11 @@ def makeFeed():
 			pass					
 		else:	
 			member = getMemberData(member)
-	print('GOT MEMBER DATA')
-	print(all_member_list)
+# 	print('GOT MEMBER DATA')
+# 	print(all_member_list)
 	all_member_list = tools.setTimeValues(all_member_list)
-	print('SET TIME VALUES')
-	print(all_member_list)
+# 	print('SET TIME VALUES')
+# 	print(all_member_list)
 	recently_active = [m for m in all_member_list if m['datetime'] > date_threshold[0]]
 	recently_active = tools.dedupeMemberList(recently_active, 'datetime', 'page path')
 	#remove pages we don't want to display in the list, like Grants:IdeaLab/Preload
