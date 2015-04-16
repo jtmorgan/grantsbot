@@ -18,68 +18,61 @@
 import grantsbot_settings
 import output_settings
 import profiles
+from random import shuffle
 import sys
 import templates
 
 ###FUNCTIONS
 def makeGallery():
-	"""
-	Makes featured profiles for IdeaLab galleries.
-	"""
-	if params['subtype'] in ['intro', 'new_idea', 'ieg_draft', 'participants_wanted']:
-		featured_list = getFeaturedProfiles()
-	else:
-		sys.exit("unrecognized featured content type " + params['subtype'])	
-	prepOutput(featured_list)				
+    """
+    Makes featured profiles for IdeaLab galleries.
+    """
+    if params['subtype'] in ['intro', 'new_idea', 'ieg_draft', 'participants_wanted']:
+        featured_list = getFeaturedProfiles()
+    else:
+        sys.exit("unrecognized featured content type " + params['subtype']) 
+    prepOutput(featured_list)               
 
 def getFeaturedProfiles():
-	"""
-	Gets info about the top-billed profiles in a guide.
-	"""
-	featured_list = []
-	profile_page = profiles.Profiles(params[params['subtype']]['input page path'], params[params['subtype']]['input page id'], params)
-	profile_list = profile_page.getPageSectionData(level = params[params['subtype']]['profile toclevel'])
-	for profile in profile_list:
-		text = profile_page.getPageText(profile['index'])
-		profile = profile_page.scrapeInfobox(profile, text)
-		if params['subtype'] == 'intro':
-			if (profile['summary'] and profile['name']): #this might not be filtering. see below.
-				profile['action'] = params[params['subtype']]['action']
-				profile['summary'] = tools.formatSummaries(profile['summary'])
-				profile['username'] = "User:" + profile['title'] 
-				del profile['title'] #title is used for featured ideas, in a different param
-				featured_list.append(profile)
-			else:
-				pass	
-		else:
-			if len(profile['summary']) > 1:
-				profile['action'] = params[params['subtype']]['action']
-				profile['summary'] = tools.formatSummaries(profile['summary'])	
-				featured_list.append(profile)
-			else:
-				pass
-	return featured_list		
-	
+    """
+    Gets info about the top-billed profiles in a guide.
+    """
+    featured_list = []
+    profile_page = profiles.Profiles(params[params['subtype']]['input page path'], params[params['subtype']]['input page id'], params)
+    profile_list = profile_page.getPageSectionData(level = params[params['subtype']]['profile toclevel'])
+    for profile in profile_list:
+#         print profile
+        text = profile_page.getPageText(profile['index'])
+        profile = profile_page.scrapeInfobox(profile, text)
+        if len(profile['summary']) > 1 and len(profile['image']) > 1:
+            profile['action'] = params[params['subtype']]['action']
+            profile['summary'] = tools.formatSummaries(profile['summary'])  
+            featured_list.append(profile)
+    shuffle(featured_list)
+    featured_list = featured_list[:params[params['subtype']]['number featured']]
+#     print featured_list        
+    return featured_list        
+    
 def prepOutput(featured_list):
-	first_subpage = params[params['subtype']]['first subpage']
-	number_featured = params[params['subtype']]['number featured']	
-	featured_list = tools.addDefaults(featured_list)       		
-	output = profiles.Profiles(params[params['subtype']]['output path'], settings = params) #stupid tocreate a new profile object here. and stupid to re-specify the path below
-	i = first_subpage
-	for f in featured_list:
-		if i <= first_subpage + (number_featured - 1):
-			f['profile'] = output.formatProfile(f)
-			f['profile'] = params['header template'] + '\n' + f['profile']
-			edit_summ = params['edit summary'] % (params['subtype'] + " " + params['type'])
-			output.publishProfile(f['profile'], params[params['subtype']]['output path'], edit_summ, sb_page = i)
-			i += 1
-		else:
-			break	
-			
-###MAIN
-param = output_settings.Params()
-params = param.getParams(sys.argv[1])
-params['type'] = sys.argv[1]
-params['subtype'] = sys.argv[2]
-tools = profiles.Toolkit()
-makeGallery()	
+    first_subpage = params[params['subtype']]['first subpage']
+    number_featured = params[params['subtype']]['number featured']  
+    featured_list = tools.addDefaults(featured_list)            
+    output = profiles.Profiles(params[params['subtype']]['output path'], settings = params) #stupid tocreate a new profile object here. and stupid to re-specify the path below
+    i = first_subpage
+    for f in featured_list:
+        if i <= first_subpage + (number_featured - 1):
+            f['profile'] = output.formatProfile(f)
+            f['profile'] = params['header template'] + '\n' + f['profile']
+            edit_summ = params['edit summary'] % (params['subtype'] + " " + params['type'])
+            output.publishProfile(f['profile'], params[params['subtype']]['output path'], edit_summ, sb_page = i)
+            i += 1
+        else:
+            break   
+            
+if __name__ == "__main__":
+    param = output_settings.Params()
+    params = param.getParams(sys.argv[1])
+    params['type'] = sys.argv[1]
+    params['subtype'] = sys.argv[2]
+    tools = profiles.Toolkit()
+    makeGallery()   

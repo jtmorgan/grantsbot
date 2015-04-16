@@ -218,9 +218,9 @@ class Params:
                         'profile toclevel' : 1,
                         'infobox params' : {
                             'summary' : '^\|\s*story\s*=',
-                            'name' : '^\|\s*name\s*=',
+                            'page path' : '^\|\s*link\s*=',
                             'image' : '^\|\s*image\s*=',
-                            'badge' : '^\|\s*badge\s*=',
+                            'time' : '^\|\s*timestamp\s*=',
                             },
                         },
                     },
