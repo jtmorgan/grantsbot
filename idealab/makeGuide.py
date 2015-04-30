@@ -38,20 +38,18 @@ def makeGuide():
     member_list.sort(key=operator.itemgetter('datetime'), reverse=True)
     if params['subtype'] == 'new':
         member_list = member_list[:5]
-    unique_list = tools.dedupeMemberList(member_list, "datetime", "page id")
-    #remove pages we don't want to display in the list, like Grants:IdeaLab/Preload
-    for u in unique_list:
-        if u['page path'] in params['ignored pages']:
-            #             print u['page path']
-            unique_list.remove(u)
-            #     print unique_list
-    prepOutput(unique_list)
+    prepOutput(member_list)
 
 def getMembers():
-    cat = params[params['subtype']]['category']
-    memcat = categories.Categories(cat, namespace = params['main namespace']) #not sure if namespace is optional in categories?
-    member_list = memcat.getCatMembers()
+    cats = params[params['subtype']]['categories']
+    member_list = []
+    for cat in cats:
+        memcat = categories.Categories(cat, namespace = params['main namespace']) #not sure if namespace is optional in categories?
+        cat_list = memcat.getCatMembers()
+        member_list.extend(cat_list)
+    member_list = tools.dedupeMemberList(member_list, 'timestamp', 'page id')   
     for member in member_list:
+#         print member['page path']
         member['title'] = tools.titleFromPath(member['page path'])
     return member_list
 
@@ -73,7 +71,10 @@ def getMemberData(member):
     member['created'] = revs[0]['timestamp']
     if params['formatted fields']:
         for field in params['formatted fields']: #do I need the 'if' above this line?
-          member[field] = tools.formatSummaries(member[field])
+            try:
+                member[field] = tools.formatSummaries(member[field])
+            except:    
+                pass
 #             print member[field]
     return member
 

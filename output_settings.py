@@ -31,9 +31,10 @@ class Params:
                     'main namespace' : 200,
                     'output path' : 'Grants:Learning_patterns/',
                     'ignored pages' : ['Grants:IdeaLab/Preload',], #more ignored pages for inspire?
+                    'formatted fields' : ['problem'],
                     'edit summary' : 'Updating %s',
                     'all' :        {
-                            'category' : 'Learning_patterns',
+                            'categories' : ['Learning_patterns',],
                             'subpage' : 'All',
                             'time value' : 'timestamp',
                             },
@@ -50,28 +51,33 @@ class Params:
                     'formatted fields' : ['summary',],
                     'edit summary' : 'Updating %s',
                     'participants' : {
-                            'category' : 'IdeaLab/Ideas/Participants',
+                            'categories' : ['IdeaLab/Ideas/Participants',],
                             'subpage' : 'Participants',
                             'time value' : 'timestamp',
                             },
                     'draft' :        {
-                            'category' : 'IEG/Proposals/Draft',
+                            'categories' : ['IEG/Proposals/Draft', 'IdeaLab/Ideas/Proposal',],
                             'subpage' : 'Ideas/Drafts',
                             'time value' : 'timestamp',
                             },
                     'new' : {
-                            'category' : 'IdeaLab/Ideas/IdeaLab',
+                            'categories' : ['IdeaLab/Ideas/IdeaLab','IdeaLab/Ideas/Inspire',],
                             'subpage' : 'Ideas/New',
                             'time value' : 'created',
                             },
                     'all' : {
-                            'category' : 'IdeaLab/Ideas/IdeaLab',
+                            'categories' : ['IdeaLab/Ideas/IdeaLab','IdeaLab/Ideas/Inspire',],
                             'subpage' : 'Ideas/All',
                             'time value' : 'timestamp',
                             },
                     'inspire-all' : {
-                            'category' : 'IdeaLab/Ideas/Inspire',
+                            'categories' : ['IdeaLab/Ideas/Inspire',],
                             'subpage' : 'Inspire/All',
+                            'time value' : 'timestamp',
+                            },
+                    'inspire-draft' : {
+                            'categories' : ['IdeaLab/Ideas/Proposal',],
+                            'subpage' : 'Inspire/Drafts',
                             'time value' : 'timestamp',
                             },
                     },
@@ -81,15 +87,20 @@ class Params:
                         'image' : '^\|\s*image\s*=',
                         'skills' : '^\|\s*skills\s*=',
                         },
-                    'header template' : """<noinclude>[[Category:IdeaLab]]</noinclude>""",
+                    'header template' : """<noinclude>
+[[Category:IdeaLab]]
+{| class="infobox" style="width: 120px;" 
+| colspan="2" | '''Can't find your profile?''' [[Grants:IdeaLab/Introductions/Archive|Check to archive]].
+|}
+</noinclude>""",
                     'main namespace' : 200,
                     'output path' : 'Grants:IdeaLab/',
                     'ignored pages' : ['Grants:IdeaLab/Preload',],
                     'formatted fields' : ['story', 'skills'],
                     'edit summary' : 'Updating %s',
                     'inspire-profiles' : {
-                            'category' : 'IdeaLab_members',
-                            'subpage' : 'Inspire/Profiles',
+                            'categories' : ['IdeaLab_members',],
+                            'subpage' : 'Introductions',
                             'time value' : 'created',
                             },
                     },
@@ -207,9 +218,9 @@ class Params:
                         'profile toclevel' : 1,
                         'infobox params' : {
                             'summary' : '^\|\s*story\s*=',
-                            'name' : '^\|\s*name\s*=',
+                            'page path' : '^\|\s*link\s*=',
                             'image' : '^\|\s*image\s*=',
-                            'badge' : '^\|\s*badge\s*=',
+                            'time' : '^\|\s*timestamp\s*=',
                             },
                         },
                     },
