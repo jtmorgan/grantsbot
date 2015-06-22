@@ -49,7 +49,6 @@ def getMembers():
         member_list.extend(cat_list)
     member_list = tools.dedupeMemberList(member_list, 'timestamp', 'page id')   
     for member in member_list:
-#         print member['page path']
         member['title'] = tools.titleFromPath(member['page path'])
     return member_list
 
@@ -75,7 +74,6 @@ def getMemberData(member):
                 member[field] = tools.formatSummaries(member[field])
             except:    
                 pass
-#             print member[field]
     return member
 
 def prepOutput(member_list):
@@ -87,11 +85,11 @@ def prepOutput(member_list):
     output.publishProfile(all_profiles, params['output path'], edit_summ, sb_page = params[params['subtype']]['subpage'])
 
 
-###MAIN###
-param = output_settings.Params()
-params = param.getParams(sys.argv[1])
-params['type'] = sys.argv[1]
-params['subtype'] = sys.argv[2]
-tools = profiles.Toolkit()
-makeGuide()
+if __name__ == "__main__":
+    param = output_settings.Params()
+    params = param.getParams(sys.argv[1])
+    params['type'] = sys.argv[1]
+    params['subtype'] = sys.argv[2]
+    tools = profiles.Toolkit()
+    makeGuide()
 

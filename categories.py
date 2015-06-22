@@ -35,7 +35,7 @@ class Categories:
 		if namespace:
 			self.mem_namespace = namespace
 		else:
-			self.mem_namespace = ""	
+			self.mem_namespace = ""
 		self.wiki = wikitools.Wiki(grantsbot_settings.apiurl)
 		self.wiki.login(grantsbot_settings.username, grantsbot_settings.password)
 
@@ -43,7 +43,7 @@ class Categories:
 		"""
 		Get the members of the specified category and their metadata.
 		Example: http://meta.wikimedia.org/w/api.php?action=query&list=categorymembers&cmtype=page&cmtitle=Category:IEG/Proposals/IdeaLab&cmnamespace=200&cmprop=title|timestamp|ids&cmsort=timestamp&cmdir=desc&format=jsonfm
-		...will return a dict like 
+		...will return a dict like
 		{'page id' : someid, 'page path' : 'somepath', 'datetime added' : 'sometimestamp'}
 		"""
 		if self.mem_type == 'page':
@@ -55,7 +55,8 @@ class Categories:
 			'cmnamespace' : self.mem_namespace,
 			'cmprop' : 'title|timestamp|ids',
 			'cmsort' : 'timestamp',
-			'cmdir' : 'desc'
+			'cmdir' : 'desc',
+			'rawcontinue' : '1',
 			}
 			req = wikitools.APIRequest(self.wiki, query_params)
 			response = req.query()
@@ -63,19 +64,20 @@ class Categories:
 			for mem in mem_list:
 				mem = self.getPageMetaData(mem)
 			return mem_list
-		else: 
+		else:
 			print "not set up to get " + self.mem_type + " category members yet"
 
 	def getPageMetaData(self, mempage): #Need to make this a call to profiles.py.
 		"""
-		Gets some additional metadata about each page. 
-		Currently just the local talkpage id or subjectid and the full url. 
+		Gets some additional metadata about each page.
+		Currently just the local talkpage id or subjectid and the full url.
 		"""
 		params = {
 			'action': 'query',
 			'titles': mempage['page path'],
 			'prop': 'info',
-			'inprop' : 'talkid|subjectid|url'
+			'inprop' : 'talkid|subjectid|url',
+			'rawcontinue' : '1',
 		}
 		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()

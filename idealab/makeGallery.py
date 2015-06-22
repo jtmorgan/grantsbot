@@ -50,7 +50,6 @@ def getFeaturedProfiles():
             featured_list.append(profile)
     shuffle(featured_list)
     featured_list = featured_list[:params[params['subtype']]['number featured']]
-#     print featured_list        
     return featured_list        
     
 def prepOutput(featured_list):

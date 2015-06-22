@@ -67,7 +67,7 @@ class Profiles:
 	def getPageText(self, section = False):
 		"""
 		Gets the raw text of a page or page section.
-		Sample: http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&titles=Grants:Learning_patterns/Repeat_events&rvprop=content&rvsection=0&format=jsonfm
+		Sample: http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&titles=Grants:Learning_patterns/Repeat_events&rvprop=content&rvsection=0&format=jsonfm&rawcontinue=1
 		"""
 		params = {
 			'action': 'query',
@@ -75,6 +75,7 @@ class Profiles:
 			'titles': self.page_path,
 			'rvprop' : 'content',
 			'rvsection' : '',
+			'rawcontinue' : '1',
 		}
 		if section:
 			params['rvsection'] = section
@@ -90,7 +91,7 @@ class Profiles:
 	def getPageEditInfo(self, sort_dir="older", page = False, rvstart = False, rvend = False): #should just be 'getPageRecentRevs'
 		"""
 		Returns a list of values for revision properties you specify. Can use the page id associated with the current profiles object, or another one specified through the page arg.
-		Example: http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&rvdir=newer&rvstart=20130601000000&rvprop=comment|ids|timestamp|user|userid&rvlimit=50&format=jsonfm
+		Example: http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&rvdir=newer&rvstart=20130601000000&rvprop=comment|ids|timestamp|user|userid&rvlimit=50&format=jsonfm&rawcontinue=1
 		"""
 		if page:
 			page_id = page
@@ -104,6 +105,7 @@ class Profiles:
 				'rvprop' : 'comment|ids|timestamp|user|userid',
 				'rvlimit' : 'max',
 				'rvdir' : sort_dir,
+    			'rawcontinue' : '1',
 					}
 		if rvstart:
 			params['rvstart'] = rvstart
@@ -121,13 +123,14 @@ class Profiles:
 		"""
 		Get edits by a user in a given namespace within the past month
 		(or whatever range recentchanges is set to on your wiki).
-		Sample: http://meta.wikimedia.org/w/api.php?action=query&list=recentchanges&rcnamespace=200&rcuser=Jmorgan_(WMF)&rclimit=500&format=jsonfm
+		Sample: http://meta.wikimedia.org/w/api.php?action=query&list=recentchanges&rcnamespace=200&rcuser=Jmorgan_(WMF)&rclimit=500&format=jsonfm&rawcontinue=1
 		"""
 		params = {
 				'action': 'query',
 				'list': 'recentchanges',
 				'rcuser': user_name,
 				'rcnamespace': edit_namespace,
+    			'rawcontinue' : '1',
 		}
 		req = wikitools.APIRequest(self.wiki, params)
 		response = req.query()
@@ -137,7 +140,7 @@ class Profiles:
 	def getRecentIntros(self, rvend): #should generalize this a bit, like getPageEditInfo
 		"""
 		Gets recent profiles added to a page. Example:
-http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&rvdir=older&rvend=20131001000000&rvprop=comment|ids|timestamp|user|userid&rvlimit=50&format=jsonfm
+http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&rvdir=older&rvend=20131001000000&rvprop=comment|ids|timestamp|user|userid&rvlimit=50&format=jsonfm&rawcontinue=1
 		"""
 		params = {
 				'action': 'query',
@@ -147,6 +150,7 @@ http://meta.wikimedia.org/w/api.php?action=query&prop=revisions&pageids=2101758&
 				'rvend' : rvend,
 				'rvlimit' : 100, #arbitrarily high
 				'rvdir' : 'older',
+    			'rawcontinue' : '1',
 					}
 		intro_list = []
 		suffix = "new section"
