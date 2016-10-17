@@ -1,5 +1,6 @@
 # configuration files
 grantsbot_settings.*
+*cnf*
 # compiled modules
 *.pyc
 # subdirectories
