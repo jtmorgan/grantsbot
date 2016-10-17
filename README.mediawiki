@@ -1,1 +1,1 @@
-This is the dev branch!
+A bot that makes edits in the Grants: namespace on meta.wikimedia.org
