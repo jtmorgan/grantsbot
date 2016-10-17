@@ -103,7 +103,7 @@ def getMemberData(member):
 
 def prepOutput(short_member_list):
 	output = profiles.Profiles(params['output path'], settings = params) #stupid tocreate a new profile object here.
-	print(output)
+# 	print(output)
 	for m in short_member_list: #inconsistent. i do this earlier in eval_portal
 		m['profile'] = output.formatProfile(m) #will this work here?		
 	all_profiles = params['header template'] + '\n'.join(m['profile'] for m in short_member_list)

@@ -23,7 +23,7 @@ report_title = grantsbot_settings.rootpage + 'IdeaLab/Inspire/Leaderboard'
 
 report_template = u'''==Endorsed ideas==
 <!-- PLEASE DO NOT MAKE MANUAL CHANGES TO THIS SECTION OF THE PAGE. They will be overwritten next time the bot runs -->
-This list is updated daily at approximately 1600 UTC. It  was last updated on {{subst:REVISIONMONTH}}/{{subst:REVISIONDAY}}/{{subst:REVISIONYEAR}} by [[User:{{subst:REVISIONUSER}}]].
+This list is updated hourly. It  was last updated on {{subst:REVISIONMONTH}}/{{subst:REVISIONDAY}}/{{subst:REVISIONYEAR}} by [[User:{{subst:REVISIONUSER}}]]. Manual changes to this list will be overwritten the next time the bot runs.
 
 {| class="wikitable sortable"
 | align="center" style="background:#f0f0f0; font-weight:bold;"|idea
@@ -60,7 +60,7 @@ JOIN metawiki_p.categorylinks AS cl
 ON p.page_id = cl.cl_from 
 JOIN metawiki_p.revision AS r
 ON p.page_id = r.rev_page
-WHERE cl.cl_to ="IdeaLab/Ideas/Inspire"
+WHERE cl.cl_to ="IdeaLab/Ideas/Inspire/Addressing_harassment"
 AND cl.cl_type = "page"
 AND p.page_namespace = 200
 AND p.page_title LIKE "IdeaLab/%"

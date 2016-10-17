@@ -71,7 +71,7 @@ class Params:
                             'time value' : 'timestamp',
                             },
                     'inspire-all' : {
-                            'categories' : ['IdeaLab/Ideas/Inspire',],
+                            'categories' : ['IdeaLab/Ideas/Inspire/Addressing_harassment',],
                             'subpage' : 'Inspire/All',
                             'time value' : 'timestamp',
                             },
@@ -145,18 +145,7 @@ class Params:
                     'activity' : {
                         'new idea' : {
                             'action' : 1,
-                            'category' : 'IdeaLab/Ideas/Inspire',
-                            },
-                        'ieg' : {
-                            'action' : 4,
-                            'category' : 'IEG/Proposals/Draft',
-                            },
-                        'participants wanted' : {
-                            'action' : 3,
-                            'category' : 'IdeaLab/Ideas/Participants',
-                            },
-                        'joined' : {
-                            'action' : 5,
+                            'category' : 'IdeaLab/Ideas/Inspire/Addressing_harassment',
                             },
                         },
                     },
@@ -193,21 +182,6 @@ class Params:
                             'time' : '^\|\s*time\s*=',
                             },
                         },
-#                     'ieg_draft' : {
-#                         'output path' : 'Grants:IdeaLab/Ideas/Featured/',
-#                         'action' : 4,
-#                         'input page path' : 'Grants:IdeaLab/Ideas/Drafts',
-#                         'input page id' : 2294500,
-#                         'first subpage' : 5,
-#                         'number featured' : 2,
-#                         'profile toclevel' : 1,
-#                         'infobox params' : {
-#                             'summary' : '^\|\s*summary\s*=',
-#                             'image' : '^\|\s*image\s*=',
-#                             'page path' : '^\|\s*idea link\s*=',
-#                             'time' : '^\|\s*time\s*=',
-#                             },
-#                         },
                     'intro' : {
                         'output path' : 'Grants:IdeaLab/Introductions/Featured/',
                         'action' : 5,
