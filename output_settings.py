@@ -76,7 +76,7 @@ class Params:
                             'time value' : 'timestamp',
                             },
                     'inspire-draft' : {
-                            'categories' : ['IdeaLab/Ideas/Proposal',],
+                        'categories' : ['Project/Proposals/Draft', 'Rapid/Proposals/Draft', 'IdeaLab/Ideas/Proposal',],
                             'subpage' : 'Inspire/Drafts',
                             'time value' : 'timestamp',
                             },

@@ -40,13 +40,35 @@ def makeGuide():
         member_list = member_list[:5]
     prepOutput(member_list)
 
+def multicat(catlist1, catlist2):
+    catlist3 = []
+    for x in catlist1:
+        for y in catlist2:
+            if x['page path'] in y.values():
+                catlist3.append(x)  
+    return catlist3
+        
 def getMembers():
     cats = params[params['subtype']]['categories']
     member_list = []
-    for cat in cats:
-        memcat = categories.Categories(cat, namespace = params['main namespace']) #not sure if namespace is optional in categories?
-        cat_list = memcat.getCatMembers()
-        member_list.extend(cat_list)
+    if (params['type'] == 'idealab_guide' and params['subtype'] == 'inspire-draft'):
+#         print("you're running the 'if' statement")
+        proj_draft_cat = categories.Categories('Project/Proposals/Draft', namespace = params['main namespace'])
+        proj_cat_list = proj_draft_cat.getCatMembers() #gets all members of project/proposals/draft
+#         print(proj_cat_list)
+        rapid_draft_cat = categories.Categories('Rapid/Proposals/Draft', namespace = params['main namespace'])
+        rapid_cat_list = rapid_draft_cat.getCatMembers() #gets all members of rapid/proposals/draft
+#         print(rapid_cat_list)        
+        inspire_draft_cat = categories.Categories('IdeaLab/Ideas/Inspire/Knowledge_networks', namespace = params['main namespace'])
+        inspire_cat_list = inspire_draft_cat.getCatMembers() #gets all inspire ideas for the current campaign
+#         print(inspire_cat_list)        
+        member_list.extend(multicat(rapid_cat_list, inspire_cat_list))
+        member_list.extend(multicat(proj_cat_list, inspire_cat_list))        
+    else:   
+        for cat in cats:
+            memcat = categories.Categories(cat, namespace = params['main namespace']) #not sure if namespace is optional in categories?
+            cat_list = memcat.getCatMembers()
+            member_list.extend(cat_list)
     member_list = tools.dedupeMemberList(member_list, 'timestamp', 'page id')   
     for member in member_list:
         member['title'] = tools.titleFromPath(member['page path'])
