@@ -60,7 +60,7 @@ JOIN metawiki_p.categorylinks AS cl
 ON p.page_id = cl.cl_from 
 JOIN metawiki_p.revision AS r
 ON p.page_id = r.rev_page
-WHERE cl.cl_to ="IdeaLab/Ideas/Inspire/Addressing_harassment"
+WHERE cl.cl_to ="IdeaLab/Ideas/Inspire/Knowledge_networks"
 AND cl.cl_type = "page"
 AND p.page_namespace = 200
 AND p.page_title LIKE "IdeaLab/%"

@@ -71,7 +71,7 @@ class Params:
                             'time value' : 'timestamp',
                             },
                     'inspire-all' : {
-                            'categories' : ['IdeaLab/Ideas/Inspire/Addressing_harassment',],
+                            'categories' : ['IdeaLab/Ideas/Inspire/Knowledge_networks',],
                             'subpage' : 'Inspire/All',
                             'time value' : 'timestamp',
                             },
@@ -145,7 +145,7 @@ class Params:
                     'activity' : {
                         'new idea' : {
                             'action' : 1,
-                            'category' : 'IdeaLab/Ideas/Inspire/Addressing_harassment',
+                            'category' : 'IdeaLab/Ideas/Inspire/Knowledge_networks',
                             },
                         },
                     },
