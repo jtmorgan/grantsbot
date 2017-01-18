@@ -56,7 +56,7 @@ class Params:
                             'time value' : 'timestamp',
                             },
                     'draft' :        {
-                            'categories' : ['IEG/Proposals/Draft', 'IdeaLab/Ideas/Proposal',],
+                            'categories' : ['Project/Proposals/Draft', 'Rapid/Proposals/Draft', 'IdeaLab/Ideas/Proposal',],
                             'subpage' : 'Ideas/Drafts',
                             'time value' : 'timestamp',
                             },
@@ -71,7 +71,7 @@ class Params:
                             'time value' : 'timestamp',
                             },
                     'inspire-all' : {
-                            'categories' : ['IdeaLab/Ideas/Inspire/Addressing_harassment',],
+                            'categories' : ['IdeaLab/Ideas/Inspire/Knowledge_networks',],
                             'subpage' : 'Inspire/All',
                             'time value' : 'timestamp',
                             },
