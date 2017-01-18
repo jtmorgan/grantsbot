@@ -48,7 +48,7 @@ def get_new_participant_count(site):
 def get_page_ids(site):
     """Get a list of strings containing the pageids of all members of
     Category:IdeaLab/Ideas/Inspire and Category:Inspire campaign."""
-    categories = ['Category:IdeaLab', 'Category:IdeaLab/Ideas/Inspire/Addressing_harassment', 'Category:Inspire_campaign']
+    categories = ['Category:IdeaLab', 'Category:IdeaLab/Ideas/Inspire/Knowledge_networks', 'Category:Inspire_campaign']
     pageids = []
     for category in categories:
         kwargs = {'action': 'query',
@@ -66,7 +66,7 @@ def get_participants(page_ids, site):
     since 31May2016."""
     contributors = []
     for page_id in page_ids:
-        response = site.api(action='query', prop='revisions', rvstart='2016-05-31T00:00:00Z', rvlimit='max', pageids=page_id, rvprop='userid', rvdir='newer')
+        response = site.api(action='query', prop='revisions', rvstart='2016-01-31T00:00:00Z', rvlimit='max', pageids=page_id, rvprop='userid', rvdir='newer')
         revisions = response['query']['pages'][page_id].get('revisions')
         if revisions:
             for revision in revisions:
