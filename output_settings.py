@@ -56,7 +56,7 @@ class Params:
                             'time value' : 'timestamp',
                             },
                     'draft' :        {
-                            'categories' : ['IEG/Proposals/Draft', 'IdeaLab/Ideas/Proposal',],
+                            'categories' : ['Project/Proposals/Draft', 'Rapid/Proposals/Draft', 'IdeaLab/Ideas/Proposal',],
                             'subpage' : 'Ideas/Drafts',
                             'time value' : 'timestamp',
                             },
