@@ -48,6 +48,18 @@ def makeFeed():
 			recently_active.remove(r)
 	recently_active = recently_active[:6]						
 	prepOutput(recently_active)				
+
+def inspire_drafts_only(cat_mems_list):
+    #not yet working, these are lists of dicts with the page title in the 'page path' key
+    print(cat_mems_list)
+    inspire_draft_cat = categories.Categories('IdeaLab/Ideas/Inspire/Knowledge_networks', namespace = params['main namespace'])
+    inspire_cat_list = inspire_draft_cat.getCatMembers() #gets all inspire ideas for the current campaign
+    print(inspire_cat_list)
+    for m in cat_mems_list:
+        new_mems_list = [m for m in cat_mems_list if m['page path'] in [v for k,v in inspire_cat_list.iteritems()]]
+    print(new_mems_list)
+    return new_mems_list
+
 	
 def getMembers():
 	all_member_list = []
@@ -71,7 +83,8 @@ def getMembers():
 		else:
 			cat = v['category'] 
 			memcat = categories.Categories(cat, namespace = params['main namespace'])
-			members = memcat.getCatMembers()						
+			members = memcat.getCatMembers()
+# 			members = inspire_drafts_only(members)						
 		for mem in members:
 			mem['event type'] = event_type
 			mem['action'] = params['activity'][event_type]['action']				

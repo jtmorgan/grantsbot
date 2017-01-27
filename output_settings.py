@@ -119,9 +119,9 @@ class Params:
                             'action' : 1,
                             'category' : 'IdeaLab/Ideas/Active',
                             },
-                        'ieg' : {
+                        'project_draft' : {
                             'action' : 4,
-                            'category' : 'IEG/Proposals/Draft',
+                            'category' : 'Project/Proposals/Draft',
                             },
                         'participants wanted' : {
                             'action' : 3,
@@ -147,6 +147,14 @@ class Params:
                             'action' : 1,
                             'category' : 'IdeaLab/Ideas/Inspire/Knowledge_networks',
                             },
+#                         'project draft' : {
+#                             'action' : 4,
+#                             'category' : 'Project/Proposals/Draft',
+#                             },
+#                         'rapid draft' : {
+#                             'action' : 6,
+#                             'category' : 'Rapid/Proposals/Draft',
+#                             },                                                          
                         },
                     },
             'idealab_gallery' : {
