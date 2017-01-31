@@ -95,7 +95,7 @@ def get_inspire_idea_count(site):
     correct for the three that are templates, not ideas."""
     response = site.api(action='query',
                         prop='categoryinfo',
-                        titles='Category:IdeaLab/Ideas/Inspire/Addressing_harassment')
+                        titles='Category:IdeaLab/Ideas/Inspire/Knowledge_networks')
     page_count = parse_idea_count_response(response)
 
     # don't count probox, etc
@@ -112,7 +112,7 @@ def parse_idea_count_response(response):
 def calculate_days_left():
     """Calculate the number of days until June 30, 2016. If the date
     has passed, return 0."""
-    ending_date = datetime.date(2016, 07, 01)
+    ending_date = datetime.date(2017, 03, 01)
     days_left = (ending_date - datetime.date.today()).days
     if days_left >= 0:
         return days_left
