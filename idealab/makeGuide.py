@@ -53,10 +53,10 @@ def getMembers():
     member_list = []
     if (params['type'] == 'idealab_guide' and params['subtype'] == 'inspire-draft'):
 #         print("you're running the 'if' statement")
-        proj_draft_cat = categories.Categories('Project/Proposals/Draft', namespace = params['main namespace'])
+        proj_draft_cat = categories.Categories('Project/Proposals/IdeaLab', namespace = params['main namespace'])
         proj_cat_list = proj_draft_cat.getCatMembers() #gets all members of project/proposals/draft
 #         print(proj_cat_list)
-        rapid_draft_cat = categories.Categories('Rapid/Proposals/Draft', namespace = params['main namespace'])
+        rapid_draft_cat = categories.Categories('Rapid/Proposals/IdeaLab', namespace = params['main namespace'])
         rapid_cat_list = rapid_draft_cat.getCatMembers() #gets all members of rapid/proposals/draft
 #         print(rapid_cat_list)        
         inspire_draft_cat = categories.Categories('IdeaLab/Ideas/Inspire/Knowledge_networks', namespace = params['main namespace'])
