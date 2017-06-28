@@ -29,8 +29,8 @@ def makeGuide():
     """
     Make lists of profiles for resources in a portal.
     """
-    member_list = getMembers()
-    member_list = tools.excludeSubpages(member_list, 'page path', depth=2) #excluding translated subpages
+    member_list = getMembers()  
+    member_list = tools.excludeSubpages(member_list, 'page path') #excluding translated subpages
     for member in member_list:
         member = getMemberData(member)
     member_list = tools.setTimeValues(member_list, val = params[params['subtype']]['time value'])
@@ -38,7 +38,9 @@ def makeGuide():
     member_list.sort(key=operator.itemgetter('datetime'), reverse=True)
     if params['subtype'] == 'new':
         member_list = member_list[:5]
-    prepOutput(member_list)
+    for m in member_list:
+        print(m['page path'])
+#     prepOutput(member_list)
 
 def multicat(catlist1, catlist2):
     catlist3 = []
@@ -49,19 +51,16 @@ def multicat(catlist1, catlist2):
     return catlist3
         
 def getMembers():
+    #NOTE: for learning patterns, retriveing stuff outside main ns as pages. not sure why.
     cats = params[params['subtype']]['categories']
     member_list = []
     if (params['type'] == 'idealab_guide' and params['subtype'] == 'inspire-draft'):
-#         print("you're running the 'if' statement")
         proj_draft_cat = categories.Categories('Project/Proposals/IdeaLab', namespace = params['main namespace'])
         proj_cat_list = proj_draft_cat.getCatMembers() #gets all members of project/proposals/draft
-#         print(proj_cat_list)
         rapid_draft_cat = categories.Categories('Rapid/Proposals/IdeaLab', namespace = params['main namespace'])
         rapid_cat_list = rapid_draft_cat.getCatMembers() #gets all members of rapid/proposals/draft
-#         print(rapid_cat_list)        
         inspire_draft_cat = categories.Categories('IdeaLab/Ideas/Inspire/Knowledge_networks', namespace = params['main namespace'])
         inspire_cat_list = inspire_draft_cat.getCatMembers() #gets all inspire ideas for the current campaign
-#         print(inspire_cat_list)        
         member_list.extend(multicat(rapid_cat_list, inspire_cat_list))
         member_list.extend(multicat(proj_cat_list, inspire_cat_list))        
     else:   
@@ -69,11 +68,20 @@ def getMembers():
             memcat = categories.Categories(cat, namespace = params['main namespace']) #not sure if namespace is optional in categories?
             cat_list = memcat.getCatMembers()
             member_list.extend(cat_list)
+#     print(member_list)
     member_list = tools.dedupeMemberList(member_list, 'timestamp', 'page id')   
+    if params['type'] == 'pattern_guide':
+        member_list = learningPatternsHack(member_list)
     for member in member_list:
         member['title'] = tools.titleFromPath(member['page path'])
+#                 print(member['page path'])
     return member_list
 
+def learningPatternsHack(member_list):
+    #a hack to prune the LP list
+    #not using 'ignored pages' because there are a lot of pages to ignore
+    return [m for m in member_list if m['page path'].startswith('Learning patterns')]
+    
 def getMemberData(member):
     profile = profiles.Profiles(member['page path'], id=member['page id'], settings = params)
     infobox = profile.getPageText(0) #zero is the top section

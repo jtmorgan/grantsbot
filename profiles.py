@@ -335,7 +335,7 @@ class Toolkit:
 		else:
 			return date_two
 
-	def queryDB(self, query_type):
+	def queryDB(self, query_type):#do I even use this anymore?
 		"""
 		MySQL queries for the evaluation portal.
 		"""

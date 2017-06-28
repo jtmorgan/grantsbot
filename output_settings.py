@@ -28,9 +28,9 @@ class Params:
                         'image' : '^\|\s*image\s*=',
                         },
                     'header template' : """<noinclude>[[Category:Learning_Pattern_Library]] {{mbox|text='''The list on this page is transcluded and updated daily by [[User:GrantsBot|GrantsBot]].''' Please make any edits to the actual pages listed, not here at the transclusion. If you have a question, or see an error that needs to be fixed, please post to the [[Grants_talk:Learning_patterns|Library talk page]]. You may also contact [[User:Jmorgan (WMF)|GrantsBot's maintainer]] directly.}}</noinclude>""",
-                    'main namespace' : 200,
-                    'output path' : 'Grants:Learning_patterns/',
-                    'ignored pages' : ['Grants:IdeaLab/Preload',], #more ignored pages for inspire?
+                    'main namespace' : 0,
+                    'output path' : 'Learning_patterns/',
+                    'ignored pages' : [u'Sandbox:KHarold (WMF)/Education Toolkit/',u'KHarold (WMF) Sandbox/Education Toolkit/Dealing with Challenges',u'KHarold (WMF) Sandbox/Education Toolkit/Dealing with Challenges/Connectivity',],#had to make this a unicode string as a hack; should use unicode by default instead
                     'formatted fields' : ['problem'],
                     'edit summary' : 'Updating %s',
                     'all' :        {
