@@ -35,7 +35,7 @@ class Categories:
 		if namespace:
 			self.mem_namespace = namespace
 		else:
-			self.mem_namespace = ""
+			self.mem_namespace = '0'#does this need to be a string?
 		self.wiki = wikitools.Wiki(grantsbot_settings.apiurl)
 		self.wiki.login(grantsbot_settings.username, grantsbot_settings.password)
 

@@ -359,7 +359,7 @@ class Toolkit:
 		  else:
 			 print '\t' * (indent+1) + str(value)
 
-	def excludeSubpages(self, mem_list, path_key, depth=1, skip_list=False):
+	def excludeSubpages(self, mem_list, path_key, depth=2, skip_list=False):
 		"""
 		Takes a list of dictionaries that contains data about a bunch of wiki-pages,
 		including the page path. Removes dicts from the list
