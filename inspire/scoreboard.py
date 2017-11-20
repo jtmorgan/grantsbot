@@ -48,7 +48,7 @@ def get_new_participant_count(site):
 def get_page_ids(site):
     """Get a list of strings containing the pageids of all members of
     Category:IdeaLab/Ideas/Inspire and Category:Inspire campaign."""
-    categories = ['Category:IdeaLab', 'Category:IdeaLab/Ideas/Inspire/Knowledge_networks', 'Category:Inspire_campaign']
+    categories = ['Category:IdeaLab', 'Category:IdeaLab/Ideas/Inspire/New_readers', 'Category:Inspire_campaign']
     pageids = []
     for category in categories:
         kwargs = {'action': 'query',
@@ -95,7 +95,7 @@ def get_inspire_idea_count(site):
     correct for the three that are templates, not ideas."""
     response = site.api(action='query',
                         prop='categoryinfo',
-                        titles='Category:IdeaLab/Ideas/Inspire/Knowledge_networks')
+                        titles='Category:IdeaLab/Ideas/Inspire/New_readers')
     page_count = parse_idea_count_response(response)
 
     # don't count probox, etc
