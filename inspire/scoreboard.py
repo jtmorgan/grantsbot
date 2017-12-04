@@ -95,7 +95,7 @@ def get_inspire_idea_count(site):
     correct for the three that are templates, not ideas."""
     response = site.api(action='query',
                         prop='categoryinfo',
-                        titles='Category:IdeaLab/Ideas/Inspire/New_readers')
+                        titles='Category:IdeaLab/Ideas/Inspire/Knowledge_networks')
     page_count = parse_idea_count_response(response)
 
     # don't count probox, etc
