@@ -52,7 +52,7 @@ def makeFeed():
 def inspire_drafts_only(cat_mems_list):
     #not yet working, these are lists of dicts with the page title in the 'page path' key
     print(cat_mems_list)
-    inspire_draft_cat = categories.Categories('IdeaLab/Ideas/Inspire/Knowledge_networks', namespace = params['main namespace'])
+    inspire_draft_cat = categories.Categories('IdeaLab/Ideas/Inspire/New_readers', namespace = params['main namespace'])
     inspire_cat_list = inspire_draft_cat.getCatMembers() #gets all inspire ideas for the current campaign
     print(inspire_cat_list)
     for m in cat_mems_list:

@@ -55,7 +55,7 @@ def getMembers():
         proj_cat_list = proj_draft_cat.getCatMembers() #gets all members of project/proposals/draft
         rapid_draft_cat = categories.Categories('Rapid/Proposals/IdeaLab', namespace = params['main namespace'])
         rapid_cat_list = rapid_draft_cat.getCatMembers() #gets all members of rapid/proposals/draft
-        inspire_draft_cat = categories.Categories('IdeaLab/Ideas/Inspire/Knowledge_networks', namespace = params['main namespace'])
+        inspire_draft_cat = categories.Categories('IdeaLab/Ideas/Inspire/New_readers', namespace = params['main namespace'])
         inspire_cat_list = inspire_draft_cat.getCatMembers() #gets all inspire ideas for the current campaign
         member_list.extend(multicat(rapid_cat_list, inspire_cat_list))
         member_list.extend(multicat(proj_cat_list, inspire_cat_list))
