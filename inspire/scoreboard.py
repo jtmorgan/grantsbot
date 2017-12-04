@@ -48,7 +48,7 @@ def get_new_participant_count(site):
 def get_page_ids(site):
     """Get a list of strings containing the pageids of all members of
     Category:IdeaLab/Ideas/Inspire and Category:Inspire campaign."""
-    categories = ['Category:IdeaLab', 'Category:IdeaLab/Ideas/Inspire/Knowledge_networks', 'Category:Inspire_campaign']
+    categories = ['Category:IdeaLab', 'Category:IdeaLab/Ideas/Inspire/New_readers', 'Category:Inspire_campaign']
     pageids = []
     for category in categories:
         kwargs = {'action': 'query',
