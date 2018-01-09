@@ -71,7 +71,7 @@ class Params:
                             'time value' : 'timestamp',
                             },
                     'inspire-all' : {
-                            'categories' : ['IdeaLab/Ideas/Inspire/Knowledge_networks',],
+                            'categories' : ['IdeaLab/Ideas/Inspire/New_readers',],
                             'subpage' : 'Inspire/All',
                             'time value' : 'timestamp',
                             },
