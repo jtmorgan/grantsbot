@@ -48,7 +48,7 @@ def get_new_participant_count(site):
 def get_page_ids(site):
     """Get a list of strings containing the pageids of all members of
     Category:IdeaLab/Ideas/Inspire and Category:Inspire campaign."""
-    categories = ['Category:IdeaLab', 'Category:IdeaLab/Ideas/Inspire/New_readers', 'Category:Inspire_campaign']
+    categories = ['Category:IdeaLab', 'Category:IdeaLab/Ideas/Inspire/Measuring_community_health', 'Category:Inspire_campaign']
     pageids = []
     for category in categories:
         kwargs = {'action': 'query',
@@ -63,10 +63,10 @@ def get_page_ids(site):
 
 def get_participants(page_ids, site):
     """Given a list of pageids, get the people who have edited them
-    since 07 January 2018."""
+    since 09 July 2018."""
     contributors = []
     for page_id in page_ids:
-        response = site.api(action='query', prop='revisions', rvstart='2018-01-09T00:00:00Z', rvlimit='max', pageids=page_id, rvprop='userid', rvdir='newer')
+        response = site.api(action='query', prop='revisions', rvstart='2018-07-08T00:00:00Z', rvlimit='max', pageids=page_id, rvprop='userid', rvdir='newer')
         revisions = response['query']['pages'][page_id].get('revisions')
         if revisions:
             for revision in revisions:
@@ -95,7 +95,7 @@ def get_inspire_idea_count(site):
     correct for the three that are templates, not ideas."""
     response = site.api(action='query',
                         prop='categoryinfo',
-                        titles='Category:IdeaLab/Ideas/Inspire/New_readers')
+                        titles='Category:IdeaLab/Ideas/Inspire/Measuring_community_health')
     page_count = parse_idea_count_response(response)
 
     # don't count probox, etc
@@ -110,9 +110,9 @@ def parse_idea_count_response(response):
 
 
 def calculate_days_left():
-    """Calculate the number of days until Feb 09, 2018. If the date
+    """Calculate the number of days until August 09, 2018. If the date
     has passed, return 0."""
-    ending_date = datetime.date(2018, 02, 09)
+    ending_date = datetime.date(2018, 08, 09)
     days_left = (ending_date - datetime.date.today()).days
     if days_left >= 0:
         return days_left
