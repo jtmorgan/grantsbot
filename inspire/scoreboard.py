@@ -66,7 +66,7 @@ def get_participants(page_ids, site):
     since 09 July 2018."""
     contributors = []
     for page_id in page_ids:
-        response = site.api(action='query', prop='revisions', rvstart='2018-7-8T00:00:00Z', rvlimit='max', pageids=page_id, rvprop='userid', rvdir='newer')
+        response = site.api(action='query', prop='revisions', rvstart='2018-07-01T00:00:00Z', rvlimit='max', pageids=page_id, rvprop='userid', rvdir='newer')
         revisions = response['query']['pages'][page_id].get('revisions')
         if revisions:
             for revision in revisions:
