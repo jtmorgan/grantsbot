@@ -63,7 +63,7 @@ def get_page_ids(site):
 
 def get_participants(page_ids, site):
     """Given a list of pageids, get the people who have edited them
-    since 06 January 2018."""
+    since 1 July 2018."""
     contributors = []
     for page_id in page_ids:
         response = site.api(action='query', prop='revisions', rvstart='2018-07-01T00:00:00Z', rvlimit='max', pageids=page_id, rvprop='userid', rvdir='newer')
@@ -95,7 +95,7 @@ def get_inspire_idea_count(site):
     correct for the three that are templates, not ideas."""
     response = site.api(action='query',
                         prop='categoryinfo',
-                        titles='Category:IdeaLab/Ideas/Inspire/New_readers')
+                        titles='Category:IdeaLab/Ideas/Inspire/Measuring_community_health')
     page_count = parse_idea_count_response(response)
 
     # don't count probox, etc

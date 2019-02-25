@@ -19,7 +19,7 @@ import MySQLdb
 import grantsbot_settings
 import wikitools
 
-report_title = grantsbot_settings.rootpage + 'IdeaLab/Inspire/Leaderboard'
+report_title = 'Grants:IdeaLab/Inspire/Leaderboard'
 
 report_template = u'''==Endorsed ideas==
 <!-- PLEASE DO NOT MAKE MANUAL CHANGES TO THIS SECTION OF THE PAGE. They will be overwritten next time the bot runs -->
@@ -60,7 +60,7 @@ JOIN metawiki_p.categorylinks AS cl
 ON p.page_id = cl.cl_from 
 JOIN metawiki_p.revision AS r
 ON p.page_id = r.rev_page
-WHERE cl.cl_to ="IdeaLab/Ideas/Inspire/New_readers"
+WHERE cl.cl_to ="IdeaLab/Ideas/Inspire/Measuring_community_health"
 AND cl.cl_type = "page"
 AND p.page_namespace = 200
 AND p.page_title LIKE "IdeaLab/%"

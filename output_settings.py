@@ -71,7 +71,7 @@ class Params:
                             'time value' : 'timestamp',
                             },
                     'inspire-all' : {
-                            'categories' : ['IdeaLab/Ideas/Inspire/New_readers',],
+                            'categories' : ['IdeaLab/Ideas/Inspire/Measuring_community_health',],
                             'subpage' : 'Inspire/All',
                             'time value' : 'timestamp',
                             },
@@ -145,7 +145,7 @@ class Params:
                     'activity' : {
                         'new idea' : {
                             'action' : 1,
-                            'category' : 'IdeaLab/Ideas/Inspire/Knowledge_networks',
+                            'category' : 'IdeaLab/Ideas/Inspire/Measuring_community_health',
                             },
 #                         'project draft' : {
 #                             'action' : 4,
