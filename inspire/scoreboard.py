@@ -63,7 +63,7 @@ def get_page_ids(site):
 
 def get_participants(page_ids, site):
     """Given a list of pageids, get the people who have edited them
-    since 1 July 2018."""
+    since 09 July 2018."""
     contributors = []
     for page_id in page_ids:
         response = site.api(action='query', prop='revisions', rvstart='2018-07-01T00:00:00Z', rvlimit='max', pageids=page_id, rvprop='userid', rvdir='newer')
@@ -110,7 +110,7 @@ def parse_idea_count_response(response):
 
 
 def calculate_days_left():
-    """Calculate the number of days until Aug 09, 2018. If the date
+    """Calculate the number of days until August 09, 2018. If the date
     has passed, return 0."""
     ending_date = datetime.date(2018, 8, 9)
     days_left = (ending_date - datetime.date.today()).days
